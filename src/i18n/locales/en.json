@@ -1,0 +1,28 @@
+{
+  "appName": "Jyotish KP Pro",
+  "login": {
+    "welcomeTitle": "Welcome to Jyotish KP Pro",
+    "welcomeSubtitle": "Login or sign up to access your professional astrology tools and precise KP horoscopes.",
+    "emailOrPhone": "Email or Phone Number",
+    "emailPlaceholder": "e.g. name@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign In",
+    "noAccount": "Don't have an account?",
+    "signUpFree": "Sign up for free"
+  },
+  "footer": {
+    "terms": "By continuing, you agree to our Terms of Service and Privacy Policy."
+  },
+  "tabs": {
+    "home": "Home",
+    "horoscope": "Horoscope",
+    "profile": "Profile"
+  },
+  "screens": {
+    "homeTitle": "Home",
+    "horoscopeTitle": "Horoscope",
+    "profileTitle": "Profile"
+  }
+}

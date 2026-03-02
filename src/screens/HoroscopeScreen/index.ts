@@ -1,0 +1,1 @@
+export { HoroscopeScreen } from './HoroscopeScreen';

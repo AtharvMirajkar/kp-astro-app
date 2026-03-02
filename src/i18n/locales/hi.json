@@ -1,0 +1,28 @@
+{
+  "appName": "ज्योतिष KP Pro",
+  "login": {
+    "welcomeTitle": "ज्योतिष KP Pro में आपका स्वागत है",
+    "welcomeSubtitle": "अपने पेशेवर ज्योतिष उपकरण और सटीक KP कुंडली तक पहुंचने के लिए लॉगिन या साइन अप करें.",
+    "emailOrPhone": "ईमेल या फोन नंबर",
+    "emailPlaceholder": "जैसे name@example.com",
+    "password": "पासवर्ड",
+    "passwordPlaceholder": "अपना पासवर्ड दर्ज करें",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "signIn": "साइन इन",
+    "noAccount": "खाता नहीं है?",
+    "signUpFree": "मुफ्त में साइन अप करें"
+  },
+  "footer": {
+    "terms": "जारी रखकर, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत हैं."
+  },
+  "tabs": {
+    "home": "होम",
+    "horoscope": "कुंडली",
+    "profile": "प्रोफाइल"
+  },
+  "screens": {
+    "homeTitle": "होम",
+    "horoscopeTitle": "कुंडली",
+    "profileTitle": "प्रोफाइल"
+  }
+}
