@@ -1,5 +1,6 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { StackScreenProps } from '@react-navigation/stack';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -17,6 +18,11 @@ export type RootStackParamList = {
 };
 
 export type LoginScreenProps = StackScreenProps<AuthStackParamList, 'Login'>;
+
+export type HoroscopeScreenProps = BottomTabScreenProps<
+  MainTabParamList,
+  'Horoscope'
+>;
 
 declare global {
   namespace ReactNavigation {

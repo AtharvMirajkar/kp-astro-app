@@ -30,7 +30,7 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
         CommonActions.reset({
           index: 0,
           routes: [{ name: 'MainTabs' }],
-        })
+        }),
       );
     }
   };
@@ -69,23 +69,19 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
 
           <View style={styles.logoContainer}>
             <View style={styles.logoCircle}>
-              <Icon
-                name="star-and-crescent"
-                size={40}
-                color={colors.primary}
-              />
+              <Icon name="star-and-crescent" size={40} color={colors.primary} />
             </View>
           </View>
 
-          <Text style={styles.welcomeTitle}>{t('login:welcomeTitle')}</Text>
+          <Text style={styles.welcomeTitle}>{t('login.welcomeTitle')}</Text>
           <Text style={styles.welcomeSubtitle}>
-            {t('login:welcomeSubtitle')}
+            {t('login.welcomeSubtitle')}
           </Text>
 
           <View style={styles.form}>
             <Input
-              label={t('login:emailOrPhone')}
-              placeholder={t('login:emailPlaceholder')}
+              label={t('login.emailOrPhone')}
+              placeholder={t('login.emailPlaceholder')}
               value={email}
               onChangeText={setEmail}
               leftIcon="email"
@@ -94,38 +90,35 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
               autoCorrect={false}
             />
             <Input
-              label={t('login:password')}
-              placeholder={t('login:passwordPlaceholder')}
+              label={t('login.password')}
+              placeholder={t('login.passwordPlaceholder')}
               value={password}
               onChangeText={setPassword}
               leftIcon="password"
               secureTextEntry={!showPassword}
               rightIcon={showPassword ? 'eye-off' : 'eye'}
-              onRightIconPress={() => setShowPassword((prev) => !prev)}
+              onRightIconPress={() => setShowPassword(prev => !prev)}
             />
             <TouchableOpacity
               onPress={handleForgotPassword}
               style={styles.forgotPasswordTouchable}
             >
               <Text style={styles.forgotPasswordText}>
-                {t('login:forgotPassword')}
+                {t('login.forgotPassword')}
               </Text>
             </TouchableOpacity>
 
-            <PrimaryButton
-              title={t('login:signIn')}
-              onPress={handleSignIn}
-            />
+            <PrimaryButton title={t('login.signIn')} onPress={handleSignIn} />
 
             <View style={styles.signUpRow}>
-              <Text style={styles.signUpPrompt}>{t('login:noAccount')}</Text>
+              <Text style={styles.signUpPrompt}>{t('login.noAccount')}</Text>
               <TouchableOpacity onPress={handleSignUp}>
-                <Text style={styles.signUpLink}>{t('login:signUpFree')}</Text>
+                <Text style={styles.signUpLink}>{t('login.signUpFree')}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <Text style={styles.footerText}>{t('footer:terms')}</Text>
+          <Text style={styles.footerText}>{t('footer.terms')}</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

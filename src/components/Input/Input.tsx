@@ -10,7 +10,12 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../constants/colors';
 
-export type InputIconType = 'email' | 'password' | 'none';
+export type InputIconType =
+  | 'email'
+  | 'password'
+  | 'user'
+  | 'location'
+  | 'none';
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
   label: string;
@@ -32,9 +37,13 @@ export function Input({
   const getLeftIconName = (): string => {
     switch (leftIcon) {
       case 'email':
-        return 'account-outline';
+        return 'email-outline';
       case 'password':
         return 'lock-outline';
+      case 'user':
+        return 'account-outline';
+      case 'location':
+        return 'map-marker-outline';
       default:
         return 'circle-outline';
     }
