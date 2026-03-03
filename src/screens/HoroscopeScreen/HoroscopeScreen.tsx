@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../constants/colors';
 import { Input, PrimaryButton } from '../../components';
 import type { HoroscopeScreenProps } from '../../types/navigation';
+import { fonts } from '../../constants';
 
 export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
   const { t } = useTranslation();
@@ -42,11 +43,7 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             style={styles.headerIconButton}
           >
-            <Icon
-              name="arrow-left"
-              size={22}
-              color={colors.textPrimary}
-            />
+            <Icon name="arrow-left" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('kundali.screenTitle')}</Text>
           <TouchableOpacity
@@ -54,7 +51,11 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             style={styles.headerIconButton}
           >
-            <Icon name="information-outline" size={20} color={colors.textPrimary} />
+            <Icon
+              name="information-outline"
+              size={20}
+              color={colors.textPrimary}
+            />
           </TouchableOpacity>
         </View>
 
@@ -77,10 +78,7 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
           />
 
           <View style={styles.inlineRow}>
-            <TouchableOpacity
-              style={styles.fieldPill}
-              activeOpacity={0.8}
-            >
+            <TouchableOpacity style={styles.fieldPill} activeOpacity={0.8}>
               <View style={styles.fieldIconWrapper}>
                 <Icon
                   name="calendar-blank-outline"
@@ -104,10 +102,7 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.fieldPill}
-              activeOpacity={0.8}
-            >
+            <TouchableOpacity style={styles.fieldPill} activeOpacity={0.8}>
               <View style={styles.fieldIconWrapper}>
                 <Icon
                   name="clock-time-four-outline"
@@ -145,11 +140,7 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
             activeOpacity={0.8}
           >
             <View style={styles.locationRow}>
-              <Icon
-                name="crosshairs-gps"
-                size={16}
-                color={colors.link}
-              />
+              <Icon name="crosshairs-gps" size={16} color={colors.link} />
               <Text style={styles.locationText}>
                 {t('kundali.useCurrentLocation')}
               </Text>
@@ -160,11 +151,7 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
         <View style={styles.ayanamsaCard}>
           <View style={styles.ayanamsaLeft}>
             <View style={styles.ayanamsaIconWrapper}>
-              <Icon
-                name="cog-outline"
-                size={20}
-                color={colors.primary}
-              />
+              <Icon name="cog-outline" size={20} color={colors.primary} />
             </View>
             <View>
               <Text style={styles.ayanamsaLabel}>
@@ -187,9 +174,7 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
             title={t('kundali.cta')}
             onPress={handleGenerateChart}
           />
-          <Text style={styles.footerNote}>
-            {t('kundali.footerNote')}
-          </Text>
+          <Text style={styles.footerNote}>{t('kundali.footerNote')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -219,6 +204,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
+    fontFamily: fonts.bold,
   },
   sectionIntro: {
     marginBottom: 16,
@@ -228,11 +214,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 6,
+    fontFamily: fonts.bold,
   },
   sectionSubtitle: {
     fontSize: 14,
     color: colors.textSecondary,
     lineHeight: 20,
+    fontFamily: fonts.regular,
   },
   formCard: {
     backgroundColor: colors.backgroundSecondary,
@@ -274,14 +262,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: colors.textSecondary,
     marginBottom: 2,
+    fontFamily: fonts.regular,
   },
   fieldPlaceholderText: {
     fontSize: 13,
     color: colors.placeholder,
+    fontFamily: fonts.regular,
   },
   fieldValueText: {
     fontSize: 13,
     color: colors.textPrimary,
+    fontFamily: fonts.regular,
   },
   locationRow: {
     flexDirection: 'row',
@@ -293,6 +284,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
     color: colors.link,
+    fontFamily: fonts.medium,
   },
   ayanamsaCard: {
     flexDirection: 'row',
@@ -320,17 +312,20 @@ const styles = StyleSheet.create({
   ayanamsaLabel: {
     fontSize: 13,
     color: colors.textSecondary,
+    fontFamily: fonts.regular,
   },
   ayanamsaValue: {
     fontSize: 14,
     fontWeight: '600',
     color: colors.textPrimary,
+    fontFamily: fonts.bold,
   },
   ayanamsaChange: {
     fontSize: 13,
     fontWeight: '600',
     color: colors.link,
     textTransform: 'uppercase',
+    fontFamily: fonts.medium,
   },
   ctaWrapper: {
     marginTop: 8,
@@ -340,5 +335,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
     textAlign: 'center',
+    fontFamily: fonts.regular,
   },
 });

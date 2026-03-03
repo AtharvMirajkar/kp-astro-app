@@ -66,5 +66,33 @@
     "ayanamsaChange": "Change",
     "cta": "Generate Chart",
     "footerNote": "Calculations based on high-precision KP Astrology algorithms."
+  },
+  "profile": {
+    "headerTitle": "My Horoscope Profile",
+    "name": "Aravind Sharma",
+    "tierLabel": "Gold Tier",
+    "memberSince": "Member since Oct 2023",
+    "editProfile": "Edit Profile",
+    "shareChart": "Share Chart",
+    "savedChartsValue": "12",
+    "savedChartsLabel": "Saved Charts",
+    "reportsValue": "45",
+    "reportsLabel": "Reports",
+    "minutesValue": "108",
+    "minutesLabel": "Minutes",
+    "zodiacTitle": "Zodiac Alignment",
+    "sunLabel": "Sun",
+    "sunValue": "Libra",
+    "moonLabel": "Moon",
+    "moonValue": "Aries",
+    "ascLabel": "Asc",
+    "ascValue": "Leo",
+    "servicesTitle": "Services & Management",
+    "prashnaTitle": "KP Prashna Reports",
+    "prashnaSubtitle": "View your detailed horary readings",
+    "walletTitle": "Wallet & Credits",
+    "walletSubtitle": "Balance: ₹1,250.00",
+    "historyTitle": "Consultation History",
+    "historySubtitle": "Access previous expert calls"
   }
 }

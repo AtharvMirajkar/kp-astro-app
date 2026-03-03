@@ -24,6 +24,11 @@ export type HoroscopeScreenProps = BottomTabScreenProps<
   'Horoscope'
 >;
 
+export type ProfileScreenProps = BottomTabScreenProps<
+  MainTabParamList,
+  'Profile'
+>;
+
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}

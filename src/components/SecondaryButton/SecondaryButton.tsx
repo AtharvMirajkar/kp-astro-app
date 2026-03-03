@@ -7,6 +7,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { colors } from '../../constants/colors';
+import { fonts } from '../../constants';
 
 export interface SecondaryButtonProps {
   title: string;
@@ -52,5 +53,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.textPrimary,
+    fontFamily: fonts.medium,
   },
 });

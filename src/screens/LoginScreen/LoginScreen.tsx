@@ -15,6 +15,7 @@ import { Input, PrimaryButton } from '../../components';
 import { colors } from '../../constants/colors';
 import { CommonActions } from '@react-navigation/native';
 import type { LoginScreenProps } from '../../types/navigation';
+import { fonts } from '../../constants';
 
 export function LoginScreen({ navigation }: LoginScreenProps) {
   const { t } = useTranslation();
@@ -152,6 +153,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.textPrimary,
+    fontFamily: fonts.bold,
   },
   headerSpacer: {
     width: 32,
@@ -173,12 +175,14 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 24,
     fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textPrimary,
     marginBottom: 8,
     lineHeight: 32,
   },
   welcomeSubtitle: {
     fontSize: 15,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
     lineHeight: 22,
     marginBottom: 28,
@@ -193,6 +197,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.link,
     fontWeight: '500',
   },
@@ -206,15 +211,18 @@ const styles = StyleSheet.create({
   },
   signUpPrompt: {
     fontSize: 15,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
   },
   signUpLink: {
     fontSize: 15,
+    fontFamily: fonts.medium,
     color: colors.link,
     fontWeight: '600',
   },
   footerText: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,

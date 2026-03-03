@@ -9,13 +9,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../constants/colors';
+import { fonts } from '../../constants';
 
-export type InputIconType =
-  | 'email'
-  | 'password'
-  | 'user'
-  | 'location'
-  | 'none';
+export type InputIconType = 'email' | 'password' | 'user' | 'location' | 'none';
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
   label: string;
@@ -52,7 +48,9 @@ export function Input({
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <View style={[styles.inputWrapper, error ? styles.inputWrapperError : null]}>
+      <View
+        style={[styles.inputWrapper, error ? styles.inputWrapperError : null]}
+      >
         {leftIcon !== 'none' && (
           <Icon
             name={getLeftIconName()}
@@ -62,7 +60,10 @@ export function Input({
           />
         )}
         <TextInput
-          style={[styles.input, leftIcon !== 'none' && styles.inputWithLeftIcon]}
+          style={[
+            styles.input,
+            leftIcon !== 'none' && styles.inputWithLeftIcon,
+          ]}
           placeholderTextColor={colors.placeholder}
           secureTextEntry={secureTextEntry}
           {...textInputProps}
@@ -95,6 +96,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: 8,
     fontWeight: '400',
+    fontFamily: fonts.regular,
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -114,6 +116,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     paddingVertical: 12,
     paddingHorizontal: 16,
+    fontFamily: fonts.regular,
   },
   inputWithLeftIcon: {
     paddingLeft: 8,
@@ -130,5 +133,6 @@ const styles = StyleSheet.create({
     color: '#D32F2F',
     marginTop: 4,
     marginLeft: 4,
+    fontFamily: fonts.regular,
   },
 });

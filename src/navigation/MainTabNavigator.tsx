@@ -43,7 +43,7 @@ export function MainTabNavigator() {
         options={{
           tabBarLabel: t('tabs:horoscope'),
           tabBarIcon: ({ color, size }) => (
-            <Icon name="star-and-crescent" size={size} color={color} />
+            <Icon name="zodiac-gemini" size={size} color={color} />
           ),
         }}
       />

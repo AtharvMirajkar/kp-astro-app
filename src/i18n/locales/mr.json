@@ -66,5 +66,33 @@
     "ayanamsaChange": "बदला",
     "cta": "कुंडली तयार करा",
     "footerNote": "उच्च-प्रेसिजन KP ज्योतिषीय अल्गोरिदमवर आधारित गणना."
+  },
+  "profile": {
+    "headerTitle": "माझी ज्योतिष प्रोफाइल",
+    "name": "अरविंद शर्मा",
+    "tierLabel": "गोल्ड टियर",
+    "memberSince": "सदस्य: ऑक्टोबर 2023 पासून",
+    "editProfile": "प्रोफाइल संपादित करा",
+    "shareChart": "कुंडली शेअर करा",
+    "savedChartsValue": "12",
+    "savedChartsLabel": "जतन केलेल्या कुंडल्या",
+    "reportsValue": "45",
+    "reportsLabel": "रिपोर्ट्स",
+    "minutesValue": "108",
+    "minutesLabel": "मिनिटे",
+    "zodiacTitle": "राशी संयोजन",
+    "sunLabel": "सूर्य",
+    "sunValue": "तुला",
+    "moonLabel": "चंद्र",
+    "moonValue": "मेष",
+    "ascLabel": "लग्न",
+    "ascValue": "सिंह",
+    "servicesTitle": "सेवा आणि व्यवस्थापन",
+    "prashnaTitle": "KP प्रश्न रिपोर्ट्स",
+    "prashnaSubtitle": "तुमचे विस्तृत प्रश्न ज्योतिष वाचन पाहा",
+    "walletTitle": "वॉलेट आणि क्रेडिट्स",
+    "walletSubtitle": "शिल्लक: ₹1,250.00",
+    "historyTitle": "समुपदेशन इतिहास",
+    "historySubtitle": "मागील तज्ज्ञ कॉल्स पाहा"
   }
 }
