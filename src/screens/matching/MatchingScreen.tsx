@@ -131,7 +131,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
   const [location2, setLocation2] = useState('');
 
   const handleCalculate = () => {
-    // Placeholder: run matching calculation
+    navigation.navigate('CompatibilityReport');
   };
 
   return (

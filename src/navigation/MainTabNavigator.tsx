@@ -2,7 +2,8 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
-import { HomeScreen, MatchingScreen, HoroscopeScreen, ProfileScreen } from '../screens';
+import { HomeScreen, HoroscopeScreen, ProfileScreen } from '../screens';
+import { MatchStackNavigator } from './MatchStackNavigator';
 import { colors } from '../constants/colors';
 import type { MainTabParamList } from './types';
 
@@ -39,7 +40,7 @@ export function MainTabNavigator() {
       />
       <Tab.Screen
         name="Match"
-        component={MatchingScreen}
+        component={MatchStackNavigator}
         options={{
           tabBarLabel: t('tabs:match'),
           tabBarIcon: ({ color, size }) => (
