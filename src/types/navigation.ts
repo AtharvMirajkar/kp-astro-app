@@ -6,10 +6,22 @@ export type MatchStackParamList = {
   CompatibilityReport: undefined;
 };
 
+export type HoroscopeStackParamList = {
+  CreateKundali: undefined;
+  KundaliOverview:
+    | {
+        name?: string;
+        dob?: string;
+        tob?: string;
+        place?: string;
+      }
+    | undefined;
+};
+
 export type MainTabParamList = {
   Home: undefined;
   Match: NavigatorScreenParams<MatchStackParamList>;
-  Horoscope: undefined;
+  Horoscope: NavigatorScreenParams<HoroscopeStackParamList>;
   Profile: undefined;
   Settings: undefined;
 };
@@ -25,9 +37,14 @@ export type RootStackParamList = {
 
 export type LoginScreenProps = StackScreenProps<AuthStackParamList, 'Login'>;
 
-export type HoroscopeScreenProps = BottomTabScreenProps<
-  MainTabParamList,
-  'Horoscope'
+export type HoroscopeScreenProps = StackScreenProps<
+  HoroscopeStackParamList,
+  'CreateKundali'
+>;
+
+export type KundaliOverviewScreenProps = StackScreenProps<
+  HoroscopeStackParamList,
+  'KundaliOverview'
 >;
 
 export type ProfileScreenProps = BottomTabScreenProps<
@@ -54,5 +71,6 @@ declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
     interface AuthParamList extends AuthStackParamList {}
+    interface HoroscopeParamList extends HoroscopeStackParamList {}
   }
 }

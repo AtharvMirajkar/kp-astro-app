@@ -1,6 +1,7 @@
 export type {
   MainTabParamList,
   MatchStackParamList,
+  HoroscopeStackParamList,
   AuthStackParamList,
   RootStackParamList,
   LoginScreenProps,

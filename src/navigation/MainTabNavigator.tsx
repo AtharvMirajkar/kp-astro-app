@@ -4,11 +4,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
 import {
   HomeScreen,
-  HoroscopeScreen,
   ProfileScreen,
   SettingsScreen,
 } from '../screens';
 import { MatchStackNavigator } from './MatchStackNavigator';
+import { HoroscopeStackNavigator } from './HoroscopeStackNavigator';
 import { colors } from '../constants/colors';
 import type { MainTabParamList } from './types';
 
@@ -55,7 +55,7 @@ export function MainTabNavigator() {
       />
       <Tab.Screen
         name="Horoscope"
-        component={HoroscopeScreen}
+        component={HoroscopeStackNavigator}
         options={{
           tabBarLabel: t('tabs:horoscope'),
           tabBarIcon: ({ color, size }) => (

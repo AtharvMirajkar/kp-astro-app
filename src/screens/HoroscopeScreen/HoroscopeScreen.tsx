@@ -23,7 +23,12 @@ export function HoroscopeScreen({ navigation }: HoroscopeScreenProps) {
   const [placeOfBirth, setPlaceOfBirth] = useState('');
 
   const handleGenerateChart = () => {
-    // Placeholder: hook into generation flow
+    navigation.navigate('KundaliOverview', {
+      name: fullName || undefined,
+      dob: dateOfBirth || undefined,
+      tob: timeOfBirth || undefined,
+      place: placeOfBirth || undefined,
+    });
   };
 
   const handleUseCurrentLocation = () => {
