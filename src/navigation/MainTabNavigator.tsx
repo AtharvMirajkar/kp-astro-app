@@ -2,7 +2,12 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
-import { HomeScreen, HoroscopeScreen, ProfileScreen } from '../screens';
+import {
+  HomeScreen,
+  HoroscopeScreen,
+  ProfileScreen,
+  SettingsScreen,
+} from '../screens';
 import { MatchStackNavigator } from './MatchStackNavigator';
 import { colors } from '../constants/colors';
 import type { MainTabParamList } from './types';
@@ -62,9 +67,19 @@ export function MainTabNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarLabel: t('tabs:profile'),
+          tabBarLabel: t('tabs.profile'),
           tabBarIcon: ({ color, size }) => (
             <Icon name="account-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: t('tabs.settings'),
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="cog-outline" size={size} color={color} />
           ),
         }}
       />

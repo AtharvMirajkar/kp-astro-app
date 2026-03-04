@@ -11,6 +11,7 @@ export type MainTabParamList = {
   Match: NavigatorScreenParams<MatchStackParamList>;
   Horoscope: undefined;
   Profile: undefined;
+  Settings: undefined;
 };
 
 export type AuthStackParamList = {
@@ -32,6 +33,11 @@ export type HoroscopeScreenProps = BottomTabScreenProps<
 export type ProfileScreenProps = BottomTabScreenProps<
   MainTabParamList,
   'Profile'
+>;
+
+export type SettingsScreenProps = BottomTabScreenProps<
+  MainTabParamList,
+  'Settings'
 >;
 
 export type MatchingScreenProps = StackScreenProps<

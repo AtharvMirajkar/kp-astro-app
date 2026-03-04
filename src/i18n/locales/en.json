@@ -19,7 +19,8 @@
     "home": "Home",
     "match": "Match",
     "horoscope": "Horoscope",
-    "profile": "Profile"
+    "profile": "Profile",
+    "settings": "Settings"
   },
   "screens": {
     "homeTitle": "Home",
@@ -143,5 +144,38 @@
     "walletSubtitle": "Balance: ₹1,250.00",
     "historyTitle": "Consultation History",
     "historySubtitle": "Access previous expert calls"
+  },
+  "settings": {
+    "screenTitle": "Settings",
+    "userName": "Sandeep Sharma",
+    "premiumBadge": "Premium Member",
+    "userId": "ID: JKPP-9921",
+    "manageAccount": "Manage Account",
+    "astrologyEngine": "Astrology Engine",
+    "ayanamsa": "Ayanamsa",
+    "ayanamsaValue": "KP (New/Straight Line)",
+    "chartStyle": "Chart Style",
+    "chartStyleValue": "North Indian (Diamond)",
+    "nodeCalculation": "Node Calculation",
+    "nodeCalculationValue": "True Nodes (Rahu/Ketu)",
+    "preferences": "Preferences",
+    "language": "Language",
+    "languageValue": "English (US)",
+    "languageEn": "English (US)",
+    "languageHi": "Hindi",
+    "languageMr": "Marathi",
+    "pushNotifications": "Push Notifications",
+    "pushNotificationsValue": "Horoscope & Transit Alerts",
+    "appearance": "Appearance",
+    "appearanceValue": "System Default"
+  },
+  "languageModal": {
+    "title": "Select Language",
+    "currentlyActive": "Currently Active",
+    "applySelection": "Apply Selection",
+    "disclaimer": "Changes will take effect immediately",
+    "optionEn": "English - English",
+    "optionHi": "Hindi - हिन्दी",
+    "optionMr": "Marathi - मराठी"
   }
 }

@@ -19,7 +19,8 @@
     "home": "मुख्यपृष्ठ",
     "match": "मॅच",
     "horoscope": "कुंडली",
-    "profile": "प्रोफाइल"
+    "profile": "प्रोफाइल",
+    "settings": "सेटिंग्स"
   },
   "screens": {
     "homeTitle": "मुख्यपृष्ठ",
@@ -143,5 +144,38 @@
     "walletSubtitle": "शिल्लक: ₹1,250.00",
     "historyTitle": "समुपदेशन इतिहास",
     "historySubtitle": "मागील तज्ज्ञ कॉल्स पाहा"
+  },
+  "settings": {
+    "screenTitle": "सेटिंग्स",
+    "userName": "सन्दीप शर्मा",
+    "premiumBadge": "प्रीमियम सदस्य",
+    "userId": "आयडी: JKPP-9921",
+    "manageAccount": "खाते व्यवस्थापित करा",
+    "astrologyEngine": "ज्योतिष इंजिन",
+    "ayanamsa": "अयनांश",
+    "ayanamsaValue": "KP (नवीन/सरळ रेषा)",
+    "chartStyle": "चार्ट शैली",
+    "chartStyleValue": "उत्तर भारतीय (डायमंड)",
+    "nodeCalculation": "नोड गणना",
+    "nodeCalculationValue": "खरे नोड्स (राहू/केतू)",
+    "preferences": "प्राधान्ये",
+    "language": "भाषा",
+    "languageValue": "इंग्रजी (US)",
+    "languageEn": "English (US)",
+    "languageHi": "Hindi",
+    "languageMr": "Marathi",
+    "pushNotifications": "पुश नोटिफिकेशन्स",
+    "pushNotificationsValue": "कुंडली आणि गोचर अलर्ट",
+    "appearance": "दिसणे",
+    "appearanceValue": "सिस्टम डीफॉल्ट"
+  },
+  "languageModal": {
+    "title": "भाषा निवडा",
+    "currentlyActive": "सध्या सक्रिय",
+    "applySelection": "निवड लागू करा",
+    "disclaimer": "बदल त्वरित लागू होतील",
+    "optionEn": "English - English",
+    "optionHi": "Hindi - हिन्दी",
+    "optionMr": "Marathi - मराठी"
   }
 }
