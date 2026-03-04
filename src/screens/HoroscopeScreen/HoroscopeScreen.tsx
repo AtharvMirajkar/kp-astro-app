@@ -207,7 +207,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
@@ -216,7 +215,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 6,
     fontFamily: fonts.bold,
@@ -321,13 +319,11 @@ const styles = StyleSheet.create({
   },
   ayanamsaValue: {
     fontSize: 14,
-    fontWeight: '600',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
   ayanamsaChange: {
     fontSize: 13,
-    fontWeight: '600',
     color: colors.link,
     textTransform: 'uppercase',
     fontFamily: fonts.medium,

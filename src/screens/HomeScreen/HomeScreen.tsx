@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
@@ -185,8 +184,8 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 20,
-    fontWeight: '700',
     color: colors.textPrimary,
+    fontFamily: fonts.bold,
     marginBottom: 4,
   },
   dateLine: {
@@ -214,7 +213,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 12,
     fontFamily: fonts.bold,

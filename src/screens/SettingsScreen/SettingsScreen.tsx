@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { OptionSelectModal } from '../../components';
 import { colors } from '../../constants/colors';
 import type { SettingsScreenProps } from '../../types/navigation';
+import { fonts } from '../../constants';
 
 const SUPPORTED_LOCALES = ['en', 'hi', 'mr'] as const;
 type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
@@ -36,8 +37,8 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
     currentLang === 'en'
       ? t('settings.languageEn')
       : currentLang === 'hi'
-        ? t('settings.languageHi')
-        : t('settings.languageMr');
+      ? t('settings.languageHi')
+      : t('settings.languageMr');
 
   const languageOptions = useMemo(
     () => [
@@ -45,7 +46,7 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
       { value: 'hi', label: t('languageModal.optionHi') },
       { value: 'mr', label: t('languageModal.optionMr') },
     ],
-    [t]
+    [t],
   );
 
   const handleLanguageApply = (value: string) => {
@@ -213,7 +214,11 @@ export function SettingsScreen({ navigation }: SettingsScreenProps) {
             android_ripple={{ color: colors.border }}
           >
             <View style={styles.rowIconCircle}>
-              <Icon name="theme-light-dark" size={20} color={colors.textMuted} />
+              <Icon
+                name="theme-light-dark"
+                size={20}
+                color={colors.textMuted}
+              />
             </View>
             <View style={styles.rowTextWrap}>
               <Text style={styles.rowTitle}>{t('settings.appearance')}</Text>
@@ -262,7 +267,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textPrimary,
   },
   profileBlock: {
@@ -305,7 +310,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textPrimary,
   },
   premiumBadge: {
@@ -318,11 +323,12 @@ const styles = StyleSheet.create({
   },
   premiumBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.textOnPrimary,
   },
   userId: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textSecondary,
   },
   manageAccountButton: {
@@ -333,12 +339,12 @@ const styles = StyleSheet.create({
   },
   manageAccountButtonText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textOnPrimary,
   },
   sectionTitle: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textSecondary,
     marginHorizontal: 20,
     marginBottom: 8,
@@ -380,12 +386,13 @@ const styles = StyleSheet.create({
   },
   rowTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.textPrimary,
   },
   rowSub: {
     fontSize: 13,
     color: colors.textSecondary,
+    fontFamily: fonts.regular,
     marginTop: 2,
   },
 });

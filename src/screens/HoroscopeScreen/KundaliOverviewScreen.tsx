@@ -339,7 +339,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
@@ -363,13 +362,11 @@ const styles = StyleSheet.create({
   tabActive: {},
   tabText: {
     fontSize: 13,
-    fontWeight: '500',
     color: colors.textMuted,
     fontFamily: fonts.medium,
   },
   tabTextActive: {
     color: colors.primary,
-    fontWeight: '600',
     fontFamily: fonts.bold,
   },
   tabUnderline: {
@@ -418,7 +415,6 @@ const styles = StyleSheet.create({
   },
   chartCellText: {
     fontSize: 11,
-    fontWeight: '600',
     color: CHART_COLOR,
     fontFamily: fonts.medium,
   },
@@ -437,7 +433,6 @@ const styles = StyleSheet.create({
   },
   ascMoonLabel: {
     fontSize: 10,
-    fontWeight: '700',
     color: colors.textSecondary,
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -445,7 +440,6 @@ const styles = StyleSheet.create({
   },
   ascMoonValue: {
     fontSize: 15,
-    fontWeight: '700',
     color: colors.primary,
     marginBottom: 2,
     fontFamily: fonts.bold,
@@ -463,20 +457,17 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
   sectionTitleStandalone: {
     fontSize: 16,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
     marginBottom: 12,
   },
   viewDetailed: {
     fontSize: 13,
-    fontWeight: '600',
     color: colors.primary,
     fontFamily: fonts.medium,
   },
@@ -513,7 +504,6 @@ const styles = StyleSheet.create({
   },
   planetName: {
     fontSize: 14,
-    fontWeight: '600',
     color: colors.textPrimary,
     fontFamily: fonts.medium,
   },
@@ -535,7 +525,6 @@ const styles = StyleSheet.create({
   },
   statusPillText: {
     fontSize: 11,
-    fontWeight: '600',
     color: '#2E7D32',
     fontFamily: fonts.medium,
   },
@@ -573,7 +562,6 @@ const styles = StyleSheet.create({
   },
   dashaValue: {
     fontSize: 15,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },

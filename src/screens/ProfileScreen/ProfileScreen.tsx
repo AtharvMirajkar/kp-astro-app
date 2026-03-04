@@ -218,7 +218,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
@@ -256,8 +255,8 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 20,
-    fontWeight: '700',
     color: colors.textPrimary,
+    fontFamily: fonts.bold,
     marginBottom: 4,
   },
   profileMetaRow: {
@@ -274,7 +273,6 @@ const styles = StyleSheet.create({
   },
   tierPillText: {
     fontSize: 11,
-    fontWeight: '700',
     color: colors.primary,
     textTransform: 'uppercase',
     fontFamily: fonts.medium,
@@ -305,7 +303,6 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     fontSize: 14,
-    fontWeight: '700',
     color: colors.textOnPrimary,
     fontFamily: fonts.medium,
   },
@@ -326,7 +323,6 @@ const styles = StyleSheet.create({
   },
   shareButtonText: {
     fontSize: 14,
-    fontWeight: '600',
     color: colors.textPrimary,
     fontFamily: fonts.medium,
   },
@@ -344,7 +340,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textPrimary,
     marginBottom: 2,
   },
@@ -363,7 +359,6 @@ const styles = StyleSheet.create({
   },
   zodiacTitle: {
     fontSize: 14,
-    fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 12,
     fontFamily: fonts.bold,
@@ -385,13 +380,11 @@ const styles = StyleSheet.create({
   zodiacValue: {
     marginTop: 2,
     fontSize: 14,
-    fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
   servicesTitle: {
     fontSize: 13,
-    fontWeight: '700',
     color: colors.textSecondary,
     marginBottom: 8,
     fontFamily: fonts.bold,
@@ -422,7 +415,6 @@ const styles = StyleSheet.create({
   },
   serviceTitle: {
     fontSize: 14,
-    fontWeight: '600',
     color: colors.textPrimary,
     fontFamily: fonts.medium,
   },

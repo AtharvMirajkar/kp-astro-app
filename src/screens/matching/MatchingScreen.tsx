@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../constants/colors';
 import { Input, PrimaryButton } from '../../components';
 import type { MatchingScreenProps } from '../../types/navigation';
+import { fonts } from '../../constants';
 
 type Gender = 'male' | 'female';
 
@@ -64,7 +65,9 @@ function PartnerForm({
         onPress={() => onGenderChange(gender === 'male' ? 'female' : 'male')}
       >
         <Text style={styles.genderValue}>
-          {gender === 'male' ? t('matching.genderMale') : t('matching.genderFemale')}
+          {gender === 'male'
+            ? t('matching.genderMale')
+            : t('matching.genderFemale')}
         </Text>
         <Icon name="chevron-down" size={20} color={colors.textSecondary} />
       </TouchableOpacity>
@@ -73,9 +76,7 @@ function PartnerForm({
           <View style={styles.fieldTextWrapper}>
             <Text style={styles.fieldLabelText}>{t('matching.dobLabel')}</Text>
             <Text
-              style={
-                dob ? styles.fieldValueText : styles.fieldPlaceholderText
-              }
+              style={dob ? styles.fieldValueText : styles.fieldPlaceholderText}
             >
               {dob || t('matching.dobPlaceholder')}
             </Text>
@@ -91,9 +92,7 @@ function PartnerForm({
           <View style={styles.fieldTextWrapper}>
             <Text style={styles.fieldLabelText}>{t('matching.tobLabel')}</Text>
             <Text
-              style={
-                tob ? styles.fieldValueText : styles.fieldPlaceholderText
-              }
+              style={tob ? styles.fieldValueText : styles.fieldPlaceholderText}
             >
               {tob || t('matching.tobPlaceholder')}
             </Text>
@@ -211,10 +210,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
         />
 
         <View style={styles.ctaWrapper}>
-          <PrimaryButton
-            title={t('matching.cta')}
-            onPress={handleCalculate}
-          />
+          <PrimaryButton title={t('matching.cta')} onPress={handleCalculate} />
           <Text style={styles.footerNote}>{t('matching.footerNote')}</Text>
         </View>
       </ScrollView>
@@ -243,8 +239,8 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '700',
     color: colors.textPrimary,
+    fontFamily: fonts.bold,
   },
   progressRow: {
     flexDirection: 'row',
@@ -270,13 +266,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textPrimary,
     marginBottom: 8,
   },
   sectionSubtitle: {
     fontSize: 14,
     color: colors.textSecondary,
+    fontFamily: fonts.medium,
     lineHeight: 20,
   },
   partnerCard: {
@@ -294,12 +291,13 @@ const styles = StyleSheet.create({
   partnerTitle: {
     marginLeft: 8,
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.textPrimary,
   },
   fieldLabel: {
     fontSize: 14,
     color: colors.textSecondary,
+    fontFamily: fonts.regular,
     marginBottom: 8,
   },
   genderRow: {
@@ -317,6 +315,7 @@ const styles = StyleSheet.create({
   genderValue: {
     fontSize: 15,
     color: colors.textPrimary,
+    fontFamily: fonts.regular,
   },
   inlineRow: {
     flexDirection: 'row',
@@ -341,6 +340,7 @@ const styles = StyleSheet.create({
   fieldLabelText: {
     fontSize: 11,
     color: colors.textSecondary,
+    fontFamily: fonts.regular,
     marginBottom: 2,
   },
   fieldPlaceholderText: {
@@ -350,6 +350,7 @@ const styles = StyleSheet.create({
   fieldValueText: {
     fontSize: 13,
     color: colors.textPrimary,
+    fontFamily: fonts.regular,
   },
   fieldRightIcon: {
     marginLeft: 8,
@@ -373,6 +374,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 12,
     color: colors.textSecondary,
+    fontFamily: fonts.medium,
     textAlign: 'center',
   },
 });

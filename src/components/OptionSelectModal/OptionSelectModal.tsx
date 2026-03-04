@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../constants/colors';
+import { fonts } from '../../constants';
 
 export interface OptionSelectModalOption {
   value: string;
@@ -86,7 +87,7 @@ export function OptionSelectModal({
               </View>
 
               <View style={styles.optionsList}>
-                {options.map((opt) => {
+                {options.map(opt => {
                   const isSelected = pendingValue === opt.value;
                   return (
                     <Pressable
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textPrimary,
   },
   closeButton: {
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   },
   optionLabel: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.textPrimary,
   },
   optionLabelSelected: {
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
   },
   optionActiveSub: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: fonts.medium,
     color: colors.primary,
     marginTop: 2,
     textTransform: 'uppercase',
@@ -286,12 +287,13 @@ const styles = StyleSheet.create({
   },
   applyButtonText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     color: colors.textOnPrimary,
   },
   disclaimer: {
     fontSize: 12,
     color: colors.textMuted,
+    fontFamily: fonts.medium,
     textAlign: 'center',
   },
 });
