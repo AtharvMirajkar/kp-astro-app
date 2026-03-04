@@ -17,6 +17,7 @@
   },
   "tabs": {
     "home": "Home",
+    "match": "Match",
     "horoscope": "Horoscope",
     "profile": "Profile"
   },
@@ -66,6 +67,27 @@
     "ayanamsaChange": "Change",
     "cta": "Generate Chart",
     "footerNote": "Calculations based on high-precision KP Astrology algorithms."
+  },
+  "matching": {
+    "screenTitle": "Kundli Matching",
+    "checkTitle": "Check Compatibility",
+    "checkSubtitle": "Enter birth details for both partners to get a detailed KP Astrology compatibility report.",
+    "firstPartner": "First Partner",
+    "secondPartner": "Second Partner",
+    "fullNameLabel": "Full Name",
+    "fullNamePlaceholder1": "e.g. Rahul Sharma",
+    "fullNamePlaceholder2": "e.g. Priya Patel",
+    "genderLabel": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "dobLabel": "Date of Birth",
+    "dobPlaceholder": "mm/dd/yyyy",
+    "tobLabel": "Time of Birth",
+    "tobPlaceholder": "----",
+    "birthLocationLabel": "Birth Location",
+    "birthLocationPlaceholder": "City, Country",
+    "cta": "Calculate Matching Points",
+    "footerNote": "Analysis based on KP System of Astrology and Guna Milan"
   },
   "profile": {
     "headerTitle": "My Horoscope Profile",

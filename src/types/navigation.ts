@@ -4,6 +4,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 export type MainTabParamList = {
   Home: undefined;
+  Match: undefined;
   Horoscope: undefined;
   Profile: undefined;
 };
@@ -27,6 +28,11 @@ export type HoroscopeScreenProps = BottomTabScreenProps<
 export type ProfileScreenProps = BottomTabScreenProps<
   MainTabParamList,
   'Profile'
+>;
+
+export type MatchingScreenProps = BottomTabScreenProps<
+  MainTabParamList,
+  'Match'
 >;
 
 declare global {

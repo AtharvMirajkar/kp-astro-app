@@ -17,6 +17,7 @@
   },
   "tabs": {
     "home": "मुख्यपृष्ठ",
+    "match": "मॅच",
     "horoscope": "कुंडली",
     "profile": "प्रोफाइल"
   },
@@ -66,6 +67,27 @@
     "ayanamsaChange": "बदला",
     "cta": "कुंडली तयार करा",
     "footerNote": "उच्च-प्रेसिजन KP ज्योतिषीय अल्गोरिदमवर आधारित गणना."
+  },
+  "matching": {
+    "screenTitle": "कुंडली जुळवणी",
+    "checkTitle": "सुसंगतता तपासा",
+    "checkSubtitle": "दोन्ही जोडीदारांचे जन्म तपशील प्रविष्ट करून तपशीलवार KP ज्योतिष सुसंगतता अहवाल मिळवा.",
+    "firstPartner": "पहिला जोडीदार",
+    "secondPartner": "दुसरा जोडीदार",
+    "fullNameLabel": "पूर्ण नाव",
+    "fullNamePlaceholder1": "उदा. राहुल शर्मा",
+    "fullNamePlaceholder2": "उदा. प्रिया पाटील",
+    "genderLabel": "लिंग",
+    "genderMale": "पुरुष",
+    "genderFemale": "स्त्री",
+    "dobLabel": "जन्म तारीख",
+    "dobPlaceholder": "म्म/द्द/वर्ष",
+    "tobLabel": "जन्म वेळ",
+    "tobPlaceholder": "----",
+    "birthLocationLabel": "जन्म ठिकाण",
+    "birthLocationPlaceholder": "शहर, देश",
+    "cta": "मिलान गुण मोजा",
+    "footerNote": "KP ज्योतिष प्रणाली आणि गुण मिलानावर आधारित विश्लेषण"
   },
   "profile": {
     "headerTitle": "माझी ज्योतिष प्रोफाइल",
