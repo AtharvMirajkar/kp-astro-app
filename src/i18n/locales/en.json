@@ -12,6 +12,44 @@
     "noAccount": "Don't have an account?",
     "signUpFree": "Sign up for free"
   },
+  "signup": {
+  "title": "Create your account",
+  "subtitle": "Sign up to access your professional KP astrology tools and personalized horoscope insights.",
+  "fullName": "Full Name",
+  "fullNamePlaceholder": "e.g. Rahul Sharma",
+  "email": "Email Address",
+  "emailPlaceholder": "e.g. name@example.com",
+  "password": "Password",
+  "passwordPlaceholder": "Create a secure password",
+  "confirmPassword": "Confirm Password",
+  "confirmPasswordPlaceholder": "Re-enter your password",
+  "createAccount": "Create Account",
+  "haveAccount": "Already have an account?",
+  "signIn": "Sign in"
+},
+"forgotPassword": {
+  "title": "Forgot Password?",
+  "subtitle": "Enter your email address and we will send a verification OTP to reset your password.",
+  "email": "Email",
+  "emailPlaceholder": "Enter your email",
+  "resetButton": "Send OTP",
+  "backToLogin": "Back to Login"
+},
+"verifyOtp": {
+  "title": "Verify OTP",
+  "subtitle": "Enter the 4-digit code sent to your email.",
+  "verifyButton": "Verify OTP",
+  "resendCode": "Resend Code"
+},
+"resetPassword": {
+  "title": "Reset Password",
+  "subtitle": "Create a new secure password for your account.",
+  "newPassword": "New Password",
+  "newPasswordPlaceholder": "Enter new password",
+  "confirmPassword": "Confirm Password",
+  "confirmPasswordPlaceholder": "Re-enter password",
+  "resetButton": "Reset Password"
+},
   "footer": {
     "terms": "By continuing, you agree to our Terms of Service and Privacy Policy."
   },

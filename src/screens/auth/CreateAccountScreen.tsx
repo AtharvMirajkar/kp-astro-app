@@ -13,35 +13,26 @@ import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Input, PrimaryButton } from '../../components';
 import { colors } from '../../constants/colors';
-import { CommonActions } from '@react-navigation/native';
-import type { LoginScreenProps } from '../../types/navigation';
 import { fonts } from '../../constants';
+import type { CreateAccountScreenProps } from '../../types/navigation';
 
-export function LoginScreen({ navigation }: LoginScreenProps) {
+export function CreateAccountScreen({ navigation }: CreateAccountScreenProps) {
   const { t } = useTranslation();
+
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleCreateAccount = () => {
+    // TODO: integrate API later
+  };
 
   const handleSignIn = () => {
-    // Placeholder: replace with real auth logic
-    const root = navigation.getParent();
-    if (root) {
-      root.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        }),
-      );
-    }
-  };
-
-  const handleForgotPassword = () => {
-    // Placeholder: navigate to forgot password
-  };
-
-  const handleSignUp = () => {
-    // Placeholder: navigate to sign up
+    navigation.goBack();
   };
 
   return (
@@ -49,13 +40,14 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {/* Header */}
+
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -64,9 +56,13 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
             >
               <Icon name="arrow-left" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
+
             <Text style={styles.headerTitle}>{t('appName')}</Text>
+
             <View style={styles.headerSpacer} />
           </View>
+
+          {/* Logo */}
 
           <View style={styles.logoContainer}>
             <View style={styles.logoCircle}>
@@ -74,25 +70,37 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
             </View>
           </View>
 
-          <Text style={styles.welcomeTitle}>{t('login.welcomeTitle')}</Text>
-          <Text style={styles.welcomeSubtitle}>
-            {t('login.welcomeSubtitle')}
-          </Text>
+          {/* Title */}
+
+          <Text style={styles.title}>{t('signup.title')}</Text>
+
+          <Text style={styles.subtitle}>{t('signup.subtitle')}</Text>
+
+          {/* Form */}
 
           <View style={styles.form}>
             <Input
-              label={t('login.emailOrPhone')}
-              placeholder={t('login.emailPlaceholder')}
+              label={t('signup.fullName')}
+              placeholder={t('signup.fullNamePlaceholder')}
+              value={fullName}
+              onChangeText={setFullName}
+              leftIcon="user"
+              autoCapitalize="words"
+            />
+
+            <Input
+              label={t('signup.email')}
+              placeholder={t('signup.emailPlaceholder')}
               value={email}
               onChangeText={setEmail}
               leftIcon="email"
               keyboardType="email-address"
               autoCapitalize="none"
-              autoCorrect={false}
             />
+
             <Input
-              label={t('login.password')}
-              placeholder={t('login.passwordPlaceholder')}
+              label={t('signup.password')}
+              placeholder={t('signup.passwordPlaceholder')}
               value={password}
               onChangeText={setPassword}
               leftIcon="password"
@@ -100,21 +108,30 @@ export function LoginScreen({ navigation }: LoginScreenProps) {
               rightIcon={showPassword ? 'eye-off' : 'eye'}
               onRightIconPress={() => setShowPassword(prev => !prev)}
             />
-            <TouchableOpacity
-              onPress={handleForgotPassword}
-              style={styles.forgotPasswordTouchable}
-            >
-              <Text style={styles.forgotPasswordText}>
-                {t('login.forgotPassword')}
-              </Text>
-            </TouchableOpacity>
 
-            <PrimaryButton title={t('login.signIn')} onPress={handleSignIn} />
+            <Input
+              label={t('signup.confirmPassword')}
+              placeholder={t('signup.confirmPasswordPlaceholder')}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              leftIcon="password"
+              secureTextEntry={!showConfirmPassword}
+              rightIcon={showConfirmPassword ? 'eye-off' : 'eye'}
+              onRightIconPress={() => setShowConfirmPassword(prev => !prev)}
+            />
 
-            <View style={styles.signUpRow}>
-              <Text style={styles.signUpPrompt}>{t('login.noAccount')}</Text>
-              <TouchableOpacity onPress={handleSignUp}>
-                <Text style={styles.signUpLink}>{t('login.signUpFree')}</Text>
+            <PrimaryButton
+              title={t('signup.createAccount')}
+              onPress={handleCreateAccount}
+            />
+
+            {/* Login redirect */}
+
+            <View style={styles.loginRow}>
+              <Text style={styles.loginPrompt}>{t('signup.haveAccount')}</Text>
+
+              <TouchableOpacity onPress={handleSignIn}>
+                <Text style={styles.loginLink}>{t('signup.signIn')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -131,14 +148,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+
   keyboardView: {
     flex: 1,
   },
+
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingBottom: 32,
   },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -146,22 +166,27 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     minHeight: 44,
   },
+
   backButton: {
     padding: 4,
   },
+
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.textPrimary,
     fontFamily: fonts.bold,
+    color: colors.textPrimary,
   },
+
   headerSpacer: {
     width: 32,
   },
+
   logoContainer: {
     alignItems: 'center',
     marginBottom: 24,
   },
+
   logoCircle: {
     width: 80,
     height: 80,
@@ -172,60 +197,50 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  welcomeTitle: {
+
+  title: {
     fontSize: 24,
-    fontWeight: '700',
     fontFamily: fonts.bold,
     color: colors.textPrimary,
     marginBottom: 8,
-    lineHeight: 32,
   },
-  welcomeSubtitle: {
+
+  subtitle: {
     fontSize: 15,
     fontFamily: fonts.regular,
     color: colors.textSecondary,
     lineHeight: 22,
     marginBottom: 28,
   },
+
   form: {
     marginBottom: 24,
   },
-  forgotPasswordTouchable: {
-    alignSelf: 'flex-end',
-    marginBottom: 20,
-    marginTop: -4,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    fontFamily: fonts.regular,
-    color: colors.link,
-    fontWeight: '500',
-  },
-  signUpRow: {
+
+  loginRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'center',
-    alignItems: 'center',
     marginTop: 20,
-    gap: 4,
   },
-  signUpPrompt: {
+
+  loginPrompt: {
     fontSize: 15,
     fontFamily: fonts.regular,
     color: colors.textSecondary,
   },
-  signUpLink: {
+
+  loginLink: {
     fontSize: 15,
     fontFamily: fonts.medium,
     color: colors.link,
-    fontWeight: '600',
+    marginLeft: 4,
   },
+
   footerText: {
     fontSize: 12,
     fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 18,
-    paddingHorizontal: 8,
   },
 });

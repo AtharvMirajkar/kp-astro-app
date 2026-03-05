@@ -11,6 +11,44 @@
     "signIn": "साइन इन",
     "noAccount": "खाते नाही?",
     "signUpFree": "विनामूल्य साइन अप करा"
+  },  
+  "signup": {
+    "title": "तुमचा खातं तयार करा",
+    "subtitle": "व्यावसायिक केपी ज्योतिष साधने आणि वैयक्तिकृत कुंडली निरीक्षणांसाठी साइन अप करा.",
+    "fullName": "पूर्ण नाव",
+    "fullNamePlaceholder": "उदा. राहुल शर्मा",
+    "email": "ईमेल पत्ता",
+    "emailPlaceholder": "उदा. नाव@example.com",
+    "password": "पासवर्ड",
+    "passwordPlaceholder": "सुरक्षित पासवर्ड तयार करा",
+    "confirmPassword": "पासवर्डची पुष्टी करा",
+    "confirmPasswordPlaceholder": "पुन्हा पासवर्ड टाका",
+    "createAccount": "खातं तयार करा",
+    "haveAccount": "आधीच एक खातं आहे का?",
+    "signIn": "साइन इन करा"
+  },
+  "forgotPassword": {
+    "title": "पासवर्ड विसरला?",
+    "subtitle": "तुमचा ईमेल पत्ता टाका आणि आम्ही तुमच्या पासवर्डला रीसेट करण्यासाठी ओटीपी पाठवू.",
+    "email": "ईमेल",
+    "emailPlaceholder": "तुमचा ईमेल टाका",
+    "resetButton": "ओटीपी पाठवा",
+    "backToLogin": "लॉगिनला परत जा"
+  },
+  "verifyOtp": {
+    "title": "ओटीपी सत्यापित करा",
+    "subtitle": "तुमच्या ईमेलवर पाठवलेला ४-अंकी कोड टाका.",
+    "verifyButton": "ओटीपी सत्यापित करा",
+    "resendCode": "कोड पुन्हा पाठवा"
+  },
+  "resetPassword": {
+    "title": "पासवर्ड रीसेट करा",
+    "subtitle": "तुमच्या खात्यासाठी एक नवीन सुरक्षित पासवर्ड तयार करा.",
+    "newPassword": "नवीन पासवर्ड",
+    "newPasswordPlaceholder": "नवीन पासवर्ड टाका",
+    "confirmPassword": "पासवर्डची पुष्टी करा",
+    "confirmPasswordPlaceholder": "पासवर्ड पुन्हा टाका",
+    "resetButton": "पासवर्ड रीसेट करा"
   },
   "footer": {
     "terms": "सुरू ठेवून, तुम्ही आमच्या सेवा अटी आणि गोपनीयता धोरणाशी सहमत आहात."

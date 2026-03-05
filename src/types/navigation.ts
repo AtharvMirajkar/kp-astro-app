@@ -28,6 +28,10 @@ export type MainTabParamList = {
 
 export type AuthStackParamList = {
   Login: undefined;
+  CreateAccount: undefined;
+  ForgotPassword: undefined;
+  VerifyOTP: undefined;
+  ResetPassword: undefined;
 };
 
 export type RootStackParamList = {
@@ -36,6 +40,26 @@ export type RootStackParamList = {
 };
 
 export type LoginScreenProps = StackScreenProps<AuthStackParamList, 'Login'>;
+
+export type CreateAccountScreenProps = StackScreenProps<
+  AuthStackParamList,
+  'CreateAccount'
+>;
+
+export type ForgotPasswordScreenProps = StackScreenProps<
+  AuthStackParamList,
+  'ForgotPassword'
+>;
+
+export type VerifyOTPScreenProps = StackScreenProps<
+  AuthStackParamList,
+  'VerifyOTP'
+>;
+
+export type ResetPasswordScreenProps = StackScreenProps<
+  AuthStackParamList,
+  'ResetPassword'
+>;
 
 export type HoroscopeScreenProps = StackScreenProps<
   HoroscopeStackParamList,
