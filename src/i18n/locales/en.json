@@ -1,5 +1,33 @@
 {
   "appName": "Jyotish KP Pro",
+  "onboarding": {
+    "slide1Title1": "Welcome to",
+    "slide1Title2": "Jyotish KP Pro",
+    "slide1Subtitle": "Precise Predictions. Scientific Astrology.",
+
+    "slide2Title1": "Create",
+    "slide2Title2": "Accurate Kundali",
+    "slide2Subtitle": "Generate birth charts using KP astrology.",
+
+    "slide3Title1": "Get",
+    "slide3Title2": "Future Predictions",
+    "slide3Subtitle": "Understand career, marriage and life events.",
+
+    "getStarted": "Get Started",
+    "next": "Next",
+    "skip": "Skip"
+  },
+  "birthDetails": {
+  "title": "Enter Your Birth Details",
+  "subtitle": "We need your birth information to generate accurate Kundali predictions.",
+  "name": "Full Name",
+  "namePlaceholder": "Enter your name",
+  "dob": "Date of Birth",
+  "tob": "Time of Birth",
+  "place": "Birth Place",
+  "placePlaceholder": "Enter birth city",
+  "continue": "Continue"
+},
   "login": {
     "welcomeTitle": "Welcome to Jyotish KP Pro",
     "welcomeSubtitle": "Login or sign up to access your professional astrology tools and precise KP horoscopes.",

@@ -4,5 +4,6 @@ export type {
   HoroscopeStackParamList,
   AuthStackParamList,
   RootStackParamList,
+  OnboardingStackParamList,
   LoginScreenProps,
 } from '../types/navigation';

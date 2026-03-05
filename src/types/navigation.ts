@@ -34,7 +34,14 @@ export type AuthStackParamList = {
   ResetPassword: undefined;
 };
 
+export type OnboardingStackParamList = {
+  Onboarding: undefined;
+  LanguageSelection: undefined;
+  BirthDetails: undefined;
+};
+
 export type RootStackParamList = {
+  Onboarding: NavigatorScreenParams<OnboardingStackParamList>;
   Auth: NavigatorScreenParams<AuthStackParamList>;
   MainTabs: NavigatorScreenParams<MainTabParamList>;
 };
