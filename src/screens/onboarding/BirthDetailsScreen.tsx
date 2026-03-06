@@ -23,9 +23,25 @@ export function BirthDetailsScreen({ navigation }: any) {
   const [dob, setDob] = useState('');
   const [tob, setTob] = useState('');
   const [place, setPlace] = useState('');
+  const [gender, setGender] = useState('');
 
   const handleContinue = () => {
-    navigation.navigate('Auth'); // go to login/signup
+    navigation.navigate('KundaliLoading');
+  };
+
+  const renderGenderButton = (value: string, label: string) => {
+    const active = gender === value;
+
+    return (
+      <TouchableOpacity
+        style={[styles.genderButton, active && styles.genderButtonActive]}
+        onPress={() => setGender(value)}
+      >
+        <Text style={[styles.genderText, active && styles.genderTextActive]}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -75,12 +91,20 @@ export function BirthDetailsScreen({ navigation }: any) {
               leftIcon="user"
             />
 
+            {/* Gender */}
+            <Text style={styles.genderLabel}>{t('birthDetails.gender')}</Text>
+
+            <View style={styles.genderContainer}>
+              {renderGenderButton('male', t('birthDetails.male'))}
+              {renderGenderButton('female', t('birthDetails.female'))}
+              {renderGenderButton('other', t('birthDetails.other'))}
+            </View>
+
             <Input
               label={t('birthDetails.dob')}
               placeholder="DD/MM/YYYY"
               value={dob}
               onChangeText={setDob}
-              //   leftIcon="calendar"
             />
 
             <Input
@@ -88,7 +112,6 @@ export function BirthDetailsScreen({ navigation }: any) {
               placeholder="HH:MM"
               value={tob}
               onChangeText={setTob}
-              //   leftIcon="clock-outline"
             />
 
             <Input
@@ -96,7 +119,6 @@ export function BirthDetailsScreen({ navigation }: any) {
               placeholder={t('birthDetails.placePlaceholder')}
               value={place}
               onChangeText={setPlace}
-              //   leftIcon="map-marker"
             />
 
             <PrimaryButton
@@ -180,6 +202,44 @@ const styles = StyleSheet.create({
 
   form: {
     marginBottom: 24,
+  },
+
+  genderLabel: {
+    fontSize: 14,
+    fontFamily: fonts.medium,
+    color: colors.textPrimary,
+    marginBottom: 10,
+  },
+
+  genderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+
+  genderButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+
+  genderButtonActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.logoBackground,
+  },
+
+  genderText: {
+    fontSize: 14,
+    fontFamily: fonts.medium,
+    color: colors.textSecondary,
+  },
+
+  genderTextActive: {
+    color: colors.primary,
   },
 
   footerText: {

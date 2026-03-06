@@ -38,6 +38,7 @@ export type OnboardingStackParamList = {
   Onboarding: undefined;
   LanguageSelection: undefined;
   BirthDetails: undefined;
+  KundaliLoading: undefined;
 };
 
 export type RootStackParamList = {

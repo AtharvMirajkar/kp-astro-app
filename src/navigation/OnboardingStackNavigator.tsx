@@ -5,6 +5,7 @@ import {
   OnboardingScreen,
   LanguageSelectionScreen,
   BirthDetailsScreen,
+  KundaliLoadingScreen,
 } from '../screens/onboarding';
 
 import type { OnboardingStackParamList } from './types';
@@ -24,6 +25,7 @@ export function OnboardingStackNavigator() {
         component={LanguageSelectionScreen}
       />
       <Stack.Screen name="BirthDetails" component={BirthDetailsScreen} />
+      <Stack.Screen name="KundaliLoading" component={KundaliLoadingScreen} />
     </Stack.Navigator>
   );
 }
