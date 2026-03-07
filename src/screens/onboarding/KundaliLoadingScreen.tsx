@@ -2,8 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
+
+import { RootState, AppDispatch } from '../../redux/store';
+import { generateKundali } from '../../redux/slices/kundaliSlice';
 
 const loadingSteps = [
   'Calculating planetary positions...',
@@ -13,33 +18,21 @@ const loadingSteps = [
 ];
 
 export function KundaliLoadingScreen({ navigation }: any) {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { birthDetails } = useSelector((state: RootState) => state.kundali);
+
   const rotateAnim = useRef(new Animated.Value(0)).current;
+
   const [stepIndex, setStepIndex] = useState(0);
 
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ---------------------------
+  // Rotation Animation
+  // ---------------------------
+
   useEffect(() => {
-    startRotation();
-
-    const interval = setInterval(() => {
-      setStepIndex(prev => {
-        if (prev === loadingSteps.length - 1) {
-          clearInterval(interval);
-
-          // Navigate after loading
-          setTimeout(() => {
-            navigation.replace('MainTabs');
-          }, 800);
-
-          return prev;
-        }
-
-        return prev + 1;
-      });
-    }, 1500);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const startRotation = () => {
     Animated.loop(
       Animated.timing(rotateAnim, {
         toValue: 1,
@@ -48,7 +41,50 @@ export function KundaliLoadingScreen({ navigation }: any) {
         useNativeDriver: true,
       }),
     ).start();
-  };
+  }, [rotateAnim]);
+
+  // ---------------------------
+  // Loading Text Steps
+  // ---------------------------
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setStepIndex(prev => {
+        if (prev === loadingSteps.length - 1) {
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 1500);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
+  // ---------------------------
+  // Generate Kundali API
+  // ---------------------------
+
+  useEffect(() => {
+    const generate = async () => {
+      if (!birthDetails) return;
+
+      try {
+        const result = await dispatch(generateKundali(birthDetails));
+
+        if (generateKundali.fulfilled.match(result)) {
+          navigation.replace('MainTabs');
+        }
+      } catch (error) {
+        console.log('Kundali generation failed', error);
+      }
+    };
+
+    generate();
+  }, [birthDetails, dispatch, navigation]);
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
@@ -58,7 +94,7 @@ export function KundaliLoadingScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Animated Icon */}
+        {/* Animated Zodiac Icon */}
         <Animated.View
           style={[styles.iconWrapper, { transform: [{ rotate }] }]}
         >

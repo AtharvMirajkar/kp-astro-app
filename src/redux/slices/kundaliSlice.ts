@@ -4,12 +4,24 @@ import axiosInstance from '../../api/axiosInstance';
 interface KundaliState {
   currentKundali: any | null;
   kundaliList: any[];
+  birthDetails: BirthDetails | null;
   loading: boolean;
+}
+
+interface BirthDetails {
+  name: string;
+  dob: string;
+  tob: string;
+  place: string;
+  latitude: string;
+  longitude: string;
+  gender: string;
 }
 
 const initialState: KundaliState = {
   currentKundali: null,
   kundaliList: [],
+  birthDetails: null,
   loading: false,
 };
 
@@ -20,6 +32,8 @@ export const generateKundali = createAsyncThunk(
     dob: string;
     tob: string;
     place: string;
+    latitude: string;
+    longitude: string;
   }) => {
     const res = await axiosInstance.post('/kundali/generate', payload);
     return res.data;
@@ -42,7 +56,11 @@ export const fetchKundaliOverview = createAsyncThunk(
 const kundaliSlice = createSlice({
   name: 'kundali',
   initialState,
-  reducers: {},
+  reducers: {
+    setBirthDetails(state, action) {
+      state.birthDetails = action.payload;
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(generateKundali.pending, state => {
@@ -64,4 +82,5 @@ const kundaliSlice = createSlice({
   },
 });
 
+export const { setBirthDetails } = kundaliSlice.actions;
 export default kundaliSlice.reducer;

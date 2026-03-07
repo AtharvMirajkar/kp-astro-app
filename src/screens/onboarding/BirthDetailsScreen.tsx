@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -16,8 +17,13 @@ import { Input, PrimaryButton } from '../../components';
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
 
+import { useDispatch } from 'react-redux';
+import { setBirthDetails } from '../../redux/slices/kundaliSlice';
+import { AppDispatch } from '../../redux/store';
+
 export function BirthDetailsScreen({ navigation }: any) {
   const { t } = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
@@ -25,7 +31,62 @@ export function BirthDetailsScreen({ navigation }: any) {
   const [place, setPlace] = useState('');
   const [gender, setGender] = useState('');
 
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+
+  const [locations, setLocations] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  /**
+   * Search location using OpenStreetMap
+   */
+  const searchLocation = async (text: string) => {
+    setPlace(text);
+
+    if (text.length < 3) {
+      setLocations([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${text}&format=json&limit=5`,
+      );
+
+      console.log(response, 'Search response');
+
+      const data = await response.json();
+      setLocations(data);
+      setShowSuggestions(true);
+    } catch (error) {
+      console.log('Location search error', error);
+    }
+  };
+
+  /**
+   * When user selects a place
+   */
+  const selectLocation = (item: any) => {
+    setPlace(item.display_name);
+    setLatitude(item.lat);
+    setLongitude(item.lon);
+
+    setShowSuggestions(false);
+  };
+
   const handleContinue = () => {
+    const birthData = {
+      name,
+      dob,
+      tob,
+      place,
+      latitude,
+      longitude,
+      gender,
+    };
+
+    dispatch(setBirthDetails(birthData));
+
     navigation.navigate('KundaliLoading');
   };
 
@@ -45,7 +106,7 @@ export function BirthDetailsScreen({ navigation }: any) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -53,7 +114,6 @@ export function BirthDetailsScreen({ navigation }: any) {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
         >
           {/* Header */}
           <View style={styles.header}>
@@ -65,15 +125,7 @@ export function BirthDetailsScreen({ navigation }: any) {
             </TouchableOpacity>
 
             <Text style={styles.headerTitle}>{t('appName')}</Text>
-
             <View style={{ width: 32 }} />
-          </View>
-
-          {/* Icon */}
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <Icon name="account-star" size={40} color={colors.primary} />
-            </View>
           </View>
 
           {/* Title */}
@@ -118,8 +170,27 @@ export function BirthDetailsScreen({ navigation }: any) {
               label={t('birthDetails.place')}
               placeholder={t('birthDetails.placePlaceholder')}
               value={place}
-              onChangeText={setPlace}
+              onChangeText={searchLocation}
             />
+
+            {showSuggestions && locations.length > 0 && (
+              <View style={styles.suggestionBox}>
+                <FlatList
+                  data={locations}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.suggestionItem}
+                      onPress={() => selectLocation(item)}
+                    >
+                      <Text style={styles.suggestionText}>
+                        {item.display_name}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            )}
 
             <PrimaryButton
               title={t('birthDetails.continue')}
@@ -240,6 +311,25 @@ const styles = StyleSheet.create({
 
   genderTextActive: {
     color: colors.primary,
+  },
+
+  suggestionBox: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    maxHeight: 200,
+    marginBottom: 16,
+  },
+
+  suggestionItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+
+  suggestionText: {
+    fontSize: 14,
+    color: colors.textPrimary,
   },
 
   footerText: {
