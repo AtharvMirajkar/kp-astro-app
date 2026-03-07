@@ -18,4 +18,16 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        maven {
+            // Tell Gradle to look here for AsyncStorage’s Android native library
+            url("$rootDir/../node_modules/@react-native-async-storage/async-storage/android/local_repo")
+        }
+        mavenCentral()
+        google()
+        maven { url("$rootDir/../node_modules/react-native/android") }
+    }
+}
+
 apply plugin: "com.facebook.react.rootproject"
