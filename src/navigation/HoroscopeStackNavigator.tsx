@@ -12,7 +12,7 @@ export function HoroscopeStackNavigator() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="CreateKundali" component={HoroscopeScreen} />
+      {/* <Stack.Screen name="CreateKundali" component={HoroscopeScreen} /> */}
       <Stack.Screen name="KundaliOverview" component={KundaliOverviewScreen} />
     </Stack.Navigator>
   );

@@ -1,15 +1,103 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useSelector } from 'react-redux';
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
+import { RootState } from '../../redux/store';
 
-export function HomeScreen() {
+// Map sign names to zodiac icon names (MaterialCommunityIcons)
+const zodiacIconMap: Record<string, string> = {
+  Aries: 'zodiac-aries',
+  Taurus: 'zodiac-taurus',
+  Gemini: 'zodiac-gemini',
+  Cancer: 'zodiac-cancer',
+  Leo: 'zodiac-leo',
+  Virgo: 'zodiac-virgo',
+  Libra: 'zodiac-libra',
+  Scorpio: 'zodiac-scorpio',
+  Sagittarius: 'zodiac-sagittarius',
+  Capricorn: 'zodiac-capricorn',
+  Aquarius: 'zodiac-aquarius',
+  Pisces: 'zodiac-pisces',
+};
+
+// Map planet names to abbreviated display labels
+const planetAbbrMap: Record<string, string> = {
+  Sun: 'Su',
+  Moon: 'Mo',
+  Mars: 'Ma',
+  Mercury: 'Me',
+  Jupiter: 'Ju',
+  Venus: 'Ve',
+  Saturn: 'Sa',
+  Rahu: 'Ra',
+  Ketu: 'Ke',
+  Harshal: 'Ha',
+  Neptune: 'Ne',
+};
+
+// Planet icon background colors
+const planetColorMap: Record<string, string> = {
+  Sun: '#FFE8D6',
+  Moon: '#E8F0FF',
+  Mars: '#FFE0E0',
+  Mercury: '#D6FFE8',
+  Jupiter: '#FFF4D6',
+  Venus: '#FFD6F5',
+  Saturn: '#E8E8FF',
+  Rahu: '#F0E8FF',
+  Ketu: '#FFE8F0',
+};
+
+// Get house suffix
+function houseSuffix(n: number): string {
+  if (n === 1) return '1st';
+  if (n === 2) return '2nd';
+  if (n === 3) return '3rd';
+  return `${n}th`;
+}
+
+export function HomeScreen({ navigation }: any) {
   const { t } = useTranslation();
+  const { currentKundali, birthDetails } = useSelector(
+    (state: RootState) => state.kundali,
+  );
 
-  const userName = 'Rahul';
+  const userName = birthDetails?.name ?? 'User';
+
+  // ── Derived values from Kundali ──────────────────────────────────────
+  const ascendantData = currentKundali?.planetary_positions?.Ascendant;
+  const moonData = currentKundali?.planetary_positions?.Moon;
+  const sunData = currentKundali?.planetary_positions?.Sun;
+  const jupiterData = currentKundali?.planetary_positions?.Jupiter;
+  const saturnData = currentKundali?.planetary_positions?.Saturn;
+  const planetHousePositions = currentKundali?.planet_house_positions ?? {};
+
+  const ascendantSign = ascendantData?.sign ?? t('home.ascendantSign');
+  const ascendantNakshatra = ascendantData?.nakshatra ?? t('home.ascendantSub');
+  const moonSign = moonData?.sign ?? t('home.moonSignSign');
+  const moonNakshatra = moonData?.nakshatra ?? t('home.moonSignSub');
+
+  // Top 5 planets to show in "Planetary Snapshot"
+  const keyPlanets = [
+    'Sun',
+    'Moon',
+    'Mars',
+    'Mercury',
+    'Jupiter',
+    'Venus',
+    'Saturn',
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -17,6 +105,7 @@ export function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* ── Header ── */}
         <View style={styles.headerRow}>
           <Icon name="menu" size={24} color={colors.textPrimary} />
           <Text style={styles.headerTitle}>{t('home.headerTitle')}</Text>
@@ -25,21 +114,25 @@ export function HomeScreen() {
           </View>
         </View>
 
+        {/* ── Profile Card ── */}
         <View style={styles.card}>
           <View style={styles.profileRow}>
-            <View style={styles.avatarWrapper}>
-              {/* Placeholder avatar */}
+            {/* <View style={styles.avatarWrapper}>
               <Image
                 source={{ uri: 'https://via.placeholder.com/80x80.png' }}
                 style={styles.avatarImage}
               />
               <View style={styles.statusDot} />
-            </View>
+            </View> */}
             <View style={styles.profileText}>
               <Text style={styles.greeting}>
                 {t('home.greeting', { name: userName })}
               </Text>
-              <Text style={styles.dateLine}>{t('home.dateLine')}</Text>
+              <Text style={styles.dateLine}>
+                {birthDetails?.dob
+                  ? `Born: ${birthDetails.dob}  •  ${birthDetails.place ?? ''}`
+                  : t('home.dateLine')}
+              </Text>
               <View style={styles.auspiciousRow}>
                 <Icon name="star-outline" size={14} color={colors.primary} />
                 <Text style={styles.auspiciousText}>
@@ -50,63 +143,207 @@ export function HomeScreen() {
           </View>
         </View>
 
+        {/* ── Natal Summary ── */}
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitle}>{t('home.natalSummaryTitle')}</Text>
-          <Text style={styles.sectionLink}>{t('home.viewChart')}</Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Horoscope', {
+                screen: 'KundaliOverview',
+                params: {
+                  name: birthDetails?.name,
+                  dob: birthDetails?.dob,
+                  tob: birthDetails?.tob,
+                },
+              } as any)
+            }
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.sectionLink}>{t('home.viewChart')}</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.summaryRow}>
+          {/* Ascendant Card */}
           <View style={[styles.summaryCard, styles.summaryCardLeft]}>
             <View style={styles.summaryIconWrapper}>
-              <Icon name="human-male" size={20} color={colors.primary} />
+              <Icon
+                name={zodiacIconMap[ascendantSign] ?? 'zodiac-virgo'}
+                size={20}
+                color={colors.primary}
+              />
             </View>
             <Text style={styles.summaryLabel}>{t('home.ascendantTitle')}</Text>
-            <Text style={styles.summaryValue}>{t('home.ascendantSign')}</Text>
-            <Text style={styles.summarySub}>{t('home.ascendantSub')}</Text>
+            <Text style={styles.summaryValue}>{ascendantSign}</Text>
+            <Text style={styles.summarySub}>{ascendantNakshatra}</Text>
+            {ascendantData?.sign_lord ? (
+              <Text style={styles.summaryExtra}>
+                Lord: {ascendantData.sign_lord}
+              </Text>
+            ) : null}
           </View>
 
+          {/* Moon Sign Card */}
           <View style={[styles.summaryCard, styles.summaryCardRight]}>
             <View style={styles.summaryIconWrapper}>
               <Icon
-                name="moon-waning-crescent"
+                name={zodiacIconMap[moonSign] ?? 'moon-waning-crescent'}
                 size={20}
                 color={colors.primary}
               />
             </View>
             <Text style={styles.summaryLabel}>{t('home.moonSignTitle')}</Text>
-            <Text style={styles.summaryValue}>{t('home.moonSignSign')}</Text>
-            <Text style={styles.summarySub}>{t('home.moonSignSub')}</Text>
+            <Text style={styles.summaryValue}>{moonSign}</Text>
+            <Text style={styles.summarySub}>{moonNakshatra}</Text>
+            {moonData?.nakshatra_lord ? (
+              <Text style={styles.summaryExtra}>
+                Star Lord: {moonData.nakshatra_lord}
+              </Text>
+            ) : null}
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>{t('home.currentPeriodsTitle')}</Text>
+        {/* ── Sun Sign Card ── */}
+        {sunData && (
+          <View style={styles.sunCard}>
+            <View style={styles.sunLeft}>
+              <Icon name="white-balance-sunny" size={22} color="#FF9500" />
+              <View style={{ marginLeft: 12 }}>
+                <Text style={styles.sunLabel}>Sun Sign</Text>
+                <Text style={styles.sunValue}>
+                  {sunData.sign} • {sunData.degree_in_sign}
+                </Text>
+                <Text style={styles.sunSub}>{sunData.nakshatra}</Text>
+              </View>
+            </View>
+            <View style={styles.sunRight}>
+              <Text style={styles.sunHouseLabel}>House</Text>
+              <Text style={styles.sunHouseValue}>
+                {houseSuffix(planetHousePositions['Sun'] ?? 0)}
+              </Text>
+            </View>
+          </View>
+        )}
 
+        {/* ── Planetary Snapshot ── */}
+        {currentKundali && (
+          <>
+            <Text style={[styles.sectionTitle, { marginTop: 8 }]}>
+              Planetary Snapshot
+            </Text>
+            <View style={styles.planetGrid}>
+              {keyPlanets.map(planet => {
+                const pData = currentKundali.planetary_positions?.[planet];
+                if (!pData) return null;
+                const houseNum = planetHousePositions[planet];
+                return (
+                  <View key={planet} style={styles.planetChip}>
+                    <View
+                      style={[
+                        styles.planetChipIcon,
+                        {
+                          backgroundColor: planetColorMap[planet] ?? '#F0F0F0',
+                        },
+                      ]}
+                    >
+                      <Text style={styles.planetChipAbbr}>
+                        {planetAbbrMap[planet] ?? planet.slice(0, 2)}
+                      </Text>
+                    </View>
+                    <Text style={styles.planetChipName}>{planet}</Text>
+                    <Text style={styles.planetChipSign}>{pData.sign}</Text>
+                    {houseNum ? (
+                      <Text style={styles.planetChipHouse}>H{houseNum}</Text>
+                    ) : null}
+                  </View>
+                );
+              })}
+            </View>
+          </>
+        )}
+
+        {/* ── Current Periods ── */}
+        <Text style={[styles.sectionTitle, { marginTop: 8 }]}>
+          {t('home.currentPeriodsTitle')}
+        </Text>
+
+        {/* Jupiter Period */}
         <View style={styles.periodCard}>
           <View style={styles.periodIconWrapperJupiter}>
-            <Text style={styles.periodIconText}>Ju</Text>
+            <Text style={styles.periodIconText}>
+              {planetAbbrMap['Jupiter']}
+            </Text>
           </View>
           <View style={styles.periodTextWrapper}>
-            <Text style={styles.periodTitle}>{t('home.jupiterTitle')}</Text>
-            <Text style={styles.periodSub}>{t('home.jupiterSub')}</Text>
+            <Text style={styles.periodTitle}>
+              {jupiterData
+                ? `Jupiter in ${jupiterData.sign}`
+                : t('home.jupiterTitle')}
+            </Text>
+            <Text style={styles.periodSub}>
+              {jupiterData
+                ? `${jupiterData.nakshatra}  •  House ${
+                    planetHousePositions['Jupiter'] ?? '—'
+                  }`
+                : t('home.jupiterSub')}
+            </Text>
           </View>
         </View>
 
+        {/* Saturn Period */}
         <View style={styles.periodCard}>
           <View style={styles.periodIconWrapperSaturn}>
             <Icon name="orbit-variant" size={20} color={colors.primary} />
           </View>
           <View style={styles.periodTextWrapper}>
-            <Text style={styles.periodTitle}>{t('home.saturnTitle')}</Text>
-            <Text style={styles.periodSub}>{t('home.saturnSub')}</Text>
+            <Text style={styles.periodTitle}>
+              {saturnData
+                ? `Saturn in ${saturnData.sign}`
+                : t('home.saturnTitle')}
+            </Text>
+            <Text style={styles.periodSub}>
+              {saturnData
+                ? `${saturnData.nakshatra}  •  House ${
+                    planetHousePositions['Saturn'] ?? '—'
+                  }`
+                : t('home.saturnSub')}
+            </Text>
           </View>
           <View style={styles.periodTag}>
             <Text style={styles.periodTagText}>{t('home.retrograde')}</Text>
           </View>
         </View>
 
+        {/* ── KP Significators Highlight (House 10 — Career) ── */}
+        {currentKundali?.bhava_significators?.['10']?.length > 0 && (
+          <View style={styles.kpCard}>
+            <View style={styles.kpHeader}>
+              <Icon name="briefcase-outline" size={18} color={colors.primary} />
+              <Text style={styles.kpTitle}>10th House — Career</Text>
+            </View>
+            <Text style={styles.kpSub}>KP Significators</Text>
+            <View style={styles.kpPillRow}>
+              {currentKundali.bhava_significators['10'].map(
+                (planet: string) => (
+                  <View key={planet} style={styles.kpPill}>
+                    <Text style={styles.kpPillText}>{planet}</Text>
+                  </View>
+                ),
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* ── Insight Card ── */}
         <View style={styles.insightCard}>
           <Text style={styles.insightTitle}>{t('home.insightTitle')}</Text>
-          <Text style={styles.insightBody}>{t('home.insightBody')}</Text>
+          <Text style={styles.insightBody}>
+            {currentKundali
+              ? `Your Ascendant in ${ascendantSign} (${ascendantNakshatra}) shapes your outward personality. With Moon in ${moonSign}, your emotional nature reflects ${
+                  moonData?.nakshatra_lord ?? 'cosmic'
+                } energies.`
+              : t('home.insightBody')}
+          </Text>
           <View style={styles.insightButton}>
             <Text style={styles.insightButtonText}>{t('home.insightCta')}</Text>
           </View>
@@ -223,10 +460,12 @@ const styles = StyleSheet.create({
     color: colors.link,
     fontFamily: fonts.medium,
   },
+
+  // ── Summary Cards ──────────────────────────────────────
   summaryRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   summaryCard: {
     flex: 1,
@@ -235,12 +474,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 12,
   },
-  summaryCardLeft: {
-    marginRight: 4,
-  },
-  summaryCardRight: {
-    marginLeft: 4,
-  },
+  summaryCardLeft: { marginRight: 4 },
+  summaryCardRight: { marginLeft: 4 },
   summaryIconWrapper: {
     width: 32,
     height: 32,
@@ -266,6 +501,106 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontFamily: fonts.regular,
   },
+  summaryExtra: {
+    fontSize: 11,
+    color: colors.primary,
+    marginTop: 4,
+    fontFamily: fonts.medium,
+  },
+
+  // ── Sun Card ──────────────────────────────────────────
+  sunCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+    justifyContent: 'space-between',
+  },
+  sunLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sunLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 2,
+  },
+  sunValue: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+  },
+  sunSub: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  sunRight: {
+    alignItems: 'center',
+  },
+  sunHouseLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+  },
+  sunHouseValue: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.primary,
+    fontFamily: fonts.bold,
+  },
+
+  // ── Planet Grid ──────────────────────────────────────
+  planetGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 20,
+  },
+  planetChip: {
+    width: '30%',
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 14,
+    padding: 10,
+    alignItems: 'center',
+  },
+  planetChipIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  planetChipAbbr: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.primary,
+    fontFamily: fonts.bold,
+  },
+  planetChipName: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    marginBottom: 2,
+  },
+  planetChipSign: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    textAlign: 'center',
+    fontFamily: fonts.medium,
+  },
+  planetChipHouse: {
+    fontSize: 11,
+    color: colors.primary,
+    marginTop: 2,
+    fontFamily: fonts.medium,
+  },
+
+  // ── Period Cards ─────────────────────────────────────
   periodCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -298,9 +633,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.primary,
   },
-  periodTextWrapper: {
-    flex: 1,
-  },
+  periodTextWrapper: { flex: 1 },
   periodTitle: {
     fontSize: 14,
     fontWeight: '600',
@@ -326,8 +659,55 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     fontFamily: fonts.medium,
   },
+
+  // ── KP Card ──────────────────────────────────────────
+  kpCard: {
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    marginTop: 4,
+  },
+  kpHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  kpTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginLeft: 8,
+    fontFamily: fonts.medium,
+  },
+  kpSub: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 10,
+  },
+  kpPillRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  kpPill: {
+    backgroundColor: colors.logoBackground,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: colors.logoBorder,
+  },
+  kpPillText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary,
+    fontFamily: fonts.medium,
+  },
+
+  // ── Insight Card ─────────────────────────────────────
   insightCard: {
-    marginTop: 16,
+    marginTop: 8,
     borderRadius: 20,
     paddingVertical: 18,
     paddingHorizontal: 18,
