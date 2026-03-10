@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../api/axiosInstance';
+import axios from 'axios';
 
 interface KundaliState {
   currentKundali: any | null;
@@ -27,7 +28,7 @@ const initialState: KundaliState = {
 
 export const generateKundali = createAsyncThunk(
   'kundali/generate',
-  async (payload: {
+  async (birthDetails: {
     name: string;
     dob: string;
     tob: string;
@@ -35,7 +36,19 @@ export const generateKundali = createAsyncThunk(
     latitude: string;
     longitude: string;
   }) => {
-    const res = await axiosInstance.post('/kundali/generate', payload);
+    const payload = {
+      date: birthDetails.dob, 
+      time: birthDetails.tob, 
+      latitude: Number(birthDetails.latitude), 
+      longitude: Number(birthDetails.longitude), 
+      timezone: 'Asia/Kolkata', // required by API
+    };
+
+    console.log(payload, '<------- Payload');
+    const res = await axios.post(
+      'https://kp-astro-engine.onrender.com/generate-chart',
+      payload,
+    );
     return res.data;
   },
 );

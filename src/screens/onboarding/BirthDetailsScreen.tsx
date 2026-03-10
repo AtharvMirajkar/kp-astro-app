@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,12 @@ import {
   Platform,
   TouchableOpacity,
   FlatList,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { Input, PrimaryButton } from '../../components';
 import { colors } from '../../constants/colors';
@@ -26,59 +28,102 @@ export function BirthDetailsScreen({ navigation }: any) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [name, setName] = useState('');
-  const [dob, setDob] = useState('');
-  const [tob, setTob] = useState('');
-  const [place, setPlace] = useState('');
   const [gender, setGender] = useState('');
 
+  // ── Date & Time ────────────────────────────────────────
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [birthTime, setBirthTime] = useState<Date | null>(null);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const [place, setPlace] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
-
   const [locations, setLocations] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  /**
-   * Search location using OpenStreetMap
-   */
-  const searchLocation = async (text: string) => {
-    setPlace(text);
+  const debounceTimeout = useRef<number | null>(null);
 
-    if (text.length < 3) {
-      setLocations([]);
-      return;
-    }
+  // Format helpers
+  const formatDate = (date: Date | null) => {
+    if (!date) return '';
+    return date.toISOString().split('T')[0];
+  };
 
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${text}&format=json&limit=5`,
-      );
+  const formatTime = (time: Date | null) => {
+    if (!time) return '';
+    return time.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+    }); // 24-hour HH:MM
+  };
 
-      console.log(response, 'Search response');
-
-      const data = await response.json();
-      setLocations(data);
-      setShowSuggestions(true);
-    } catch (error) {
-      console.log('Location search error', error);
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios'); // iOS stays open
+    if (selectedDate) {
+      setBirthDate(selectedDate);
     }
   };
 
-  /**
-   * When user selects a place
-   */
-  const selectLocation = (item: any) => {
-    setPlace(item.display_name);
-    setLatitude(item.lat);
-    setLongitude(item.lon);
+  const onTimeChange = (event: any, selectedTime?: Date) => {
+    setShowTimePicker(Platform.OS === 'ios');
+    if (selectedTime) {
+      setBirthTime(selectedTime);
+    }
+  };
 
+  const searchLocation = (text: string) => {
+    setPlace(text);
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    if (text.length < 3) {
+      setLocations([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+            text,
+          )}&format=json&limit=5`,
+          {
+            headers: {
+              'User-Agent': 'KundaliApp/1.0',
+              'Accept-Language': 'en',
+            },
+          },
+        );
+        const data = await response.json();
+        setLocations(data);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.log('Location search error', error);
+      }
+    }, 500);
+  };
+
+  const selectLocation = (item: any) => {
+    setPlace(item.display_name || '');
+    setLatitude(item.lat || '');
+    setLongitude(item.lon || '');
     setShowSuggestions(false);
   };
 
   const handleContinue = () => {
+    if (!birthDate || !birthTime) {
+      // You can show an alert here
+      console.warn('Please select date and time');
+      return;
+    }
+
     const birthData = {
       name,
-      dob,
-      tob,
+      dob: formatDate(birthDate),
+      tob: formatTime(birthTime),
       place,
       latitude,
       longitude,
@@ -86,13 +131,11 @@ export function BirthDetailsScreen({ navigation }: any) {
     };
 
     dispatch(setBirthDetails(birthData));
-
     navigation.navigate('KundaliLoading');
   };
 
   const renderGenderButton = (value: string, label: string) => {
     const active = gender === value;
-
     return (
       <TouchableOpacity
         style={[styles.genderButton, active && styles.genderButtonActive]}
@@ -123,17 +166,13 @@ export function BirthDetailsScreen({ navigation }: any) {
             >
               <Icon name="arrow-left" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
-
             <Text style={styles.headerTitle}>{t('appName')}</Text>
             <View style={{ width: 32 }} />
           </View>
 
-          {/* Title */}
           <Text style={styles.title}>{t('birthDetails.title')}</Text>
-
           <Text style={styles.subtitle}>{t('birthDetails.subtitle')}</Text>
 
-          {/* Form */}
           <View style={styles.form}>
             <Input
               label={t('birthDetails.name')}
@@ -143,28 +182,55 @@ export function BirthDetailsScreen({ navigation }: any) {
               leftIcon="user"
             />
 
-            {/* Gender */}
             <Text style={styles.genderLabel}>{t('birthDetails.gender')}</Text>
-
             <View style={styles.genderContainer}>
               {renderGenderButton('male', t('birthDetails.male'))}
               {renderGenderButton('female', t('birthDetails.female'))}
               {renderGenderButton('other', t('birthDetails.other'))}
             </View>
 
-            <Input
-              label={t('birthDetails.dob')}
-              placeholder="DD/MM/YYYY"
-              value={dob}
-              onChangeText={setDob}
-            />
+            {/* ── Date Picker Field ── */}
+            <Pressable onPress={() => setShowDatePicker(true)}>
+              <Input
+                label={t('birthDetails.dob')}
+                placeholder="YYYY-MM-DD"
+                value={formatDate(birthDate)}
+                editable={false}
+                pointerEvents="none"
+                leftIcon="calendar"
+              />
+            </Pressable>
 
-            <Input
-              label={t('birthDetails.tob')}
-              placeholder="HH:MM"
-              value={tob}
-              onChangeText={setTob}
-            />
+            {showDatePicker && (
+              <DateTimePicker
+                value={birthDate || new Date()}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                onChange={onDateChange}
+                maximumDate={new Date()} // can't be born in future
+              />
+            )}
+
+            {/* ── Time Picker Field ── */}
+            <Pressable onPress={() => setShowTimePicker(true)}>
+              <Input
+                label={t('birthDetails.tob')}
+                placeholder="HH:MM"
+                value={formatTime(birthTime)}
+                editable={false}
+                pointerEvents="none"
+                leftIcon="clock-outline"
+              />
+            </Pressable>
+
+            {showTimePicker && (
+              <DateTimePicker
+                value={birthTime || new Date()}
+                mode="time"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={onTimeChange}
+              />
+            )}
 
             <Input
               label={t('birthDetails.place')}
@@ -210,17 +276,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-
   keyboardView: {
     flex: 1,
   },
-
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingBottom: 32,
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -228,33 +291,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     minHeight: 44,
   },
-
   backButton: {
     padding: 4,
   },
-
   headerTitle: {
     fontSize: 18,
     fontFamily: fonts.bold,
     color: colors.textPrimary,
   },
-
-  iconContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-
-  iconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.logoBackground,
-    borderWidth: 1,
-    borderColor: colors.logoBorder,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
   title: {
     fontSize: 24,
     fontFamily: fonts.bold,
@@ -262,7 +306,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
   },
-
   subtitle: {
     fontSize: 15,
     fontFamily: fonts.regular,
@@ -270,24 +313,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 28,
   },
-
   form: {
     marginBottom: 24,
   },
-
   genderLabel: {
     fontSize: 14,
     fontFamily: fonts.medium,
     color: colors.textPrimary,
     marginBottom: 10,
   },
-
   genderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-
   genderButton: {
     flex: 1,
     borderWidth: 1,
@@ -297,22 +336,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 4,
   },
-
   genderButtonActive: {
     borderColor: colors.primary,
     backgroundColor: colors.logoBackground,
   },
-
   genderText: {
     fontSize: 14,
     fontFamily: fonts.medium,
     color: colors.textSecondary,
   },
-
   genderTextActive: {
     color: colors.primary,
   },
-
   suggestionBox: {
     borderWidth: 1,
     borderColor: colors.border,
@@ -320,18 +355,15 @@ const styles = StyleSheet.create({
     maxHeight: 200,
     marginBottom: 16,
   },
-
   suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-
   suggestionText: {
     fontSize: 14,
     color: colors.textPrimary,
   },
-
   footerText: {
     fontSize: 12,
     fontFamily: fonts.regular,

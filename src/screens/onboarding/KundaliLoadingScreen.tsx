@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,7 +20,9 @@ const loadingSteps = [
 export function KundaliLoadingScreen({ navigation }: any) {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { birthDetails } = useSelector((state: RootState) => state.kundali);
+  const { birthDetails, currentKundali, loading } = useSelector(
+    (state: RootState) => state.kundali,
+  );
 
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
@@ -65,7 +67,7 @@ export function KundaliLoadingScreen({ navigation }: any) {
   }, []);
 
   // ---------------------------
-  // Generate Kundali API
+  // Generate Kundali API Call
   // ---------------------------
 
   useEffect(() => {
@@ -73,13 +75,23 @@ export function KundaliLoadingScreen({ navigation }: any) {
       if (!birthDetails) return;
 
       try {
+        // Dispatch the generateKundali action
         const result = await dispatch(generateKundali(birthDetails));
 
         if (generateKundali.fulfilled.match(result)) {
-          navigation.replace('MainTabs');
+          navigation.replace('MainTabs'); // Navigate after successful API response
+        } else {
+          // Handle case when the result is not successful
+          Alert.alert('Error', 'Failed to generate Kundali. Please try again.');
+          navigation.goBack();
         }
       } catch (error) {
-        console.log('Kundali generation failed', error);
+        console.error('Kundali generation failed', error);
+        Alert.alert(
+          'Error',
+          'Something went wrong while generating your Kundali.',
+        );
+        navigation.goBack();
       }
     };
 
@@ -105,7 +117,11 @@ export function KundaliLoadingScreen({ navigation }: any) {
         <Text style={styles.title}>Generating Your Kundali</Text>
 
         {/* Dynamic Step */}
-        <Text style={styles.subtitle}>{loadingSteps[stepIndex]}</Text>
+        <Text style={styles.subtitle}>
+          {loading
+            ? 'Please wait, we are generating your Kundali...'
+            : loadingSteps[stepIndex]}
+        </Text>
       </View>
     </SafeAreaView>
   );

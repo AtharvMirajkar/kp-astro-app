@@ -11,7 +11,14 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
 
-export type InputIconType = 'email' | 'password' | 'user' | 'location' | 'none';
+export type InputIconType =
+  | 'email'
+  | 'password'
+  | 'user'
+  | 'location'
+  | 'clock-outline'
+  | 'calendar'
+  | 'none';
 
 export interface InputProps extends Omit<TextInputProps, 'style'> {
   label: string;
@@ -40,6 +47,10 @@ export function Input({
         return 'account-outline';
       case 'location':
         return 'map-marker-outline';
+      case 'calendar':
+        return 'calendar'; 
+      case 'clock-outline':
+        return 'clock-outline';
       default:
         return 'circle-outline';
     }
