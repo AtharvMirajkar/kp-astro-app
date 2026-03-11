@@ -2,11 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
-import {
-  HomeScreen,
-  ProfileScreen,
-  SettingsScreen,
-} from '../screens';
+import { HomeScreen, ProfileScreen } from '../screens';
 import { MatchStackNavigator } from './MatchStackNavigator';
 import { HoroscopeStackNavigator } from './HoroscopeStackNavigator';
 import { colors } from '../constants/colors';
@@ -43,16 +39,7 @@ export function MainTabNavigator() {
           ),
         }}
       />
-      <Tab.Screen
-        name="Match"
-        component={MatchStackNavigator}
-        options={{
-          tabBarLabel: t('tabs:match'),
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="heart-outline" size={size} color={color} />
-          ),
-        }}
-      />
+      
       <Tab.Screen
         name="Horoscope"
         component={HoroscopeStackNavigator}
@@ -64,22 +51,22 @@ export function MainTabNavigator() {
         }}
       />
       <Tab.Screen
+        name="Match"
+        component={MatchStackNavigator}
+        options={{
+          tabBarLabel: t('tabs:match'),
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="heart-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
           tabBarLabel: t('tabs.profile'),
           tabBarIcon: ({ color, size }) => (
             <Icon name="account-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{
-          tabBarLabel: t('tabs.settings'),
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="cog-outline" size={size} color={color} />
           ),
         }}
       />

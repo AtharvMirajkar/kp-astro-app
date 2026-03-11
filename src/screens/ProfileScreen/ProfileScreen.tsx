@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,16 +6,70 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Switch,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useSelector } from 'react-redux';
+import { OptionSelectModal } from '../../components';
 import { colors } from '../../constants/colors';
 import type { ProfileScreenProps } from '../../types/navigation';
 import { fonts } from '../../constants';
+import { RootState } from '../../redux/store';
+
+const SUPPORTED_LOCALES = ['en', 'hi', 'mr'] as const;
+type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
+
+function normalizeLanguage(lang: string): LocaleCode {
+  if (lang.startsWith('hi')) return 'hi';
+  if (lang.startsWith('mr')) return 'mr';
+  return 'en';
+}
 
 export function ProfileScreen({ navigation }: ProfileScreenProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { currentKundali, birthDetails } = useSelector(
+    (state: RootState) => state.kundali,
+  );
+
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
+  const [pushNotificationsOn, setPushNotificationsOn] = useState(false);
+
+  const currentLang = normalizeLanguage(i18n.language);
+  const currentLanguageLabel =
+    currentLang === 'en'
+      ? t('settings.languageEn')
+      : currentLang === 'hi'
+      ? t('settings.languageHi')
+      : t('settings.languageMr');
+
+  const languageOptions = useMemo(
+    () => [
+      { value: 'en', label: t('languageModal.optionEn') },
+      { value: 'hi', label: t('languageModal.optionHi') },
+      { value: 'mr', label: t('languageModal.optionMr') },
+    ],
+    [t],
+  );
+
+  const handleLanguageApply = (value: string) => {
+    const locale = normalizeLanguage(value);
+    if (SUPPORTED_LOCALES.includes(locale as LocaleCode)) {
+      i18n.changeLanguage(locale);
+    }
+  };
+
+  // Dynamic kundali values
+  const sunSign =
+    currentKundali?.planetary_positions?.Sun?.sign ?? t('profile.sunValue');
+  const moonSign =
+    currentKundali?.planetary_positions?.Moon?.sign ?? t('profile.moonValue');
+  const ascSign =
+    currentKundali?.planetary_positions?.Ascendant?.sign ??
+    t('profile.ascValue');
+  const userName = birthDetails?.name ?? t('profile.name');
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -23,36 +77,24 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* ── Header ── */}
         <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            style={styles.headerIconButton}
-          >
-            <Icon name="arrow-left" size={22} color={colors.textPrimary} />
-          </TouchableOpacity>
           <Text style={styles.headerTitle}>{t('profile.headerTitle')}</Text>
-          <TouchableOpacity
-            onPress={() => {}}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            style={styles.headerIconButton}
-          >
-            <Icon name="cog-outline" size={20} color={colors.textPrimary} />
-          </TouchableOpacity>
         </View>
 
+        {/* ── Profile Card ── */}
         <View style={styles.profileCard}>
           <View style={styles.avatarWrapper}>
             <Image
               source={{ uri: 'https://via.placeholder.com/120x120.png' }}
               style={styles.avatarImage}
             />
-            <View style={styles.avatarBadge}>
-              <Icon name="star" size={16} color={colors.textOnPrimary} />
-            </View>
+            <TouchableOpacity style={styles.avatarBadge} activeOpacity={0.8}>
+              <Icon name="pencil" size={14} color={colors.textOnPrimary} />
+            </TouchableOpacity>
           </View>
 
-          <Text style={styles.profileName}>{t('profile.name')}</Text>
+          <Text style={styles.profileName}>{userName}</Text>
           <View style={styles.profileMetaRow}>
             <View style={styles.tierPill}>
               <Text style={styles.tierPillText}>{t('profile.tierLabel')}</Text>
@@ -62,13 +104,21 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
             </Text>
           </View>
 
+          {birthDetails?.dob ? (
+            <Text style={styles.birthDetailText}>
+              {birthDetails.dob}
+              {birthDetails.tob ? `  •  ${birthDetails.tob}` : ''}
+              {birthDetails.place ? `  •  ${birthDetails.place}` : ''}
+            </Text>
+          ) : null}
+
           <View style={styles.profileButtonsRow}>
             <TouchableOpacity style={styles.editButton} activeOpacity={0.85}>
               <Icon
                 name="pencil-outline"
                 size={16}
                 color={colors.textOnPrimary}
-                style={styles.editButtonIcon}
+                style={styles.buttonIcon}
               />
               <Text style={styles.editButtonText}>
                 {t('profile.editProfile')}
@@ -79,7 +129,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
                 name="share-variant"
                 size={16}
                 color={colors.textPrimary}
-                style={styles.shareButtonIcon}
+                style={styles.buttonIcon}
               />
               <Text style={styles.shareButtonText}>
                 {t('profile.shareChart')}
@@ -88,6 +138,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
           </View>
         </View>
 
+        {/* ── Stats ── */}
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <Text style={styles.statValue}>
@@ -97,102 +148,187 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
               {t('profile.savedChartsLabel')}
             </Text>
           </View>
+          <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{t('profile.reportsValue')}</Text>
             <Text style={styles.statLabel}>{t('profile.reportsLabel')}</Text>
           </View>
+          <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{t('profile.minutesValue')}</Text>
             <Text style={styles.statLabel}>{t('profile.minutesLabel')}</Text>
           </View>
         </View>
 
+        {/* ── Zodiac Summary ── */}
         <View style={styles.zodiacCard}>
-          <Text style={styles.zodiacTitle}>{t('profile.zodiacTitle')}</Text>
+          <Text style={styles.sectionLabel}>{t('profile.zodiacTitle')}</Text>
           <View style={styles.zodiacRow}>
             <View style={styles.zodiacItem}>
-              <Icon
-                name="white-balance-sunny"
-                size={20}
-                color={colors.primary}
-              />
+              <View style={styles.zodiacIconWrap}>
+                <Icon
+                  name="white-balance-sunny"
+                  size={18}
+                  color={colors.primary}
+                />
+              </View>
               <Text style={styles.zodiacLabel}>{t('profile.sunLabel')}</Text>
-              <Text style={styles.zodiacValue}>{t('profile.sunValue')}</Text>
+              <Text style={styles.zodiacValue}>{sunSign}</Text>
             </View>
             <View style={styles.zodiacItem}>
-              <Icon
-                name="moon-waxing-crescent"
-                size={20}
-                color={colors.primary}
-              />
+              <View style={styles.zodiacIconWrap}>
+                <Icon
+                  name="moon-waxing-crescent"
+                  size={18}
+                  color={colors.primary}
+                />
+              </View>
               <Text style={styles.zodiacLabel}>{t('profile.moonLabel')}</Text>
-              <Text style={styles.zodiacValue}>{t('profile.moonValue')}</Text>
+              <Text style={styles.zodiacValue}>{moonSign}</Text>
             </View>
             <View style={styles.zodiacItem}>
-              <Icon name="human-male" size={20} color={colors.primary} />
+              <View style={styles.zodiacIconWrap}>
+                <Icon name="human-male" size={18} color={colors.primary} />
+              </View>
               <Text style={styles.zodiacLabel}>{t('profile.ascLabel')}</Text>
-              <Text style={styles.zodiacValue}>{t('profile.ascValue')}</Text>
+              <Text style={styles.zodiacValue}>{ascSign}</Text>
             </View>
           </View>
         </View>
 
-        <Text style={styles.servicesTitle}>{t('profile.servicesTitle')}</Text>
+        {/* ── Services ── */}
+        <Text style={styles.sectionLabel}>{t('profile.servicesTitle')}</Text>
 
-        <View style={styles.serviceCard}>
-          <View style={styles.serviceLeft}>
-            <View style={styles.serviceIconWrapper}>
+        <View style={styles.menuCard}>
+          <Pressable
+            style={styles.menuRow}
+            android_ripple={{ color: colors.border }}
+          >
+            <View style={styles.menuIconWrap}>
               <Icon
                 name="file-document-outline"
                 size={18}
                 color={colors.primary}
               />
             </View>
-            <View>
-              <Text style={styles.serviceTitle}>
-                {t('profile.prashnaTitle')}
-              </Text>
-              <Text style={styles.serviceSubtitle}>
-                {t('profile.prashnaSubtitle')}
-              </Text>
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>{t('profile.prashnaTitle')}</Text>
+              <Text style={styles.menuSub}>{t('profile.prashnaSubtitle')}</Text>
             </View>
-          </View>
-          <Icon name="chevron-right" size={20} color={colors.textSecondary} />
-        </View>
+            <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+          </Pressable>
 
-        <View style={styles.serviceCard}>
-          <View style={styles.serviceLeft}>
-            <View style={styles.serviceIconWrapper}>
+          <View style={styles.menuDivider} />
+
+          <Pressable
+            style={styles.menuRow}
+            android_ripple={{ color: colors.border }}
+          >
+            <View style={styles.menuIconWrap}>
               <Icon name="wallet-outline" size={18} color={colors.primary} />
             </View>
-            <View>
-              <Text style={styles.serviceTitle}>
-                {t('profile.walletTitle')}
-              </Text>
-              <Text style={styles.serviceSubtitle}>
-                {t('profile.walletSubtitle')}
-              </Text>
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>{t('profile.walletTitle')}</Text>
+              <Text style={styles.menuSub}>{t('profile.walletSubtitle')}</Text>
             </View>
-          </View>
-          <Icon name="chevron-right" size={20} color={colors.textSecondary} />
-        </View>
+            <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+          </Pressable>
 
-        <View style={styles.serviceCard}>
-          <View style={styles.serviceLeft}>
-            <View style={styles.serviceIconWrapper}>
+          <View style={styles.menuDivider} />
+
+          <Pressable
+            style={styles.menuRow}
+            android_ripple={{ color: colors.border }}
+          >
+            <View style={styles.menuIconWrap}>
               <Icon name="history" size={18} color={colors.primary} />
             </View>
-            <View>
-              <Text style={styles.serviceTitle}>
-                {t('profile.historyTitle')}
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>{t('profile.historyTitle')}</Text>
+              <Text style={styles.menuSub}>{t('profile.historySubtitle')}</Text>
+            </View>
+            <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+          </Pressable>
+        </View>
+
+        {/* ── Preferences (from Settings) ── */}
+        <Text style={styles.sectionLabel}>
+          {t('settings.preferences').toUpperCase()}
+        </Text>
+
+        <View style={styles.menuCard}>
+          <Pressable
+            style={styles.menuRow}
+            onPress={() => setLanguageModalVisible(true)}
+            android_ripple={{ color: colors.border }}
+          >
+            <View style={styles.menuIconWrap}>
+              <Icon name="earth" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>{t('settings.language')}</Text>
+              <Text style={styles.menuSub}>{currentLanguageLabel}</Text>
+            </View>
+            <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+          </Pressable>
+
+          <View style={styles.menuDivider} />
+
+          <View style={styles.menuRow}>
+            <View style={styles.menuIconWrap}>
+              <Icon name="bell-outline" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>
+                {t('settings.pushNotifications')}
               </Text>
-              <Text style={styles.serviceSubtitle}>
-                {t('profile.historySubtitle')}
+              <Text style={styles.menuSub}>
+                {t('settings.pushNotificationsValue')}
               </Text>
             </View>
+            <Switch
+              value={pushNotificationsOn}
+              onValueChange={setPushNotificationsOn}
+              trackColor={{ false: colors.border, true: colors.logoBackground }}
+              thumbColor={
+                pushNotificationsOn ? colors.primary : colors.textMuted
+              }
+            />
           </View>
-          <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+
+          <View style={styles.menuDivider} />
+
+          <Pressable
+            style={styles.menuRow}
+            onPress={() => {}}
+            android_ripple={{ color: colors.border }}
+          >
+            <View style={styles.menuIconWrap}>
+              <Icon name="theme-light-dark" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>{t('settings.appearance')}</Text>
+              <Text style={styles.menuSub}>
+                {t('settings.appearanceValue')}
+              </Text>
+            </View>
+            <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+          </Pressable>
         </View>
       </ScrollView>
+
+      <OptionSelectModal
+        visible={languageModalVisible}
+        onClose={() => setLanguageModalVisible(false)}
+        title={t('languageModal.title')}
+        options={languageOptions}
+        selectedValue={currentLang}
+        onApply={handleLanguageApply}
+        applyButtonText={t('languageModal.applySelection')}
+        disclaimerText={t('languageModal.disclaimer')}
+        titleIcon="star-four-points"
+        activeSubLabel={t('languageModal.currentlyActive')}
+      />
     </SafeAreaView>
   );
 }
@@ -205,40 +341,39 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
+
+  // Header
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: 16,
   },
-  headerIconButton: {
-    padding: 4,
-  },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 22,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
+
+  // Profile card
   profileCard: {
     alignItems: 'center',
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 20,
     paddingVertical: 20,
     paddingHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   avatarWrapper: {
     width: 88,
     height: 88,
     borderRadius: 44,
-    overflow: 'hidden',
+    overflow: 'visible',
     marginBottom: 12,
   },
   avatarImage: {
-    width: '100%',
-    height: '100%',
+    width: 88,
+    height: 88,
+    borderRadius: 44,
   },
   avatarBadge: {
     position: 'absolute',
@@ -262,7 +397,7 @@ const styles = StyleSheet.create({
   profileMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 6,
   },
   tierPill: {
     paddingHorizontal: 10,
@@ -282,12 +417,20 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontFamily: fonts.regular,
   },
+  birthDetailText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
   profileButtonsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     width: '100%',
     marginTop: 4,
+    gap: 10,
   },
+  buttonIcon: { marginRight: 6 },
   editButton: {
     flex: 1,
     flexDirection: 'row',
@@ -296,10 +439,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 10,
-    marginRight: 6,
-  },
-  editButtonIcon: {
-    marginRight: 6,
   },
   editButtonText: {
     fontSize: 14,
@@ -314,29 +453,33 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 12,
     paddingVertical: 10,
-    marginLeft: 6,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  shareButtonIcon: {
-    marginRight: 6,
   },
   shareButtonText: {
     fontSize: 14,
     color: colors.textPrimary,
     fontFamily: fonts.medium,
   },
+
+  // Stats
   statsRow: {
     flexDirection: 'row',
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 8,
-    marginBottom: 16,
+    marginBottom: 12,
+    alignItems: 'center',
   },
   statItem: {
     flex: 1,
     alignItems: 'center',
+  },
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: colors.border,
   },
   statValue: {
     fontSize: 18,
@@ -350,6 +493,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: fonts.regular,
   },
+
+  // Zodiac
   zodiacCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -357,68 +502,81 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginBottom: 20,
   },
-  zodiacTitle: {
-    fontSize: 14,
-    color: colors.textPrimary,
-    marginBottom: 12,
-    fontFamily: fonts.bold,
-  },
   zodiacRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 8,
   },
   zodiacItem: {
     flex: 1,
     alignItems: 'center',
   },
-  zodiacLabel: {
-    marginTop: 6,
-    fontSize: 11,
-    color: colors.textSecondary,
-    fontFamily: fonts.regular,
-  },
-  zodiacValue: {
-    marginTop: 2,
-    fontSize: 14,
-    color: colors.textPrimary,
-    fontFamily: fonts.bold,
-  },
-  servicesTitle: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 8,
-    fontFamily: fonts.bold,
-  },
-  serviceCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    marginBottom: 10,
-  },
-  serviceLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  serviceIconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  zodiacIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.logoBackground,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginBottom: 6,
   },
-  serviceTitle: {
+  zodiacLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    marginBottom: 2,
+  },
+  zodiacValue: {
+    fontSize: 13,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+  },
+
+  // Shared section label
+  sectionLabel: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontFamily: fonts.bold,
+    marginBottom: 8,
+    marginTop: 4,
+  },
+
+  // Menu card (services + preferences)
+  menuCard: {
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginLeft: 56,
+  },
+  menuIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: colors.logoBackground,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  menuTextWrap: {
+    flex: 1,
+  },
+  menuTitle: {
     fontSize: 14,
     color: colors.textPrimary,
     fontFamily: fonts.medium,
   },
-  serviceSubtitle: {
+  menuSub: {
     fontSize: 12,
     color: colors.textSecondary,
     marginTop: 2,
