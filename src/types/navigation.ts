@@ -20,8 +20,9 @@ export type HoroscopeStackParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
-  Match: NavigatorScreenParams<MatchStackParamList>;
   Horoscope: NavigatorScreenParams<HoroscopeStackParamList>;
+  Predictions: undefined;
+  Match: NavigatorScreenParams<MatchStackParamList>;
   Profile: undefined;
   Settings: undefined;
 };
@@ -39,6 +40,10 @@ export type OnboardingStackParamList = {
   LanguageSelection: undefined;
   BirthDetails: undefined;
   KundaliLoading: undefined;
+};
+
+export type PredictionsStackParamList = {
+  FuturePredictions: undefined;
 };
 
 export type RootStackParamList = {
@@ -97,6 +102,10 @@ export type MatchingScreenProps = StackScreenProps<
 export type CompatibilityReportScreenProps = StackScreenProps<
   MatchStackParamList,
   'CompatibilityReport'
+>;
+export type FuturePredictionsScreenProps = StackScreenProps<
+  PredictionsStackParamList,
+  'FuturePredictions'
 >;
 
 declare global {

@@ -5,5 +5,6 @@ export type {
   AuthStackParamList,
   RootStackParamList,
   OnboardingStackParamList,
+  PredictionsStackParamList,
   LoginScreenProps,
 } from '../types/navigation';

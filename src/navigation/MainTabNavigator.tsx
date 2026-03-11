@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { HomeScreen, ProfileScreen } from '../screens';
 import { MatchStackNavigator } from './MatchStackNavigator';
 import { HoroscopeStackNavigator } from './HoroscopeStackNavigator';
+import { PredictionsStackNavigator } from './PredictionsStackNavigator';
 import { colors } from '../constants/colors';
 import type { MainTabParamList } from './types';
 
@@ -39,14 +40,24 @@ export function MainTabNavigator() {
           ),
         }}
       />
-      
+
       <Tab.Screen
         name="Horoscope"
         component={HoroscopeStackNavigator}
         options={{
-          tabBarLabel: t('tabs:horoscope'),
+          tabBarLabel: t('tabs.horoscope'),
           tabBarIcon: ({ color, size }) => (
             <Icon name="zodiac-gemini" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Predictions"
+        component={PredictionsStackNavigator}
+        options={{
+          tabBarLabel: t('tabs.predictions'),
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="crystal-ball" size={size} color={color} />
           ),
         }}
       />

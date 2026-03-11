@@ -1,0 +1,1 @@
+export { FuturePredictionsScreen } from './FuturePredictionsScreen';
