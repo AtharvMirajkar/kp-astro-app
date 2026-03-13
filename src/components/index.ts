@@ -9,3 +9,7 @@ export type {
   OptionSelectModalProps,
   OptionSelectModalOption,
 } from './OptionSelectModal';
+export { ScoreRing } from './ScoreRing';
+export { WeekCard } from './WeekCard';
+export type { WeekCardProps } from './WeekCard';
+export { PredictionSectionTitle } from './PredictionSectionTitle';

@@ -1,0 +1,1 @@
+export { PredictionSectionTitle } from './PredictionSectionTitle';

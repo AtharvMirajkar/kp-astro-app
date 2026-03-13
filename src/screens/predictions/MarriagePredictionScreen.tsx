@@ -7,210 +7,62 @@ import {
   TouchableOpacity,
   Share,
   Pressable,
+  DimensionValue,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
+import { ScoreRing, WeekCard, PredictionSectionTitle } from '../../components';
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 // TODO: replace with API call → fetchMarriagePrediction(userId, period)
 import MARRIAGE_DATA from '../../data/marriagePredictionData.json';
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type PlanetStrength = 'strong' | 'moderate' | 'watch';
+type StatusKey = 'single' | 'committed' | 'married';
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const ACCENT       = '#E07A8C';
-const ACCENT_BG    = '#FFF0F3';
+const ACCENT = '#E07A8C';
+const ACCENT_BG = '#FFF0F3';
 const ACCENT_LIGHT = '#FFE4EA';
 
-type EnergyLevel    = 'high' | 'peak' | 'moderate' | 'rising';
-type PlanetStrength = 'strong' | 'moderate' | 'watch';
-type StatusKey      = 'single' | 'committed' | 'married';
-
-const ENERGY_COLORS: Record<EnergyLevel, string> = {
-  high:     '#3BAA72',
-  peak:     '#E07A8C',
-  moderate: '#3B82B8',
-  rising:   '#C9A227',
-};
-
 const STRENGTH_COLORS: Record<PlanetStrength, string> = {
-  strong:   '#3BAA72',
+  strong: '#3BAA72',
   moderate: '#C9A227',
-  watch:    '#E07A5F',
+  watch: '#E07A5F',
 };
 
 const STATUS_OPTIONS: { key: StatusKey; icon: string; labelKey: string }[] = [
-  { key: 'single',    icon: 'account-outline',       labelKey: 'marriagePrediction.statusSingle' },
-  { key: 'committed', icon: 'heart-outline',          labelKey: 'marriagePrediction.statusCommitted' },
-  { key: 'married',   icon: 'ring',                   labelKey: 'marriagePrediction.statusMarried' },
+  {
+    key: 'single',
+    icon: 'account-outline',
+    labelKey: 'marriagePrediction.statusSingle',
+  },
+  {
+    key: 'committed',
+    icon: 'heart-outline',
+    labelKey: 'marriagePrediction.statusCommitted',
+  },
+  {
+    key: 'married',
+    icon: 'ring',
+    labelKey: 'marriagePrediction.statusMarried',
+  },
 ];
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function SectionTitle({ label }: { label: string }) {
-  return <Text style={sStyles.title}>{label}</Text>;
-}
-const sStyles = StyleSheet.create({
-  title: {
-    fontSize: 16,
-    color: colors.textPrimary,
-    fontFamily: fonts.bold,
-    marginBottom: 12,
-    marginTop: 4,
-  },
-});
-
-function ScoreRing({ score }: { score: number }) {
-  const ringColor =
-    score >= 75 ? '#3BAA72' : score >= 50 ? ACCENT : '#E07A5F';
-  return (
-    <View style={ringStyles.ring}>
-      <View style={[ringStyles.circle, { borderColor: ringColor }]}>
-        <Text style={[ringStyles.score, { color: ringColor }]}>{score}</Text>
-        <Text style={ringStyles.outOf}>/100</Text>
-      </View>
-    </View>
-  );
-}
-const ringStyles = StyleSheet.create({
-  ring:   { alignItems: 'center' },
-  circle: {
-    width: 80, height: 80, borderRadius: 40,
-    borderWidth: 4,
-    justifyContent: 'center', alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
-  },
-  score:  { fontSize: 22, fontFamily: fonts.bold, lineHeight: 26 },
-  outOf:  { fontSize: 10, color: colors.textSecondary, fontFamily: fonts.regular },
-});
-
-function WeekCard({
-  item,
-  t,
-}: {
-  item: typeof MARRIAGE_DATA.weeklyBreakdown[0];
-  t: any;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const energy      = item.energy as EnergyLevel;
-  const energyColor = ENERGY_COLORS[energy] ?? ACCENT;
-
-  return (
-    <TouchableOpacity
-      style={wStyles.card}
-      activeOpacity={0.85}
-      onPress={() => setExpanded(e => !e)}
-    >
-      <View style={wStyles.header}>
-        <View style={wStyles.headerLeft}>
-          <View style={[wStyles.dot, { backgroundColor: energyColor }]} />
-          <View>
-            <Text style={wStyles.weekLabel}>{item.week}</Text>
-            <Text style={wStyles.dateRange}>{item.dateRange}</Text>
-          </View>
-        </View>
-        <View style={[wStyles.pill, { backgroundColor: energyColor + '22' }]}>
-          <Text style={[wStyles.pillText, { color: energyColor }]}>
-            {t(`marriagePrediction.energy_${energy}`)}
-          </Text>
-        </View>
-        <Icon
-          name={expanded ? 'chevron-up' : 'chevron-down'}
-          size={18}
-          color={colors.textMuted}
-          style={{ marginLeft: 6 }}
-        />
-      </View>
-
-      <Text style={wStyles.highlight} numberOfLines={expanded ? undefined : 2}>
-        {item.highlight}
-      </Text>
-
-      {expanded && (
-        <View style={wStyles.expanded}>
-          <View style={wStyles.tipRow}>
-            <View style={[wStyles.tipIcon, { backgroundColor: '#E8F7F0' }]}>
-              <Icon name="check-circle-outline" size={16} color="#3BAA72" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={wStyles.tipLabel}>{t('marriagePrediction.doThis')}</Text>
-              <Text style={wStyles.tipText}>{item.doThis}</Text>
-            </View>
-          </View>
-          <View style={wStyles.tipRow}>
-            <View style={[wStyles.tipIcon, { backgroundColor: '#FDECEA' }]}>
-              <Icon name="close-circle-outline" size={16} color="#E07A5F" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={wStyles.tipLabel}>{t('marriagePrediction.avoidThis')}</Text>
-              <Text style={wStyles.tipText}>{item.avoidThis}</Text>
-            </View>
-          </View>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-}
-
-const wStyles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    gap: 10,
-  },
-  dot:       { width: 10, height: 10, borderRadius: 5 },
-  weekLabel: { fontSize: 14, color: colors.textPrimary, fontFamily: fonts.bold },
-  dateRange: {
-    fontSize: 11, color: colors.textSecondary,
-    fontFamily: fonts.regular, marginTop: 1,
-  },
-  pill:     { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
-  pillText: { fontSize: 11, fontFamily: fonts.bold },
-  highlight: {
-    fontSize: 13, color: colors.textSecondary,
-    fontFamily: fonts.regular, lineHeight: 19,
-  },
-  expanded:  { marginTop: 12, gap: 10 },
-  tipRow:    { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
-  tipIcon:   {
-    width: 32, height: 32, borderRadius: 8,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  tipLabel:  {
-    fontSize: 11, color: colors.textSecondary,
-    fontFamily: fonts.medium, marginBottom: 2,
-  },
-  tipText:   {
-    fontSize: 13, color: colors.textPrimary,
-    fontFamily: fonts.regular, lineHeight: 18,
-  },
-});
-
-// ─── Main Screen ──────────────────────────────────────────────────────────────
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export function MarriagePredictionScreen({ navigation }: any) {
   const { t } = useTranslation();
   const data = MARRIAGE_DATA;
 
   const [activeStatus, setActiveStatus] = useState<StatusKey>('single');
-  const statusData =
-    data.relationshipStatus[activeStatus];
+  const statusData = data.relationshipStatus[activeStatus];
 
   const handleShare = async () => {
     try {
@@ -282,6 +134,7 @@ export function MarriagePredictionScreen({ navigation }: any) {
               {t('marriagePrediction.lastUpdated')}: {data.meta.lastUpdated}
             </Text>
           </View>
+          {/* ✅ Shared ScoreRing component */}
           <ScoreRing score={data.meta.score} />
         </View>
 
@@ -297,7 +150,10 @@ export function MarriagePredictionScreen({ navigation }: any) {
         </View>
 
         {/* ── Relationship Status Selector ── */}
-        <SectionTitle label={t('marriagePrediction.relationshipStatusTitle')} />
+        {/* ✅ Shared PredictionSectionTitle component */}
+        <PredictionSectionTitle
+          label={t('marriagePrediction.relationshipStatusTitle')}
+        />
         <View style={styles.statusRow}>
           {STATUS_OPTIONS.map(opt => (
             <Pressable
@@ -335,7 +191,9 @@ export function MarriagePredictionScreen({ navigation }: any) {
         </View>
 
         {/* ── Key Themes ── */}
-        <SectionTitle label={t('marriagePrediction.keyThemesTitle')} />
+        <PredictionSectionTitle
+          label={t('marriagePrediction.keyThemesTitle')}
+        />
         <View style={styles.themesList}>
           {data.keyThemes.map(theme => (
             <View key={theme.id} style={styles.themeCard}>
@@ -351,13 +209,23 @@ export function MarriagePredictionScreen({ navigation }: any) {
         </View>
 
         {/* ── Weekly Breakdown ── */}
-        <SectionTitle label={t('marriagePrediction.weeklyBreakdownTitle')} />
+        <PredictionSectionTitle
+          label={t('marriagePrediction.weeklyBreakdownTitle')}
+        />
+        {/* ✅ Shared WeekCard component */}
         {data.weeklyBreakdown.map(week => (
-          <WeekCard key={week.week} item={week} t={t} />
+          <WeekCard
+            key={week.week}
+            item={week}
+            i18nPrefix="marriagePrediction"
+            accentColor={ACCENT}
+          />
         ))}
 
         {/* ── Compatibility Factors ── */}
-        <SectionTitle label={t('marriagePrediction.compatibilityTitle')} />
+        <PredictionSectionTitle
+          label={t('marriagePrediction.compatibilityTitle')}
+        />
         <View style={styles.compatCard}>
           {data.compatibilityHighlights.map((item, i) => (
             <View
@@ -378,14 +246,13 @@ export function MarriagePredictionScreen({ navigation }: any) {
                 </Text>
                 <Text style={styles.compatScoreLabel}>/100</Text>
               </View>
-              {/* Score bar below */}
               <View style={styles.compatBarTrack}>
                 <View
                   style={[
                     styles.compatBarFill,
                     {
                       backgroundColor: item.color,
-                      width: `${item.score}%`,
+                      width: `${item.score}%` as DimensionValue,
                     },
                   ]}
                 />
@@ -395,7 +262,9 @@ export function MarriagePredictionScreen({ navigation }: any) {
         </View>
 
         {/* ── Planetary Factors ── */}
-        <SectionTitle label={t('marriagePrediction.planetaryFactorsTitle')} />
+        <PredictionSectionTitle
+          label={t('marriagePrediction.planetaryFactorsTitle')}
+        />
         <View style={styles.planetList}>
           {data.planetaryFactors.map((planet, i) => {
             const strength = planet.strength as PlanetStrength;
@@ -439,45 +308,43 @@ export function MarriagePredictionScreen({ navigation }: any) {
         </View>
 
         {/* ── Auspicious / Avoid Dates ── */}
-        <SectionTitle label={t('marriagePrediction.auspiciousDatesTitle')} />
+        <PredictionSectionTitle
+          label={t('marriagePrediction.auspiciousDatesTitle')}
+        />
         <View style={styles.datesCard}>
-          <View style={styles.datesSection}>
-            <View style={styles.datesSectionHeader}>
-              <Icon name="heart-circle" size={16} color={ACCENT} />
-              <Text style={[styles.datesSectionTitle, { color: ACCENT }]}>
-                {t('marriagePrediction.auspiciousDatesTitle')}
-              </Text>
-            </View>
-            <View style={styles.datePillsRow}>
-              {data.auspiciousDates.map(d => (
-                <View key={d} style={styles.datePillGood}>
-                  <Text style={styles.datePillGoodText}>{d}</Text>
-                </View>
-              ))}
-            </View>
+          <View style={styles.datesSectionHeader}>
+            <Icon name="heart-circle" size={16} color={ACCENT} />
+            <Text style={[styles.datesSectionTitle, { color: ACCENT }]}>
+              {t('marriagePrediction.auspiciousDatesTitle')}
+            </Text>
+          </View>
+          <View style={styles.datePillsRow}>
+            {data.auspiciousDates.map(d => (
+              <View key={d} style={styles.datePillGood}>
+                <Text style={styles.datePillGoodText}>{d}</Text>
+              </View>
+            ))}
           </View>
 
           <View style={styles.datesDivider} />
 
-          <View style={styles.datesSection}>
-            <View style={styles.datesSectionHeader}>
-              <Icon name="alert-circle-outline" size={16} color="#E07A5F" />
-              <Text style={[styles.datesSectionTitle, { color: '#E07A5F' }]}>
-                {t('marriagePrediction.avoidDatesTitle')}
-              </Text>
-            </View>
-            <View style={styles.datePillsRow}>
-              {data.avoidDates.map(d => (
-                <View key={d} style={styles.datePillBad}>
-                  <Text style={styles.datePillBadText}>{d}</Text>
-                </View>
-              ))}
-            </View>
+          <View style={styles.datesSectionHeader}>
+            <Icon name="alert-circle-outline" size={16} color="#E07A5F" />
+            <Text style={[styles.datesSectionTitle, { color: '#E07A5F' }]}>
+              {t('marriagePrediction.avoidDatesTitle')}
+            </Text>
+          </View>
+          <View style={styles.datePillsRow}>
+            {data.avoidDates.map(d => (
+              <View key={d} style={styles.datePillBad}>
+                <Text style={styles.datePillBadText}>{d}</Text>
+              </View>
+            ))}
           </View>
         </View>
 
         {/* ── Muhurta Windows ── */}
-        <SectionTitle label={t('marriagePrediction.muhurtaTitle')} />
+        <PredictionSectionTitle label={t('marriagePrediction.muhurtaTitle')} />
         <View style={styles.muhurtaList}>
           {data.muhurtaWindows.map((mw, i) => (
             <View
@@ -495,7 +362,11 @@ export function MarriagePredictionScreen({ navigation }: any) {
                 <Text style={styles.muhurtaDates}>{mw.dates}</Text>
                 <View style={styles.muhurtaMeta}>
                   <View style={styles.muhurtaMetaItem}>
-                    <Icon name="clock-outline" size={12} color={colors.textSecondary} />
+                    <Icon
+                      name="clock-outline"
+                      size={12}
+                      color={colors.textSecondary}
+                    />
                     <Text style={styles.muhurtaMetaText}>{mw.time}</Text>
                   </View>
                   <View style={styles.muhurtaMetaItem}>
@@ -511,7 +382,7 @@ export function MarriagePredictionScreen({ navigation }: any) {
         </View>
 
         {/* ── Remedies ── */}
-        <SectionTitle label={t('marriagePrediction.remediesTitle')} />
+        <PredictionSectionTitle label={t('marriagePrediction.remediesTitle')} />
         <View style={styles.remediesList}>
           {data.remedies.map((remedy, i) => (
             <View
@@ -533,7 +404,9 @@ export function MarriagePredictionScreen({ navigation }: any) {
         </View>
 
         {/* ── Astrology Basis ── */}
-        <SectionTitle label={t('marriagePrediction.astrologyBasisTitle')} />
+        <PredictionSectionTitle
+          label={t('marriagePrediction.astrologyBasisTitle')}
+        />
         <View style={styles.basisCard}>
           {[
             {
@@ -619,16 +492,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: colors.background,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  headerBtn:    { padding: 4, minWidth: 36 },
+  headerBtn: { padding: 4, minWidth: 36 },
   headerCenter: { flex: 1, alignItems: 'center' },
-  headerTitle:  { fontSize: 17, color: colors.textPrimary, fontFamily: fonts.bold },
-  headerSub:    {
-    fontSize: 11, color: colors.textSecondary,
-    fontFamily: fonts.regular, marginTop: 1,
+  headerTitle: {
+    fontSize: 17,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+  },
+  headerSub: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    marginTop: 1,
   },
 
   scroll: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 48 },
@@ -645,15 +523,37 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: ACCENT + '44',
   },
-  heroLeft:       { flex: 1, marginRight: 16 },
+  heroLeft: { flex: 1, marginRight: 16 },
   heroScoreLabel: {
-    fontSize: 11, color: colors.textSecondary, fontFamily: fonts.regular,
-    textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4,
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
-  heroScoreValue: { fontSize: 26, color: ACCENT, fontFamily: fonts.bold, marginBottom: 6 },
-  heroTrendRow:   { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 },
-  heroTrendText:  { fontSize: 12, color: colors.textSecondary, fontFamily: fonts.medium },
-  heroUpdated:    { fontSize: 11, color: colors.textMuted, fontFamily: fonts.regular },
+  heroScoreValue: {
+    fontSize: 26,
+    color: ACCENT,
+    fontFamily: fonts.bold,
+    marginBottom: 6,
+  },
+  heroTrendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 8,
+  },
+  heroTrendText: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontFamily: fonts.medium,
+  },
+  heroUpdated: {
+    fontSize: 11,
+    color: colors.textMuted,
+    fontFamily: fonts.regular,
+  },
 
   // Summary
   summaryCard: {
@@ -665,23 +565,27 @@ const styles = StyleSheet.create({
     borderLeftColor: ACCENT,
   },
   summaryHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
   },
   summaryTitle: {
-    fontSize: 13, color: ACCENT, fontFamily: fonts.bold,
-    textTransform: 'uppercase', letterSpacing: 0.4,
+    fontSize: 13,
+    color: ACCENT,
+    fontFamily: fonts.bold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
   summaryBody: {
-    fontSize: 13, color: colors.textSecondary,
-    fontFamily: fonts.regular, lineHeight: 21,
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    lineHeight: 21,
   },
 
   // Status selector
-  statusRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-  },
+  statusRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   statusChip: {
     flex: 1,
     flexDirection: 'row',
@@ -689,24 +593,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 9,
     borderRadius: 20,
+    paddingHorizontal: 6,
     backgroundColor: colors.backgroundSecondary,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 6,
   },
-  statusChipActive: {
-    backgroundColor: ACCENT,
-    borderColor: ACCENT,
-  },
+  statusChipActive: { backgroundColor: ACCENT, borderColor: ACCENT },
   statusChipText: {
     fontSize: 11,
     color: colors.textSecondary,
     fontFamily: fonts.medium,
   },
-  statusChipTextActive: {
-    color: '#fff',
-    fontFamily: fonts.bold,
-  },
+  statusChipTextActive: { color: '#fff', fontFamily: fonts.bold },
   statusInsightCard: {
     backgroundColor: ACCENT_BG,
     borderRadius: 14,
@@ -728,7 +626,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Key themes
+  // Key Themes
   themesList: { gap: 10, marginBottom: 20 },
   themeCard: {
     flexDirection: 'row',
@@ -741,17 +639,24 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   themeIconWrap: {
-    width: 42, height: 42, borderRadius: 12,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
     backgroundColor: ACCENT_LIGHT,
-    justifyContent: 'center', alignItems: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   themeTitle: {
-    fontSize: 14, color: colors.textPrimary,
-    fontFamily: fonts.bold, marginBottom: 4,
+    fontSize: 14,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+    marginBottom: 4,
   },
   themeDesc: {
-    fontSize: 13, color: colors.textSecondary,
-    fontFamily: fonts.regular, lineHeight: 19,
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    lineHeight: 19,
   },
 
   // Compatibility
@@ -759,8 +664,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 14,
     paddingHorizontal: 14,
-    paddingTop: 4,
-    paddingBottom: 4,
+    paddingVertical: 4,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: colors.border,
@@ -774,12 +678,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   compatRowLast: { borderBottomWidth: 0 },
-  compatLeft:    { flex: 1, marginRight: 8 },
-  compatFactor:  { fontSize: 13, color: colors.textPrimary, fontFamily: fonts.bold, marginBottom: 2 },
-  compatDesc:    { fontSize: 11, color: colors.textSecondary, fontFamily: fonts.regular },
-  compatRight:   { flexDirection: 'row', alignItems: 'baseline', gap: 1 },
-  compatScore:   { fontSize: 20, fontFamily: fonts.bold },
-  compatScoreLabel: { fontSize: 11, color: colors.textSecondary, fontFamily: fonts.regular },
+  compatLeft: { flex: 1, marginRight: 8 },
+  compatFactor: {
+    fontSize: 13,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+    marginBottom: 2,
+  },
+  compatDesc: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+  },
+  compatRight: { flexDirection: 'row', alignItems: 'baseline', gap: 1 },
+  compatScore: { fontSize: 20, fontFamily: fonts.bold },
+  compatScoreLabel: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+  },
   compatBarTrack: {
     width: '100%',
     height: 4,
@@ -807,20 +724,33 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
     gap: 12,
   },
-  planetRowLast:  { borderBottomWidth: 0 },
-  planetDot:      { width: 10, height: 10, borderRadius: 5, marginTop: 4 },
-  planetContent:  { flex: 1 },
-  planetTopRow:   {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', marginBottom: 2,
+  planetRowLast: { borderBottomWidth: 0 },
+  planetDot: { width: 10, height: 10, borderRadius: 5, marginTop: 4 },
+  planetContent: { flex: 1 },
+  planetTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 2,
   },
-  planetName:     { fontSize: 14, color: colors.textPrimary, fontFamily: fonts.bold },
-  strengthPill:   { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
-  strengthText:   { fontSize: 11, fontFamily: fonts.bold },
-  planetRole:     { fontSize: 11, color: ACCENT, fontFamily: fonts.medium, marginBottom: 4 },
-  planetEffect:   {
-    fontSize: 12, color: colors.textSecondary,
-    fontFamily: fonts.regular, lineHeight: 18,
+  planetName: {
+    fontSize: 14,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+  },
+  strengthPill: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
+  strengthText: { fontSize: 11, fontFamily: fonts.bold },
+  planetRole: {
+    fontSize: 11,
+    color: ACCENT,
+    fontFamily: fonts.medium,
+    marginBottom: 4,
+  },
+  planetEffect: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    lineHeight: 18,
   },
 
   // Dates
@@ -832,25 +762,41 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  datesSection:       {},
-  datesSectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
-  datesSectionTitle:  { fontSize: 13, fontFamily: fonts.bold },
-  datePillsRow:       { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  datesSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 10,
+  },
+  datesSectionTitle: { fontSize: 13, fontFamily: fonts.bold },
+  datePillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   datePillGood: {
-    width: 36, height: 36, borderRadius: 18,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: ACCENT_LIGHT,
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1, borderColor: ACCENT + '55',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: ACCENT + '55',
   },
   datePillGoodText: { fontSize: 13, color: ACCENT, fontFamily: fonts.bold },
   datePillBad: {
-    width: 36, height: 36, borderRadius: 18,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#FDECEA',
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1, borderColor: '#E07A5F44',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E07A5F44',
   },
-  datePillBadText:  { fontSize: 13, color: '#E07A5F', fontFamily: fonts.bold },
-  datesDivider:     { height: 1, backgroundColor: colors.border, marginVertical: 12 },
+  datePillBadText: { fontSize: 13, color: '#E07A5F', fontFamily: fonts.bold },
+  datesDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: 12,
+  },
 
   // Muhurta
   muhurtaList: {
@@ -870,19 +816,33 @@ const styles = StyleSheet.create({
     gap: 12,
     alignItems: 'flex-start',
   },
-  muhurtaRowLast:  { borderBottomWidth: 0 },
+  muhurtaRowLast: { borderBottomWidth: 0 },
   muhurtaIconWrap: {
-    width: 40, height: 40, borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: ACCENT_LIGHT,
-    justifyContent: 'center', alignItems: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  muhurtaContent:  { flex: 1 },
-  muhurtaLabel:    { fontSize: 13, color: colors.textPrimary, fontFamily: fonts.bold, marginBottom: 2 },
-  muhurtaDates:    { fontSize: 14, color: ACCENT, fontFamily: fonts.bold, marginBottom: 6 },
-  muhurtaMeta:     { flexDirection: 'row', gap: 12 },
+  muhurtaContent: { flex: 1 },
+  muhurtaLabel: {
+    fontSize: 13,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+    marginBottom: 2,
+  },
+  muhurtaDates: {
+    fontSize: 14,
+    color: ACCENT,
+    fontFamily: fonts.bold,
+    marginBottom: 6,
+  },
+  muhurtaMeta: { flexDirection: 'row', gap: 12 },
   muhurtaMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   muhurtaMetaText: {
-    fontSize: 11, color: colors.textSecondary,
+    fontSize: 11,
+    color: colors.textSecondary,
     fontFamily: fonts.regular,
   },
 
@@ -906,15 +866,25 @@ const styles = StyleSheet.create({
   },
   remedyRowLast: { borderBottomWidth: 0 },
   remedyIconWrap: {
-    width: 40, height: 40, borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: ACCENT_LIGHT,
-    justifyContent: 'center', alignItems: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   remedyContent: { flex: 1 },
-  remedyTitle: { fontSize: 14, color: colors.textPrimary, fontFamily: fonts.bold, marginBottom: 4 },
-  remedyDesc:  {
-    fontSize: 13, color: colors.textSecondary,
-    fontFamily: fonts.regular, lineHeight: 19,
+  remedyTitle: {
+    fontSize: 14,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+    marginBottom: 4,
+  },
+  remedyDesc: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+    lineHeight: 19,
   },
 
   // Basis
@@ -936,23 +906,42 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   basisRowLast: { borderBottomWidth: 0 },
-  basisLabel:   { fontSize: 12, color: colors.textSecondary, fontFamily: fonts.medium, flex: 1 },
-  basisValue:   {
-    fontSize: 12, color: colors.textPrimary,
-    fontFamily: fonts.bold, flex: 2, textAlign: 'right',
+  basisLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontFamily: fonts.medium,
+    flex: 1,
+  },
+  basisValue: {
+    fontSize: 12,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+    flex: 2,
+    textAlign: 'right',
   },
 
   // CTAs
   ctaRow: { flexDirection: 'row', gap: 10 },
   ctaSecondary: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 14, borderRadius: 14,
-    borderWidth: 1.5, borderColor: ACCENT, backgroundColor: ACCENT_BG,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: ACCENT,
+    backgroundColor: ACCENT_BG,
   },
   ctaSecondaryText: { fontSize: 14, color: ACCENT, fontFamily: fonts.bold },
   ctaPrimary: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 14, borderRadius: 14, backgroundColor: ACCENT,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 14,
+    backgroundColor: ACCENT,
   },
   ctaPrimaryText: { fontSize: 14, color: '#fff', fontFamily: fonts.bold },
 });

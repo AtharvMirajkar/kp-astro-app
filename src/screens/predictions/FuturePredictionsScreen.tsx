@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSelector } from 'react-redux';
+import { PredictionSectionTitle } from '../../components';
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
 import { RootState } from '../../redux/store';
@@ -145,9 +146,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
         </View>
 
         {/* ── Category Cards (2×2 grid) ── */}
-        <Text style={styles.sectionTitle}>
-          {t('predictions.categoriesTitle')}
-        </Text>
+        <PredictionSectionTitle label={t('predictions.categoriesTitle')} />
         <View style={styles.categoryGrid}>
           {CATEGORIES.map(cat => (
             <TouchableOpacity
@@ -281,9 +280,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
         </View>
 
         {/* ── Planetary Influences ── */}
-        <Text style={styles.sectionTitle}>
-          {t('predictions.planetaryInfluences')}
-        </Text>
+        <PredictionSectionTitle label={t('predictions.planetaryInfluences')} />
         <View style={styles.influenceList}>
           {PLANETARY_INFLUENCES.map((item, i) => (
             <View
@@ -320,9 +317,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
         </View>
 
         {/* ── Remedies ── */}
-        <Text style={styles.sectionTitle}>
-          {t('predictions.remediesTitle')}
-        </Text>
+        <PredictionSectionTitle label={t('predictions.remediesTitle')} />
         <View style={styles.remediesCard}>
           {REMEDIES.map((remedy, i) => (
             <View key={i} style={styles.remedyRow}>
