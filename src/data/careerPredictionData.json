@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "generatedFor": "Rahul Sharma",
+    "period": "Monthly",
+    "periodRange": "March 2026",
+    "score": 74,
+    "scoreLabel": "Good",
+    "lastUpdated": "13 Mar 2026"
+  },
+  "summary": "Jupiter's strong aspect on your 10th house this month creates a powerful window for career advancement. Your communication skills are amplified by Mercury's direct motion, making this an ideal time for presentations, negotiations, and professional networking. Mid-month brings a peak period where senior recognition is highly likely.",
+  "overallOutlook": {
+    "rating": "Favorable",
+    "trend": "upward",
+    "confidence": 74
+  },
+  "keyThemes": [
+    {
+      "id": "kt1",
+      "title": "Leadership Recognition",
+      "description": "Your efforts over the past few months are now visible to decision-makers. Expect acknowledgment from seniors or management between the 12th and 18th.",
+      "icon": "star-circle-outline"
+    },
+    {
+      "id": "kt2",
+      "title": "Skill Advancement",
+      "description": "Mercury's position strongly supports learning and upskilling. Enroll in a course or workshop — knowledge gained now accelerates your trajectory for the next 6 months.",
+      "icon": "school-outline"
+    },
+    {
+      "id": "kt3",
+      "title": "Network Expansion",
+      "description": "Venus in the 11th house of gains activates powerful connections. Attend industry events or LinkedIn engagement peaks this month.",
+      "icon": "account-group-outline"
+    }
+  ],
+  "weeklyBreakdown": [
+    {
+      "week": "Week 1",
+      "dateRange": "Mar 1 – 7",
+      "energy": "high",
+      "highlight": "Strong start. Mars energizes your initiative. Best time to pitch new ideas or take on additional responsibilities.",
+      "doThis": "Initiate conversations with your manager about growth goals.",
+      "avoidThis": "Avoid impulsive decisions — think before you commit to new projects."
+    },
+    {
+      "week": "Week 2",
+      "dateRange": "Mar 8 – 14",
+      "energy": "peak",
+      "highlight": "Peak career week. Jupiter–Sun conjunction illuminates your professional persona. Recognition or promotion news likely.",
+      "doThis": "Schedule important meetings, presentations or interviews this week.",
+      "avoidThis": "Do not get into disputes with colleagues — emotions run high."
+    },
+    {
+      "week": "Week 3",
+      "dateRange": "Mar 15 – 21",
+      "energy": "moderate",
+      "highlight": "Consolidation phase. Use this week to organize pending tasks and document your achievements.",
+      "doThis": "Update your portfolio or resume while accomplishments are fresh.",
+      "avoidThis": "Avoid taking on new commitments — focus on finishing what's started."
+    },
+    {
+      "week": "Week 4",
+      "dateRange": "Mar 22 – 31",
+      "energy": "rising",
+      "highlight": "Positive close to the month. New opportunities begin to surface. Saturn rewards your discipline with long-term stability signals.",
+      "doThis": "Connect with a mentor or senior professional for guidance.",
+      "avoidThis": "Avoid salary or promotion discussions — timing improves next month."
+    }
+  ],
+  "planetaryFactors": [
+    {
+      "planet": "Jupiter",
+      "role": "Primary Benefactor",
+      "effect": "Aspects your 10th house of career directly, bringing expansion, recognition, and authority.",
+      "strength": "strong",
+      "color": "#C9A227"
+    },
+    {
+      "planet": "Saturn",
+      "role": "Long-term Stabilizer",
+      "effect": "Rewards consistent effort with lasting results. Delays are lessons — stay patient.",
+      "strength": "moderate",
+      "color": "#5B6BA8"
+    },
+    {
+      "planet": "Mercury",
+      "role": "Communication Booster",
+      "effect": "Direct motion amplifies your ability to negotiate, present, and influence decisions.",
+      "strength": "strong",
+      "color": "#3BAA72"
+    },
+    {
+      "planet": "Rahu",
+      "role": "Wild Card",
+      "effect": "Sudden opportunity or disruption possible. Stay adaptable and read situations carefully.",
+      "strength": "watch",
+      "color": "#8E4E9E"
+    }
+  ],
+  "favorableDates": ["5", "8", "12", "13", "18", "22", "27"],
+  "challengingDates": ["3", "10", "24"],
+  "remedies": [
+    {
+      "id": "r1",
+      "icon": "candle",
+      "title": "Thursday Ritual",
+      "description": "Light a yellow ghee lamp and offer yellow flowers to Lord Vishnu every Thursday to strengthen Jupiter's blessings."
+    },
+    {
+      "id": "r2",
+      "icon": "book-open-variant",
+      "title": "Saraswati Mantra",
+      "description": "Chant 'Om Aim Saraswatyai Namah' 108 times daily for enhanced communication, clarity and intellectual sharpness."
+    },
+    {
+      "id": "r3",
+      "icon": "food-apple-outline",
+      "title": "Donate on Saturdays",
+      "description": "Donate black sesame seeds, mustard oil, or dark-colored clothing to the needy every Saturday to appease Saturn."
+    },
+    {
+      "id": "r4",
+      "icon": "meditation",
+      "title": "Morning Surya Namaskar",
+      "description": "Practice 12 rounds of Surya Namaskar at sunrise to align solar energy with your professional aspirations."
+    }
+  ],
+  "astrologyBasis": {
+    "ascendant": "Virgo",
+    "currentDasha": "Venus – Moon – Rahu",
+    "transitHighlight": "Jupiter transiting 10th house (Gemini)",
+    "moonSign": "Aquarius",
+    "keyHouses": ["10th House (Career)", "11th House (Gains)", "6th House (Effort)"]
+  }
+}

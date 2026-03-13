@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Pressable,
+  DimensionValue,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -341,7 +342,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
 
 // ─── Static data ─────────────────────────────────────────────────────────────
 
-const SCORE_WIDTHS: Record<CategoryKey, Record<PeriodKey, string>> = {
+const SCORE_WIDTHS: Record<CategoryKey, Record<PeriodKey, DimensionValue>> = {
   career: { weekly: '72%', monthly: '65%', yearly: '80%' },
   marriage: { weekly: '58%', monthly: '74%', yearly: '68%' },
   finance: { weekly: '45%', monthly: '60%', yearly: '75%' },

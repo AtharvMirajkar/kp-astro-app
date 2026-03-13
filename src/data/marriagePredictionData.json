@@ -1,0 +1,202 @@
+{
+  "meta": {
+    "generatedFor": "Rahul Sharma",
+    "period": "Monthly",
+    "periodRange": "March 2026",
+    "score": 68,
+    "scoreLabel": "Good",
+    "lastUpdated": "13 Mar 2026"
+  },
+  "summary": "Venus, the natural significator of marriage and relationships, is well-placed in your 7th house this month, bringing warmth, emotional depth, and a renewed desire for meaningful connection. The Moon's waxing phase in the second half amplifies sensitivity and romantic expression. For those seeking a life partner, the planetary alignment between the 10th and 22nd creates a highly auspicious window for new introductions or advancing existing conversations.",
+  "overallOutlook": {
+    "rating": "Favorable",
+    "trend": "upward",
+    "confidence": 68
+  },
+  "relationshipStatus": {
+    "single": {
+      "headline": "New Connection Likely",
+      "insight": "A significant introduction is possible through social gatherings, family connections, or digital platforms between the 10th and 20th. Keep an open mind — this person may not match your expectations on the surface but aligns deeply on values."
+    },
+    "committed": {
+      "headline": "Deepening of Bond",
+      "insight": "This month favors honest, heartfelt conversations with your partner. Shared experiences — travel, cooking together, visiting family — will significantly strengthen your bond. Avoid criticism mid-month when emotions are heightened."
+    },
+    "married": {
+      "headline": "Harmony & Renewal",
+      "insight": "A favorable period for rekindling romance and making long-term family plans. If there have been recent tensions, the Venus transit offers a natural window for resolution and forgiveness. Celebrate small moments together."
+    }
+  },
+  "keyThemes": [
+    {
+      "id": "kt1",
+      "title": "Emotional Vulnerability",
+      "description": "The Moon's influence on your 7th house heightens emotional depth this month. Expressing your true feelings openly — rather than suppressing them — will bring you closer to your partner or attract the right person.",
+      "icon": "heart-outline"
+    },
+    {
+      "id": "kt2",
+      "title": "Family Involvement",
+      "description": "Jupiter's aspect on the 4th house of family brings elders and family members into your romantic journey positively. Their blessings and involvement will play a meaningful role this month.",
+      "icon": "home-heart"
+    },
+    {
+      "id": "kt3",
+      "title": "Communication & Trust",
+      "description": "Mercury governing the 3rd house of communication urges clarity in conversations. Misunderstandings can be avoided by saying what you mean with patience and choosing the right moment to speak.",
+      "icon": "message-heart-outline"
+    }
+  ],
+  "weeklyBreakdown": [
+    {
+      "week": "Week 1",
+      "dateRange": "Mar 1 – 7",
+      "energy": "moderate",
+      "highlight": "A calm and introspective start to the month. Use this time to reflect on what you truly want in a relationship or how to improve your existing one.",
+      "doThis": "Journal your feelings or have a quiet heart-to-heart conversation with your partner.",
+      "avoidThis": "Avoid bringing up old grievances or unresolved conflicts — timing is not right yet."
+    },
+    {
+      "week": "Week 2",
+      "dateRange": "Mar 8 – 14",
+      "energy": "rising",
+      "highlight": "Venus gains strength as the week progresses. Social and romantic energy peaks around the 12th–13th. An important meeting or introduction is highly possible.",
+      "doThis": "Attend social events, say yes to family introductions, and be open to new connections.",
+      "avoidThis": "Do not rush emotional decisions — let things unfold naturally without pressure."
+    },
+    {
+      "week": "Week 3",
+      "dateRange": "Mar 15 – 21",
+      "energy": "peak",
+      "highlight": "Peak romantic week of the month. The Full Moon on the 18th illuminates the 7th house of partnerships. Deep, meaningful connection is available for those who are open.",
+      "doThis": "Plan something special — a date night, a meaningful gift, or a heartfelt letter to your partner.",
+      "avoidThis": "Avoid jealousy or possessiveness — the Full Moon can amplify insecurities if unchecked."
+    },
+    {
+      "week": "Week 4",
+      "dateRange": "Mar 22 – 31",
+      "energy": "high",
+      "highlight": "Strong close to the month. Saturn's stabilizing influence encourages commitment conversations. Good time to discuss future plans, marriage timelines, or family goals.",
+      "doThis": "Have honest conversations about long-term intentions and shared life vision.",
+      "avoidThis": "Avoid ultimatums — invite dialogue rather than demanding answers."
+    }
+  ],
+  "compatibilityHighlights": [
+    {
+      "id": "ch1",
+      "factor": "Emotional Compatibility",
+      "score": 82,
+      "description": "Moon harmoniously placed — emotional wavelengths align naturally.",
+      "color": "#E07A8C"
+    },
+    {
+      "id": "ch2",
+      "factor": "Physical Attraction",
+      "score": 74,
+      "description": "Venus in 7th house energizes physical chemistry and magnetism.",
+      "color": "#C9A227"
+    },
+    {
+      "id": "ch3",
+      "factor": "Intellectual Bond",
+      "score": 65,
+      "description": "Mercury supports meaningful conversations but needs conscious effort.",
+      "color": "#3B82B8"
+    },
+    {
+      "id": "ch4",
+      "factor": "Long-term Stability",
+      "score": 78,
+      "description": "Saturn's aspect on 7th house brings endurance and commitment potential.",
+      "color": "#3BAA72"
+    }
+  ],
+  "planetaryFactors": [
+    {
+      "planet": "Venus",
+      "role": "Primary Romance Significator",
+      "effect": "Direct and strong in 7th house — the most auspicious placement for marriage and relationships this month.",
+      "strength": "strong",
+      "color": "#E07A8C"
+    },
+    {
+      "planet": "Jupiter",
+      "role": "Blessing & Expansion",
+      "effect": "Aspects 4th house of family, bringing elder support and auspicious energy for marriage discussions.",
+      "strength": "strong",
+      "color": "#C9A227"
+    },
+    {
+      "planet": "Moon",
+      "role": "Emotional Amplifier",
+      "effect": "Waxing Moon heightens sensitivity and romantic longing. Emotional conversations carry extra weight.",
+      "strength": "moderate",
+      "color": "#3B82B8"
+    },
+    {
+      "planet": "Saturn",
+      "role": "Commitment Builder",
+      "effect": "Slow but stabilizing. Encourages serious, long-term thinking about relationships rather than casual flings.",
+      "strength": "moderate",
+      "color": "#5B6BA8"
+    },
+    {
+      "planet": "Rahu",
+      "role": "Unexpected Element",
+      "effect": "May bring an unconventional or surprising romantic development. Stay open but grounded.",
+      "strength": "watch",
+      "color": "#8E4E9E"
+    }
+  ],
+  "auspiciousDates": ["8", "10", "12", "13", "15", "18", "22", "27"],
+  "avoidDates": ["3", "7", "24", "29"],
+  "muhurtaWindows": [
+    {
+      "id": "mw1",
+      "label": "Best for Marriage Talks",
+      "dates": "Mar 12 – 15",
+      "time": "Morning (6–9 AM)",
+      "nakshatra": "Rohini"
+    },
+    {
+      "id": "mw2",
+      "label": "Engagement / Ring Ceremony",
+      "dates": "Mar 18 – 20",
+      "time": "Evening (5–7 PM)",
+      "nakshatra": "Punarvasu"
+    }
+  ],
+  "remedies": [
+    {
+      "id": "r1",
+      "icon": "candle",
+      "title": "Friday Venus Puja",
+      "description": "On every Friday, light a rose-scented candle or incense and offer white flowers to Goddess Lakshmi. Chant 'Om Shukraya Namah' 108 times for blessings in love and marriage."
+    },
+    {
+      "id": "r2",
+      "icon": "diamond-stone",
+      "title": "Wear White or Cream",
+      "description": "Wearing white, cream, or light pink on Fridays and during important romantic interactions strengthens Venus energy and creates an aura of warmth and approachability."
+    },
+    {
+      "id": "r3",
+      "icon": "flower",
+      "title": "Donate Sweets",
+      "description": "Donate white sweets or milk-based desserts to young girls or a nearby temple on Fridays to invoke blessings of Venus and improve marriage prospects."
+    },
+    {
+      "id": "r4",
+      "icon": "heart",
+      "title": "Chant Swayamvara Parvati Mantra",
+      "description": "For those seeking a life partner, chant the Swayamvara Parvati mantra 108 times daily: 'Om Hreem Yogini Yogini Yogeswari Yoga Bhayankari...' for 21 consecutive days."
+    }
+  ],
+  "astrologyBasis": {
+    "ascendant": "Virgo",
+    "currentDasha": "Venus – Moon – Rahu",
+    "transitHighlight": "Venus direct in 7th house (Pisces)",
+    "moonSign": "Aquarius",
+    "keyHouses": ["7th House (Partnership)", "5th House (Romance)", "4th House (Family)", "11th House (Fulfillment)"]
+  }
+}

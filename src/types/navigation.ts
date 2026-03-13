@@ -44,6 +44,8 @@ export type OnboardingStackParamList = {
 
 export type PredictionsStackParamList = {
   FuturePredictions: undefined;
+  CareerPrediction: undefined;
+  MarriagePrediction: undefined;
 };
 
 export type RootStackParamList = {
