@@ -13,3 +13,5 @@ export { ScoreRing } from './ScoreRing';
 export { WeekCard } from './WeekCard';
 export type { WeekCardProps } from './WeekCard';
 export { PredictionSectionTitle } from './PredictionSectionTitle';
+export { OutlookCard } from './OutlookCard';
+export type { OutlookCardProps, OutlookTrend } from './OutlookCard';

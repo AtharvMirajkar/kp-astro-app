@@ -1,0 +1,192 @@
+{
+  "meta": {
+    "generatedFor": "Rahul Sharma",
+    "period": "Monthly",
+    "periodRange": "March 2026",
+    "score": 61,
+    "scoreLabel": "Moderate",
+    "lastUpdated": "13 Mar 2026"
+  },
+  "summary": "March brings a mixed financial picture. Jupiter's expansive energy opens doors for income growth and new investment opportunities, while Saturn's disciplining aspect on the 2nd house of wealth asks for caution and careful planning. The first half of the month favours consolidation and reviewing existing investments. The second half, especially after the 18th, shifts energy toward growth — making it a better window for new financial moves, business decisions, or salary negotiations.",
+  "overallOutlook": {
+    "rating": "Moderate",
+    "trend": "stable",
+    "confidence": 61
+  },
+  "incomeOutlook": {
+    "score": 70,
+    "trend": "upward",
+    "insight": "Primary income remains stable with a possibility of a bonus or increment discussion between the 15th and 22nd. Freelancers and business owners may see a new client or project inquiry. Avoid relying on speculative income this month."
+  },
+  "expenseOutlook": {
+    "score": 55,
+    "trend": "downward",
+    "insight": "Unexpected expenses are possible around the 7th and 24th — likely related to health, vehicle, or home maintenance. Budget a contingency of 10–15% above your usual monthly spend to absorb these without stress."
+  },
+  "investmentOutlook": {
+    "score": 65,
+    "trend": "upward",
+    "insight": "Post the 18th, planetary alignments favour equity and mutual fund investments. Real estate decisions should be deferred to next month. Gold and silver look favourable as a hedge during the first half."
+  },
+  "keyThemes": [
+    {
+      "id": "kt1",
+      "title": "Disciplined Spending",
+      "description": "Saturn's transit through your 2nd house reinforces the need for a structured budget. Track every rupee this month — not out of scarcity thinking, but as a strategic foundation for long-term wealth.",
+      "icon": "calculator-variant-outline"
+    },
+    {
+      "id": "kt2",
+      "title": "Investment Opportunities",
+      "description": "Jupiter aspects the 11th house of gains post the 18th, creating a fertile window for market investments. Stick to blue-chip stocks, index funds, or SIPs rather than speculative trades.",
+      "icon": "trending-up"
+    },
+    {
+      "id": "kt3",
+      "title": "Debt Management",
+      "description": "If you carry existing loans or EMIs, this is a strong month for negotiating better terms or making prepayments. Rahu's influence may tempt you toward new credit — resist unless absolutely necessary.",
+      "icon": "bank-outline"
+    }
+  ],
+  "weeklyBreakdown": [
+    {
+      "week": "Week 1",
+      "dateRange": "Mar 1 – 7",
+      "energy": "moderate",
+      "highlight": "A cautious opening week. Review your monthly budget and check investment portfolios. No major financial moves recommended — focus on assessment and planning.",
+      "doThis": "Reconcile last month's expenses, review SIP performance, and set a clear budget for March.",
+      "avoidThis": "Avoid impulsive purchases, new loans, or acting on unsolicited investment tips."
+    },
+    {
+      "week": "Week 2",
+      "dateRange": "Mar 8 – 14",
+      "energy": "rising",
+      "highlight": "Income energy picks up mid-week. A pending payment or salary credit may arrive. Possible good news from a professional contact regarding a financial opportunity worth exploring.",
+      "doThis": "Follow up on pending receivables, explore fixed deposit renewals or debt fund options.",
+      "avoidThis": "Avoid lending money to friends or family this week — repayment may be delayed."
+    },
+    {
+      "week": "Week 3",
+      "dateRange": "Mar 15 – 21",
+      "energy": "peak",
+      "highlight": "The strongest financial week of the month. Jupiter directly aspects your 11th house of gains. Salary negotiations, new projects, or investment decisions made this week carry the best planetary support.",
+      "doThis": "Initiate SIP top-ups, apply for a raise, or finalize a business deal you have been considering.",
+      "avoidThis": "Avoid taking on new EMIs or financial commitments that stretch beyond your comfort zone."
+    },
+    {
+      "week": "Week 4",
+      "dateRange": "Mar 22 – 31",
+      "energy": "high",
+      "highlight": "Strong close to the month with continued gains energy. A good time to review tax planning, make charitable donations (which can unlock positive financial karma), and set goals for April.",
+      "doThis": "Complete tax-saving investments, review portfolio allocation, and plan your April financial goals.",
+      "avoidThis": "Avoid gambling, speculative crypto moves, or investing based purely on social media tips."
+    }
+  ],
+  "financialZones": [
+    {
+      "id": "fz1",
+      "zone": "Income & Salary",
+      "score": 70,
+      "description": "Stable with upside potential post the 15th.",
+      "color": "#3BAA72"
+    },
+    {
+      "id": "fz2",
+      "zone": "Savings & Reserves",
+      "score": 65,
+      "description": "Good month to build emergency fund buffer.",
+      "color": "#3B82B8"
+    },
+    {
+      "id": "fz3",
+      "zone": "Investments",
+      "score": 68,
+      "description": "Equity markets favourable after the 18th.",
+      "color": "#C9A227"
+    },
+    {
+      "id": "fz4",
+      "zone": "Expenses & Debt",
+      "score": 45,
+      "description": "Watch for surprise costs around 7th and 24th.",
+      "color": "#E07A5F"
+    }
+  ],
+  "planetaryFactors": [
+    {
+      "planet": "Jupiter",
+      "role": "Wealth Expander",
+      "effect": "Aspects the 11th house of income and gains post the 18th — the single most positive financial indicator this month.",
+      "strength": "strong",
+      "color": "#C9A227"
+    },
+    {
+      "planet": "Saturn",
+      "role": "Discipline & Caution",
+      "effect": "Transit through 2nd house demands structural financial planning. Rewards those who are disciplined; punishes carelessness.",
+      "strength": "moderate",
+      "color": "#5B6BA8"
+    },
+    {
+      "planet": "Mercury",
+      "role": "Deals & Negotiations",
+      "effect": "Mercury direct and strong — excellent for contract signings, salary negotiations, and financial paperwork after the 10th.",
+      "strength": "strong",
+      "color": "#3BAA72"
+    },
+    {
+      "planet": "Rahu",
+      "role": "Temptation & Risk",
+      "effect": "Rahu in the 3rd house may create FOMO around high-risk investments. Stay grounded and stick to your financial plan.",
+      "strength": "watch",
+      "color": "#8E4E9E"
+    },
+    {
+      "planet": "Venus",
+      "role": "Luxury Spending",
+      "effect": "Venus in the 6th house may increase desire for luxury purchases. Budget for indulgences rather than impulsively overspending.",
+      "strength": "moderate",
+      "color": "#E07A8C"
+    }
+  ],
+  "favorableDates": ["10", "12", "15", "17", "18", "19", "22", "26"],
+  "avoidDates": ["7", "14", "24", "29"],
+  "remedies": [
+    {
+      "id": "r1",
+      "icon": "gold",
+      "title": "Feed Cows on Thursdays",
+      "description": "Feeding green grass or jaggery to cows on Thursday strengthens Jupiter — the planet of abundance and wealth. This remedy is known to open blocked income channels and attract new financial opportunities."
+    },
+    {
+      "id": "r2",
+      "icon": "candle",
+      "title": "Dhan Lakshmi Puja on Fridays",
+      "description": "Light a ghee lamp before the image of Goddess Lakshmi every Friday evening. Offer lotus flowers or coins. Chant 'Om Shreem Mahalakshmiyei Namah' 108 times to invoke financial blessings."
+    },
+    {
+      "id": "r3",
+      "icon": "leaf",
+      "title": "Donate Yellow Items",
+      "description": "Donate yellow lentils (chana dal), yellow cloth, or turmeric to a temple or needy person on Thursdays to propitiate Jupiter and strengthen your wealth house."
+    },
+    {
+      "id": "r4",
+      "icon": "currency-inr",
+      "title": "Keep a Shree Yantra",
+      "description": "Place a Shree Yantra in your home or office facing northeast. Energize it by offering saffron-mixed water daily. This yantra is considered the most potent tool for attracting prosperity and financial growth."
+    }
+  ],
+  "astrologyBasis": {
+    "ascendant": "Virgo",
+    "currentDasha": "Venus – Moon – Rahu",
+    "transitHighlight": "Jupiter aspects 11th house (Gains) from Mar 18",
+    "moonSign": "Aquarius",
+    "keyHouses": [
+      "2nd House (Wealth)",
+      "11th House (Gains)",
+      "3rd House (Efforts)",
+      "6th House (Debts)"
+    ]
+  }
+}

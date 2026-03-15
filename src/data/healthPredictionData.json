@@ -1,0 +1,238 @@
+{
+  "meta": {
+    "generatedFor": "Rahul Sharma",
+    "period": "Monthly",
+    "periodRange": "March 2026",
+    "score": 74,
+    "scoreLabel": "Good",
+    "lastUpdated": "13 Mar 2026"
+  },
+  "summary": "March is a generally positive month for health, with the Sun's strong placement in your 6th house of health and service bolstering vitality, immunity, and physical resilience. The first three weeks are ideal for building new wellness habits — exercise routines, dietary changes, or starting a detox programme will yield strong results. Be mindful around the 22nd–26th when Mars and Saturn create a brief tension that may manifest as fatigue, joint discomfort, or sleep disruption. Overall, proactive self-care this month will set a solid foundation for the rest of the year.",
+  "overallOutlook": {
+    "rating": "Good",
+    "trend": "upward",
+    "confidence": 74
+  },
+  "healthZones": [
+    {
+      "id": "hz1",
+      "zone": "Physical Vitality",
+      "score": 80,
+      "description": "Sun in 6th house boosts energy and stamina.",
+      "icon": "run-fast",
+      "color": "#3BAA72"
+    },
+    {
+      "id": "hz2",
+      "zone": "Mental Wellness",
+      "score": 68,
+      "description": "Mercury supports focus; avoid information overload.",
+      "icon": "head-cog-outline",
+      "color": "#3B82B8"
+    },
+    {
+      "id": "hz3",
+      "zone": "Digestive Health",
+      "score": 72,
+      "description": "Moon transit affects gut sensitivity mid-month.",
+      "icon": "food-apple-outline",
+      "color": "#C9A227"
+    },
+    {
+      "id": "hz4",
+      "zone": "Sleep & Recovery",
+      "score": 60,
+      "description": "Mars-Saturn aspect may disrupt sleep after 22nd.",
+      "icon": "sleep",
+      "color": "#8E4E9E"
+    }
+  ],
+  "bodyAreas": [
+    {
+      "id": "ba1",
+      "area": "Head & Eyes",
+      "riskLevel": "low",
+      "note": "Sun governs eyes — avoid excessive screen time and bright light exposure."
+    },
+    {
+      "id": "ba2",
+      "area": "Digestive System",
+      "riskLevel": "moderate",
+      "note": "Moon influence on gut peaks around the Full Moon (18th). Stay hydrated and eat light."
+    },
+    {
+      "id": "ba3",
+      "area": "Joints & Back",
+      "riskLevel": "moderate",
+      "note": "Saturn aspect after the 22nd may cause stiffness. Gentle stretching and warm oil massage recommended."
+    },
+    {
+      "id": "ba4",
+      "area": "Respiratory System",
+      "riskLevel": "low",
+      "note": "Generally clear this month. Pranayama or breathing exercises will strengthen lung capacity."
+    },
+    {
+      "id": "ba5",
+      "area": "Nervous System",
+      "riskLevel": "watch",
+      "note": "Rahu influence may heighten anxiety or racing thoughts. Daily meditation and limiting stimulants advised."
+    }
+  ],
+  "keyThemes": [
+    {
+      "id": "kt1",
+      "title": "Build Consistent Habits",
+      "description": "The Sun strength in the 6th house makes March the ideal month to establish health routines that will last. Whatever you commit to consistently for the first 21 days has strong planetary support to become a lasting habit.",
+      "icon": "calendar-check-outline"
+    },
+    {
+      "id": "kt2",
+      "title": "Mindful Nutrition",
+      "description": "Moon influence on your digestive axis throughout the month calls for mindful eating. Favour warm, freshly cooked meals, reduce raw and processed foods, and eat your largest meal before 2 PM for optimal digestion.",
+      "icon": "food-variant"
+    },
+    {
+      "id": "kt3",
+      "title": "Stress Management",
+      "description": "Rahu placement can amplify mental noise and anxiety. Building a daily mindfulness practice — even 10 minutes of meditation — will act as an anchor and prevent stress from translating into physical symptoms.",
+      "icon": "meditation"
+    }
+  ],
+  "weeklyBreakdown": [
+    {
+      "week": "Week 1",
+      "dateRange": "Mar 1 – 7",
+      "energy": "high",
+      "highlight": "Strong start to the month. Physical energy is elevated and motivation to build new wellness habits is at its peak. An excellent week to begin a new fitness routine or dietary plan.",
+      "doThis": "Start a morning walk or yoga practice, meal prep for the week, get a full health check-up if overdue.",
+      "avoidThis": "Avoid overexertion or pushing through fatigue — the body signals are important this week."
+    },
+    {
+      "week": "Week 2",
+      "dateRange": "Mar 8 – 14",
+      "energy": "high",
+      "highlight": "Continued strong energy. Mental clarity is sharp — good week to address any chronic health concerns with a doctor. Immune system is particularly robust.",
+      "doThis": "Schedule any medical consultations, dental visits, or lab tests you have been deferring.",
+      "avoidThis": "Avoid skipping meals or irregular sleep — consistency amplifies the positive planetary energy."
+    },
+    {
+      "week": "Week 3",
+      "dateRange": "Mar 15 – 21",
+      "energy": "peak",
+      "highlight": "Peak health week. The Full Moon on the 18th heightens emotional sensitivity but also deepens the mind-body connection. Spiritual practices, deep rest, and nature time will be profoundly restorative.",
+      "doThis": "Spend time in nature, practice gratitude, try a digital detox for at least one day.",
+      "avoidThis": "Avoid emotionally charged situations, heavy meals, or late nights around the Full Moon (17th–19th)."
+    },
+    {
+      "week": "Week 4",
+      "dateRange": "Mar 22 – 31",
+      "energy": "moderate",
+      "highlight": "Energy levels dip slightly due to Mars-Saturn aspect after the 22nd. Fatigue, joint stiffness, or mild sleep disruption is possible. Prioritise recovery and gentle activity over intensity.",
+      "doThis": "Warm oil self-massage (abhyanga), gentle stretching, early dinners, and 8+ hours of sleep.",
+      "avoidThis": "Avoid high-intensity workouts, late nights, alcohol, or starting new demanding health protocols this week."
+    }
+  ],
+  "wellnessTips": [
+    {
+      "id": "wt1",
+      "category": "Exercise",
+      "icon": "weight-lifter",
+      "color": "#3BAA72",
+      "tip": "Favour strength and cardio training in weeks 1–3. Switch to restorative yoga, walking, and stretching in week 4 when Mars-Saturn tension is active."
+    },
+    {
+      "id": "wt2",
+      "category": "Diet",
+      "icon": "food-apple-outline",
+      "color": "#C9A227",
+      "tip": "Emphasise warm, cooked foods, seasonal vegetables, and adequate protein. Reduce cold beverages, raw salads, and processed snacks. Turmeric milk before bed aids joint health."
+    },
+    {
+      "id": "wt3",
+      "category": "Sleep",
+      "icon": "sleep",
+      "color": "#8E4E9E",
+      "tip": "Target 10:30 PM bedtime throughout the month. Use lavender or chamomile aromatherapy in the last week to counteract Mars-Saturn sleep disruption."
+    },
+    {
+      "id": "wt4",
+      "category": "Mental Health",
+      "icon": "brain",
+      "color": "#3B82B8",
+      "tip": "10 minutes of morning meditation plus journaling reduces Rahu-driven anxiety significantly. Limit social media to 30 minutes per day this month."
+    }
+  ],
+  "planetaryFactors": [
+    {
+      "planet": "Sun",
+      "role": "Vitality & Immunity",
+      "effect": "Placed in 6th house of health — strengthens constitution, immunity, and physical endurance throughout the month.",
+      "strength": "strong",
+      "color": "#C9A227"
+    },
+    {
+      "planet": "Moon",
+      "role": "Emotional & Digestive Health",
+      "effect": "Governs fluid balance and gut health. Full Moon on 18th may heighten sensitivity — rest and light diet recommended around that date.",
+      "strength": "moderate",
+      "color": "#3B82B8"
+    },
+    {
+      "planet": "Mars",
+      "role": "Physical Energy",
+      "effect": "Strong in weeks 1–3 giving high drive and stamina. Conjunct Saturn after the 22nd — may cause muscle tension or fatigue.",
+      "strength": "moderate",
+      "color": "#E07A5F"
+    },
+    {
+      "planet": "Saturn",
+      "role": "Chronic Conditions & Joints",
+      "effect": "Aspect on Mars after the 22nd brings potential for joint stiffness, back pain, or sluggish digestion. Preventive care and rest mitigate this.",
+      "strength": "watch",
+      "color": "#5B6BA8"
+    },
+    {
+      "planet": "Rahu",
+      "role": "Nervous System & Anxiety",
+      "effect": "Can amplify stress, overthinking, and nervous system sensitivity. Grounding practices, reduced screen time, and nature exposure are key antidotes.",
+      "strength": "watch",
+      "color": "#8E4E9E"
+    }
+  ],
+  "favorableDates": ["1", "3", "6", "10", "13", "15", "17", "20"],
+  "avoidDates": ["7", "18", "22", "26", "29"],
+  "remedies": [
+    {
+      "id": "r1",
+      "icon": "weather-sunny",
+      "title": "Sun Salutation at Sunrise",
+      "description": "Perform 12 rounds of Surya Namaskar facing the rising sun every morning. This strengthens the Sun in your chart, boosts immunity, and activates the 6th house of health directly. Even 10 minutes is sufficient."
+    },
+    {
+      "id": "r2",
+      "icon": "cup-water",
+      "title": "Copper Vessel Water",
+      "description": "Store drinking water overnight in a copper vessel and drink it first thing in the morning. This Ayurvedic practice balances all three doshas, improves digestion, and reduces inflammation — particularly beneficial this month."
+    },
+    {
+      "id": "r3",
+      "icon": "leaf",
+      "title": "Tulsi & Turmeric Daily",
+      "description": "Consume 5–7 fresh Tulsi leaves or Tulsi tea daily. Add half a teaspoon of turmeric to warm milk before bed. These herbs strengthen immunity and reduce Saturn-Mars induced inflammation."
+    },
+    {
+      "id": "r4",
+      "icon": "candle",
+      "title": "Hanuman Chalisa on Tuesdays",
+      "description": "Recite the Hanuman Chalisa on Tuesday mornings to strengthen Mars and reduce its malefic influence in the last week. This remedy is especially effective for joint pain, fatigue, and physical stress."
+    }
+  ],
+  "astrologyBasis": {
+    "ascendant": "Virgo",
+    "currentDasha": "Venus – Moon – Rahu",
+    "transitHighlight": "Sun in 6th house (Pisces) throughout March",
+    "moonSign": "Aquarius",
+    "keyHouses": ["6th House (Health & Disease)", "1st House (Body & Vitality)", "8th House (Chronic Issues)", "12th House (Recovery & Rest)"]
+  }
+}

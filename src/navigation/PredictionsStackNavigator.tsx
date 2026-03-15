@@ -2,7 +2,12 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { FuturePredictionsScreen } from '../screens/predictions/FuturePredictionsScreen';
 import type { PredictionsStackParamList } from './types';
-import { CareerPredictionScreen, MarriagePredictionScreen } from '../screens/predictions';
+import {
+  CareerPredictionScreen,
+  HealthPredictionScreen,
+  FinancePredictionScreen,
+  MarriagePredictionScreen,
+} from '../screens/predictions';
 
 const Stack = createStackNavigator<PredictionsStackParamList>();
 
@@ -22,8 +27,14 @@ export function PredictionsStackNavigator() {
         name="MarriagePrediction"
         component={MarriagePredictionScreen}
       />
-      {/* <Stack.Screen name="FinancePrediction"  component={FinancePredictionScreen} /> */}
-      {/* <Stack.Screen name="HealthPrediction"   component={HealthPredictionScreen} /> */}
+      <Stack.Screen
+        name="FinancePrediction"
+        component={FinancePredictionScreen}
+      />
+      <Stack.Screen
+        name="HealthPrediction"
+        component={HealthPredictionScreen}
+      />
     </Stack.Navigator>
   );
 }
