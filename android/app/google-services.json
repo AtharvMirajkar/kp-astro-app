@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "420337438883",
+    "project_id": "kpjyotish-c0668",
+    "storage_bucket": "kpjyotish-c0668.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420337438883:android:3a3d09dced2b367d8a2f16",
+        "android_client_info": {
+          "package_name": "com.kpjyotish"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaJNkhuAaOU3DObrhqVkRLad0zmQp8YIc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

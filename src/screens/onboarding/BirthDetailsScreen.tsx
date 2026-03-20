@@ -20,7 +20,11 @@ import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
 
 import { useDispatch } from 'react-redux';
-import { setBirthDetails } from '../../redux/slices/kundaliSlice';
+// ── NEW: import saveBirthDetails alongside existing setBirthDetails ──
+import {
+  setBirthDetails,
+  saveBirthDetails,
+} from '../../redux/slices/kundaliSlice';
 import { AppDispatch } from '../../redux/store';
 
 export function BirthDetailsScreen({ navigation }: any) {
@@ -61,7 +65,7 @@ export function BirthDetailsScreen({ navigation }: any) {
   };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios'); // iOS stays open
+    setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
       setBirthDate(selectedDate);
     }
@@ -113,9 +117,12 @@ export function BirthDetailsScreen({ navigation }: any) {
     setShowSuggestions(false);
   };
 
-  const handleContinue = () => {
+  // ── ✏️ CHANGED: handleContinue ─────────────────────────────────────────────
+  // Only change: added dispatch(saveBirthDetails(birthData)) between
+  // setBirthDetails and navigation. Everything else is identical.
+
+  const handleContinue = async () => {
     if (!birthDate || !birthTime) {
-      // You can show an alert here
       console.warn('Please select date and time');
       return;
     }
@@ -130,7 +137,16 @@ export function BirthDetailsScreen({ navigation }: any) {
       gender,
     };
 
+    // EXISTING: set birth details in Redux (KundaliLoadingScreen reads this)
     dispatch(setBirthDetails(birthData));
+
+    // NEW: save birth details + deviceId + FCM token to your backend
+    // Non-blocking — if it fails the user still proceeds to kundali generation
+    dispatch(saveBirthDetails(birthData)).catch(() => {
+      // Silent fail — backend save is best-effort
+    });
+
+    // EXISTING: navigate to KundaliLoadingScreen which calls generateKundali
     navigation.navigate('KundaliLoading');
   };
 
@@ -207,7 +223,7 @@ export function BirthDetailsScreen({ navigation }: any) {
                 mode="date"
                 display={Platform.OS === 'ios' ? 'inline' : 'default'}
                 onChange={onDateChange}
-                maximumDate={new Date()} // can't be born in future
+                maximumDate={new Date()}
               />
             )}
 

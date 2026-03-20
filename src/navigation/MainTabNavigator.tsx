@@ -8,11 +8,13 @@ import { HoroscopeStackNavigator } from './HoroscopeStackNavigator';
 import { PredictionsStackNavigator } from './PredictionsStackNavigator';
 import { colors } from '../constants/colors';
 import type { MainTabParamList } from './types';
+import { useNotifications } from '../hooks/useNotifications';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export function MainTabNavigator() {
   const { t } = useTranslation();
+  useNotifications();
 
   return (
     <Tab.Navigator

@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://api.yourdomain.com', // your API
+  baseURL: 'https://kp-astro-backend.onrender.com', // your API
   timeout: 10000,
 });
 
