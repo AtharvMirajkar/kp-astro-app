@@ -1,23 +1,17 @@
 /**
  * src/services/notificationService.ts
  *
- * Handles:
- *  - Requesting notification permissions (iOS + Android 13+)
- *  - Getting FCM token
- *  - Storing deviceId in AsyncStorage
- *  - Foreground / background / quit listeners
- *
- * NOTE: This service does NOT call the backend directly.
- * The FCM token + deviceId are passed into kundaliSlice
- * so they get saved together with birth details via POST /api/users.
+ * Handles FCM token, permissions, and listeners.
+ * Foreground messages are now displayed via Notifee instead of Alert.
  */
 
-import { Platform, Alert } from 'react-native';
+import { Platform } from 'react-native';
 import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
 import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { displayNotification } from './notifeeService';
 
 const DEVICE_ID_KEY = '@kp_device_id';
 const FCM_TOKEN_KEY = '@kp_fcm_token';
@@ -32,7 +26,6 @@ export async function requestNotificationPermission(): Promise<boolean> {
       status === messaging.AuthorizationStatus.PROVISIONAL
     );
   }
-  // Android 13+ (API 33+)
   if (Platform.OS === 'android' && Platform.Version >= 33) {
     const { PermissionsAndroid } = require('react-native');
     const result = await PermissionsAndroid.request(
@@ -43,7 +36,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return true;
 }
 
-// ─── Stable device ID (persisted across sessions) ────────────────────────────
+// ─── Device ID ────────────────────────────────────────────────────────────────
 
 export async function getOrCreateDeviceId(): Promise<string> {
   let id = await AsyncStorage.getItem(DEVICE_ID_KEY);
@@ -54,7 +47,7 @@ export async function getOrCreateDeviceId(): Promise<string> {
   return id;
 }
 
-// ─── FCM token ────────────────────────────────────────────────────────────────
+// ─── FCM Token ────────────────────────────────────────────────────────────────
 
 export async function getFCMToken(): Promise<string | null> {
   try {
@@ -74,29 +67,28 @@ export async function getFCMToken(): Promise<string | null> {
   }
 }
 
-// ─── Get cached FCM token (no network call) ───────────────────────────────────
-
 export async function getCachedFCMToken(): Promise<string | null> {
   return AsyncStorage.getItem(FCM_TOKEN_KEY);
 }
 
-// ─── Foreground message listener ─────────────────────────────────────────────
+// ─── Foreground listener ──────────────────────────────────────────────────────
+// Uses Notifee to display a styled notification instead of a plain Alert.
 
 export function listenForForegroundMessages(
   onMessage?: (msg: FirebaseMessagingTypes.RemoteMessage) => void,
 ): () => void {
   return messaging().onMessage(async remoteMessage => {
-    const title = remoteMessage.notification?.title ?? 'KP Jyotish';
-    const body = remoteMessage.notification?.body ?? '';
-    if (onMessage) {
-      onMessage(remoteMessage);
-    } else {
-      Alert.alert(title, body);
-    }
+    console.log('[FCM] Foreground message:', remoteMessage);
+
+    // Show styled Notifee notification
+    await displayNotification(remoteMessage);
+
+    // Optional custom handler (e.g. update badge, refresh a screen)
+    onMessage?.(remoteMessage);
   });
 }
 
-// ─── Token refresh listener ───────────────────────────────────────────────────
+// ─── Token refresh ────────────────────────────────────────────────────────────
 
 export function listenForTokenRefresh(
   onRefresh: (newToken: string) => void,
@@ -107,16 +99,17 @@ export function listenForTokenRefresh(
   });
 }
 
-// ─── Background handler (must be called in index.js, outside component tree) ──
+// ─── Background handler (register in index.js) ───────────────────────────────
 
 export function registerBackgroundHandler(): void {
+  // FCM background message → display via Notifee for rich styling
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('[FCM] Background message:', remoteMessage);
+    await displayNotification(remoteMessage);
   });
 
   messaging().onNotificationOpenedApp(remoteMessage => {
     console.log('[FCM] Opened from background:', remoteMessage);
-    // Handle deep link navigation via remoteMessage.data.screen if needed
   });
 
   messaging()

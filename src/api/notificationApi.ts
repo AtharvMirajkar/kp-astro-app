@@ -1,40 +1,69 @@
 /**
  * src/api/notificationApi.ts
  *
- * Wraps your backend notification endpoints.
- * Base URL is already set in axiosInstance.
+ * Matches your backend exactly:
+ *   POST /api/notifications/send
+ *   POST /api/notifications/send-to-user
+ *   POST /api/notifications/broadcast
+ *
+ * All calls use axiosInstance (Bearer token auto-attached via interceptor).
  */
 
-import axiosInstance from './axiosInstance'; // your existing axios instance
+import axiosInstance from './axiosInstance';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types matching your backend schema ───────────────────────────────────────
 
-export interface SendNotificationPayload {
-  deviceId: string;
+/** POST /api/notifications/send — send to a specific device token */
+export interface SendToDevicePayload {
+  deviceId: string; // FCM token stored in UserBirthDetail.deviceId
   title: string;
   body: string;
-  data?: Record<string, string>;
+  data?: Record<string, string>; // optional deep-link data e.g. { screen: 'FuturePredictions' }
 }
 
+/** POST /api/notifications/send-to-user — send to all devices of a MongoDB user */
 export interface SendToUserPayload {
-  userId: string;
+  userId: string; // MongoDB _id from UserBirthDetail
   title: string;
   body: string;
   data?: Record<string, string>;
 }
 
-// ─── Send to a specific device token (used internally / for testing) ──────────
+/** POST /api/notifications/broadcast — send to ALL registered devices */
+export interface BroadcastPayload {
+  title: string;
+  body: string;
+  data?: Record<string, string>;
+}
 
+// ─── API calls ────────────────────────────────────────────────────────────────
+
+/**
+ * Send notification to a specific device by its FCM token (deviceId).
+ * Use this for targeted per-device messages.
+ */
 export async function sendNotificationToDevice(
-  payload: SendNotificationPayload,
+  payload: SendToDevicePayload,
 ): Promise<void> {
   await axiosInstance.post('/api/notifications/send', payload);
 }
 
-// ─── Send to all devices of a user ───────────────────────────────────────────
-
+/**
+ * Send notification to all devices belonging to a user.
+ * Requires the MongoDB _id returned from POST /api/users (stored as userRecordId in Redux).
+ */
 export async function sendNotificationToUser(
   payload: SendToUserPayload,
 ): Promise<void> {
   await axiosInstance.post('/api/notifications/send-to-user', payload);
+}
+
+/**
+ * Broadcast notification to ALL registered devices.
+ * Use for app-wide announcements only.
+ */
+export async function broadcastNotification(
+  payload: BroadcastPayload,
+): Promise<void> {
+  await axiosInstance.post('/api/notifications/broadcast', payload);
 }
