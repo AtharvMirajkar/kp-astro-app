@@ -22,174 +22,121 @@ import { RootState } from '../../redux/store';
 const CHART_COLOR = '#C9A227';
 const CHART_BG = '#FDFBF7';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// North Indian Chart Layout
-//
-// The 12 houses are fixed diamond/triangle cells arranged like this:
-//
-//   ┌───────┬───────┬───────┐
-//   │  12   │   1   │   2   │
-//   ├───┬───┼───────┼───┬───┤
-//   │ 11│   │ (mid) │   │ 3 │
-//   ├───┴───┼───────┼───┴───┤
-//   │  10   │   9   │   4   │  ← wait, actually North Indian uses diamond grid
-//   ├───┬───┼───────┼───┬───┤
-//   │  9│   │       │   │ 5 │
-//   └───┴───┴───────┴───┴───┘
-//
-// Standard North Indian (fixed-sign) layout:
-// Houses 1-12 occupy fixed positions in a 4x4 grid (with corners hollow):
-//
-//  [12][  1  ][ 2 ]
-//  [11][     ][ 3 ]
-//  [10][  9  ][ 4 ]  ← wrong
-//
-// Correct North Indian diamond layout (each house is a triangle):
-// Top row:    House 12 | House 1 | House 2
-// Mid row:    House 11 | (center)| House 3
-// Bot row:    House 10 | House 9 | House 4  ← no
-//
-// The actual standard North Indian chart is a square divided by diagonals:
-//
-//     ___________
-//    |\ 12 | 1  /|
-//    | \   |   / |
-//    |11 \ | / 2 |
-//    |----\|/-----|
-//    |----/|\-----|
-//    |10 / | \ 3  |
-//    | /   |   \  |
-//    |/ 9  | 4  \ |
-//    |_____|_____|
-//      8  7  6  5  <- bottom row houses
-//
-// Let me use the proper approach: a square with inner diamond and lines from midpoints.
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Planet key maps per language ─────────────────────────────────────────────
+// API uses different keys in planetary_positions / planet_house_positions
+// depending on the language param used.
+// English: "Sun", "Moon", "Mars" …
+// Hindi:   "सूर्य", "चन्द्र", "मंगल" …  (note: चन्द्र)
+// Marathi: "सूर्य", "चंद्र",  "मंगळ" …  (note: चंद्र, मंगळ, गुरू, शनी, राहू, केतू)
 
-// North Indian chart: houses are positioned in a 4x4 grid of triangular cells.
-// Standard layout (sign numbers are FIXED to positions):
-//
-//  Position map (row, col) in a 4×4 grid where corners are cut diagonally:
-//
-//  Top-left corner    = House 12
-//  Top-center         = House 1
-//  Top-right corner   = House 2
-//  Left-center        = House 11
-//  Center             = (no house)
-//  Right-center       = House 3
-//  Bottom-left corner = House 10
-//  Bottom-center      = House 9 (wait - bottom center = house 7)
-//
-// Let me use the definitive standard:
-// In North Indian chart, SIGNS are fixed. House 1 = top center triangle.
-// Going clockwise: 1(top), 2(top-right), 3(right), 4(bottom-right),
-//                  5(bottom), 6(bottom-left), 7(bottom), 8, 9, 10, 11, 12
-//
-// Standard positions for a square chart divided into 12 triangles:
-//  - 4 corner triangles (top-left, top-right, bottom-right, bottom-left)
-//  - 4 side triangles (top, right, bottom, left) — these are actually inner triangles
-//  - Wait — standard North Indian = 12 rhombus/diamond shapes in 4×3 grid
-//
-// The most common implementation uses a 3×3 grid of squares where:
-// outer 8 cells are houses, center has 4 diagonal triangles for 4 more houses.
-//
-// Final approach: draw SVG with explicit polygon coordinates for all 12 houses.
+type PlanetKey = {
+  en: string; // API key for English response
+  hi: string; // API key for Hindi response
+  mr: string; // API key for Marathi response
+  icon: string; // MaterialCommunityIcons name
+};
+
+const PLANET_MAP: PlanetKey[] = [
+  { en: 'Sun', hi: 'सूर्य', mr: 'सूर्य', icon: 'white-balance-sunny' },
+  { en: 'Moon', hi: 'चन्द्र', mr: 'चंद्र', icon: 'moon-waning-crescent' },
+  { en: 'Mars', hi: 'मंगल', mr: 'मंगळ', icon: 'fire' },
+  { en: 'Mercury', hi: 'बुध', mr: 'बुध', icon: 'mercury' },
+  { en: 'Jupiter', hi: 'गुरु', mr: 'गुरू', icon: 'star' },
+  { en: 'Venus', hi: 'शुक्र', mr: 'शुक्र', icon: 'heart' },
+  { en: 'Saturn', hi: 'शनि', mr: 'शनी', icon: 'orbit-variant' },
+  { en: 'Rahu', hi: 'राहु', mr: 'राहू', icon: 'arrow-up-circle' },
+  { en: 'Ketu', hi: 'केतु', mr: 'केतू', icon: 'arrow-down-circle' },
+  { en: 'Harshal', hi: 'हर्षल', mr: 'हर्षल', icon: 'circle-outline' },
+  { en: 'Neptune', hi: 'नेप्च्यून', mr: 'नेप्च्यून', icon: 'water-outline' },
+];
+
+// Ascendant key also differs per language
+const ASCENDANT_KEY: Record<string, string> = {
+  en: 'Ascendant',
+  hi: 'लग्न',
+  mr: 'लग्न',
+};
+
+// Returns the API key for a planet given the active language
+function getPlanetApiKey(planet: PlanetKey, lang: string): string {
+  if (lang === 'hi') return planet.hi;
+  if (lang === 'mr') return planet.mr;
+  return planet.en;
+}
+
+// ─── Sign abbreviations per language ─────────────────────────────────────────
+// Sign names in API responses per language — maps full name → short abbr for SVG chart
+
+const SIGN_ABBR: Record<string, Record<string, string>> = {
+  en: {
+    Aries: 'Ar',
+    Taurus: 'Ta',
+    Gemini: 'Ge',
+    Cancer: 'Ca',
+    Leo: 'Le',
+    Virgo: 'Vi',
+    Libra: 'Li',
+    Scorpio: 'Sc',
+    Sagittarius: 'Sg',
+    Capricorn: 'Cp',
+    Aquarius: 'Aq',
+    Pisces: 'Pi',
+  },
+  hi: {
+    मेष: 'मेष',
+    वृषभ: 'वृष',
+    मिथुन: 'मिथु',
+    कर्क: 'कर्क',
+    सिंह: 'सिंह',
+    कन्या: 'कन्या',
+    तुला: 'तुला',
+    वृश्चिक: 'वृश्चि',
+    धनु: 'धनु',
+    मकर: 'मकर',
+    कुम्भ: 'कुम्भ',
+    मीन: 'मीन',
+  },
+  mr: {
+    मेष: 'मेष',
+    वृषभ: 'वृष',
+    मिथुन: 'मिथु',
+    कर्क: 'कर्क',
+    सिंह: 'सिंह',
+    कन्या: 'कन्या',
+    तुला: 'तुला',
+    वृश्चिक: 'वृश्चि',
+    धनु: 'धनु',
+    मकर: 'मकर',
+    कुंभ: 'कुंभ',
+    मीन: 'मीन',
+  },
+};
+
+function getSignAbbr(signName: string, lang: string): string {
+  if (!signName) return '—';
+  const map = SIGN_ABBR[lang] ?? SIGN_ABBR.en;
+  return map[signName] ?? signName.slice(0, 2);
+}
+
+// ─── North Indian Chart SVG ───────────────────────────────────────────────────
 
 interface NorthIndianChartProps {
   size: number;
-  houseToSign: Record<number, number>; // house number -> sign number (1=Aries)
-  planetsByHouse: Record<number, string[]>; // house -> planet abbreviations
-  ascendantHouse: number;
+  houseToSign: Record<number, string>; // house# → sign name in API language
+  planetsByHouse: Record<number, string[]>; // house# → planet names (API language, trimmed)
 }
-
-const SIGN_ABBR: Record<number, string> = {
-  1: 'Ar',
-  2: 'Ta',
-  3: 'Ge',
-  4: 'Ca',
-  5: 'Le',
-  6: 'Vi',
-  7: 'Li',
-  8: 'Sc',
-  9: 'Sg',
-  10: 'Cp',
-  11: 'Aq',
-  12: 'Pi',
-};
 
 function NorthIndianChart({
   size,
   houseToSign,
   planetsByHouse,
-  ascendantHouse,
 }: NorthIndianChartProps) {
-  const s = size;
-  const h = s / 2; // half
-  const q = s / 4; // quarter
-  const tq = (s * 3) / 4; // three-quarters
+  const s = size,
+    h = s / 2,
+    q = s / 4,
+    tq = (s * 3) / 4;
 
-  // Each house cell is defined by polygon points
-  // North Indian standard layout:
-  // House positions (fixed):
-  //   1  = top center diamond (triangle pointing up from center)
-  //   2  = top-right corner
-  //   3  = right center diamond
-  //   4  = bottom-right corner
-  //   5  = bottom center diamond
-  //   6  = bottom-left corner
-  //   7  = bottom center (mirror of 1)
-  //   8  = left center diamond (mirror of 3)  ... wait
-  //
-  // Standard North Indian houses (going clockwise from top):
-  //  1=top, 2=top-right, 3=right, 4=bottom-right, 5=bottom, 6=bottom-left,
-  //  7=bottom-center-lower, 8=left-lower, 9=left, 10=bottom-left-corner...
-  //
-  // I'll use this definitive coordinate map for the 12 triangular/square houses:
-  //
-  //  ┌──────────┬──────────┐
-  //  │    12    │    1     │
-  //  │  (TL sq) │  (TR sq) │ <- these 2 are actually top row
-  //  ├──────────┼──────────┤
-  //
-  // Simplest correct approach — 4×3 rectangle divided into 12 equal sections:
-  // Top row (3 cells): H12, H1, H2
-  // Mid-top (2 outer + center inner): H11, center, H3
-  // Mid-bot (2 outer + center inner): H10, center, H4
-  // Bot row (3 cells): H9,  H8, H5  <- hmm no
-  //
-  // I'll use the authentic diamond/lozenge layout with SVG polygons.
-  // Reference: https://en.wikipedia.org/wiki/Hindu_astrology#Chart_styles
-  //
-  // North Indian chart: a square with an inner square rotated 45 degrees (diamond).
-  // This creates 4 corner triangles and 4 side triangles = 8 houses.
-  // The inner diamond is divided into 4 more triangles = 4 more houses. Total = 12? No = 8.
-  //
-  // Actual North Indian: uses a 4×4 grid approach where the 12 houses are
-  // 4 corner rectangles + 4 edge rectangles + 4 inner triangles? Still 12.
-  //
-  // THE DEFINITIVE LAYOUT (used in all Indian astrology software):
-  // Square divided by: both diagonals + both midpoint lines = 8 triangles in outer ring
-  // + inner square divided into 4 triangles = 12 total regions.
-  //
-  // Coordinates (for a square of side S):
-  // Corners: TL(0,0), TR(S,0), BR(S,S), BL(0,S)
-  // Edge midpoints: TM(h,0), RM(S,h), BM(h,S), LM(0,h)
-  // Center: C(h,h)
-  // Inner square corners: IT(h,q), IR(tq,h), IB(h,tq), IL(q,h)
-  //
-  // 12 house polygons (clockwise from house 1 at top):
-  // H1  (top):         TL, TM, IT, IL      -- top-left triangle: TL,TM,C (no inner sq in basic)
-  //
-  // Actually the simplest correct North Indian layout uses this:
-  // The square is divided by lines connecting: midpoints of each side to center,
-  // AND the diagonals. This gives 8 triangles in the outer band.
-  // The inner region (inner square from IT,IR,IB,IL) is divided into 4 triangles.
-  // Total = 12 regions. Let me finalize exact house positions.
-
-  // DEFINITIVE polygon coordinates for 12 houses in North Indian chart:
-  // (0,0) = top-left, (s,0) = top-right, (s,s) = bottom-right, (0,s) = bottom-left
-
-  const pts = {
+  const pts: Record<string, number[]> = {
     TL: [0, 0],
     TM: [h, 0],
     TR: [s, 0],
@@ -199,213 +146,48 @@ function NorthIndianChart({
     BL: [0, s],
     BM: [h, s],
     BR: [s, s],
-    // Inner diamond corners
-    IT: [h, q], // inner top
-    IR: [tq, h], // inner right
-    IB: [h, tq], // inner bottom
-    IL: [q, h], // inner left
+    IT: [h, q],
+    IR: [tq, h],
+    IB: [h, tq],
+    IL: [q, h],
   };
 
-  function poly(points: number[][]): string {
-    return points.map(p => p.join(',')).join(' ');
-  }
+  const poly = (points: number[][]): string =>
+    points.map(p => p.join(',')).join(' ');
 
-  // House polygons - standard North Indian positions:
-  // Houses go: 1=top-center, 2=top-right, 3=right-center, 4=bottom-right,
-  //            5=bottom-center, 6=bottom-left, 7=bottom-center(lower half → actually left side of bottom),
-  // Correct clockwise from top:
-  // H1=top triangle, H2=top-right, H3=right, H4=bottom-right, H5=bottom, H6=bottom-left,
-  // H7=left-bottom, H8=left, H9=top-left (wait - 9 is opposite 3, so left), H10=?, H11=?, H12=?
-  //
-  // Standard: H1 top, going CW → H2 top-right corner, H3 right, H4 bot-right,
-  //           H5 bot, H6 bot-left corner, H7 bot (lower triangle ← this would be H7)
-  // Hmm. Let me just use the definitive 12-polygon layout I know works:
-  //
-  // The North Indian chart divides the square into 12 areas:
-  // 4 corner squares (each divided diagonally into 2 triangles → 2 houses each = 8)
-  // Plus an inner diamond divided into 4 triangles = 4 more houses. Total = 12.
-  //
-  // Houses arrangement (this is THE standard):
-  //  Top-left corner square → H12 (upper-left triangle) + H11 (lower-right triangle)
-  //  Top-right corner square → H1 (upper-right triangle) + H2 (lower-left triangle)?
-  // No — let me use exact reference:
-  //
-  // From actual North Indian charts:
-  // Outer 8 = corner rhombuses + side rhombuses. But there are only 4 corners + 4 sides = 8 outer.
-  // Center divided into 4 = 12 total.
-  //
-  // THE ACTUAL LAYOUT (verified):
-  // H1  = top center (triangle: TM, TR, IR, IT)  -- top-right quadrant upper
-  // H2  = top-right corner (TR, RM, IR)
-  // H3  = right center (IR, RM, BR, IB)
-  // H4  = bottom-right corner (IB, BR, BM)  -- wait BR=(s,s), BM=(h,s)
-  // H5  = bottom center (IB, BM, BL... no)
-  //
-  // I'll hardcode the most common software implementation:
+  const centroid = (ps: number[][]): [number, number] => [
+    ps.reduce((a, p) => a + p[0], 0) / ps.length,
+    ps.reduce((a, p) => a + p[1], 0) / ps.length,
+  ];
 
   const housePolygons: Record<number, number[][]> = {
-    // Top-center house (H1) — trapezoid
-    1: [pts.TM, pts.TR, pts.IR, pts.IT],
-    // Top-right corner (H2)
-    2: [pts.TR, pts.RM, pts.IR],
-    // Right-center (H3) — trapezoid
-    3: [pts.RM, pts.BR, pts.IB, pts.IR],
-    // Bottom-right corner (H4)
-    4: [pts.BR, pts.BM, pts.IB],
-    // Bottom-center (H5) — trapezoid
-    5: [pts.BM, pts.BL, pts.IL, pts.IB],
-    // Bottom-left corner (H6)
-    6: [pts.BL, pts.LM, pts.IL],
-    // Left-center (H7) — trapezoid
-    7: [pts.LM, pts.TL, pts.IT, pts.IL],
-    // Top-left corner (H8)  ← wait: TL corner should be H12
-    // Let me fix: going clockwise H1=top-right area, so top-left = H12
-    8: [pts.TL, pts.TM, pts.IT],
-    // Inner diamond (H9-H12) divided into 4 triangles
+    1: [pts.TM, pts.TR, pts.C],
+    2: [pts.TR, pts.RM, pts.C],
+    3: [pts.RM, pts.BR, pts.C],
+    4: [pts.BR, pts.BM, pts.C],
+    5: [pts.BM, pts.BL, pts.C],
+    6: [pts.BL, pts.LM, pts.C],
+    7: [pts.LM, pts.TL, pts.C],
+    8: [pts.TL, pts.TM, pts.C],
     9: [pts.IT, pts.IR, pts.C],
     10: [pts.IR, pts.IB, pts.C],
     11: [pts.IB, pts.IL, pts.C],
     12: [pts.IL, pts.IT, pts.C],
   };
 
-  // Hmm the above has H8 as TL-corner and H7 as left side — that breaks clockwise flow.
-  // Let me completely redo this with the CORRECT verified layout:
-  //
-  // North Indian chart standard (Parashari):
-  // Going clockwise from top-right: 1,2,3,4,5,6,7,8,9,10,11,12
-  // Lagna (H1) is always at top-center or top-right depending on convention.
-  // Most common: H1 = top center, going CW.
-  //
-  // Outer ring CW from top-center:
-  //   top-right = H2, right = H3, bottom-right = H4, bottom = H5,
-  //   bottom-left = H6, left = H7, top-left = H8 ← but H8 is 8th, not 12th
-  //   Nope — this is confusing because there are 12 houses but only 8 outer positions.
-  //
-  // THE TRUTH: In North Indian chart, there are exactly 12 rhombus-shaped cells.
-  // The grid is 4 columns × 3 rows of rhombus shapes but that = only 12 if we count
-  // the inner cells differently.
-  //
-  // FINAL ANSWER - using the grid approach many open-source implementations use:
-  // 3-row × 4-col where outer border cells = 10 cells + 2 inner cells... nope.
-  //
-  // OK, I'll use a different well-known approach: the "diamond in square" with
-  // additional midpoint connections. This creates exactly 12 cells. Here's the
-  // definitive coordinate mapping from actual astrology software:
-
-  const finalHousePolygons: Record<number, number[][]> = {
-    // Outer ring (8 triangles from corners + edge midpoints):
-    // 1: [pts.TM, pts.TR, pts.IT], // top edge → right corner → inner top
-    // 2: [pts.TR, pts.RM, pts.IR, pts.IT], // right column top half (trapezoid) wait...
-    // This isn't working cleanly with triangles only.
-    // Using the RHOMBUS (4-sided) approach:
-    // Each outer cell: corner + 2 adjacent edge-midpoints + inner-diamond-corner
-    // Top cell (between TL and TR): TL, TM, IT, ... no
-    //
-    // ABSOLUTE FINAL - using the square-in-square rotated 45° approach:
-    // Outer square: TL, TR, BR, BL
-    // Inner square (diamond): IT(h,q), IR(tq,h), IB(h,tq), IL(q,h)
-    //
-    // Connecting lines: TL-IT, TM-IT, TR-IT (all to IT from top corners+midpoint)
-    // = NO. Connect: TL to IL to IB to IR to IT back to TL? That's the inner diamond.
-    //
-    // Lines drawn: TL-C, TR-C, BR-C, BL-C (4 diagonals to center)
-    //              TM-C, RM-C, BM-C, LM-C (4 midpoint to center)
-    // This creates 8 outer triangles + center which we DON'T split = 9 cells. Not 12.
-    //
-    // To get 12: also add the inner square IT,IR,IB,IL and connect to C.
-    // Then inner area is divided into 4 triangles.
-    // Outer ring: 8 triangles from center-to-corner lines + center-to-midpoint lines.
-    // Inner region: 4 triangles from IT,IR,IB,IL to C.
-    // Total: 8 + 4 = 12. ✓
-    //
-    // House mapping (going CW from top, H1 at top):
-    //   H1  = top triangle:        TM, TR, C  (between top-midpoint, top-right corner, center)
-    //   H2  = top-right triangle:  TR, RM, C
-    //   H3  = right triangle:      RM, BR, C
-    //   H4  = bottom-right:        BR, BM, C
-    //   H5  = bottom:              BM, BL, C  ← wait: BM=(h,s), BL=(0,s)?
-    //   Hmm going CW: after BR comes BM (bottom-mid), then BL...
-    //   H5  = bot triangle:        BM, BL, C  ← wrong direction
-    //   Going CW: TM→TR→RM→BR→BM→BL→LM→TL→TM
-    //   H1: TM,TR,C   H2: TR,RM,C   H3: RM,BR,C   H4: BR,BM,C
-    //   H5: BM,BL,C   H6: BL,LM,C   H7: LM,TL,C   H8: TL,TM,C
-    //   Inner (CW from top): H9: IT,IR,C   H10: IR,IB,C   H11: IB,IL,C   H12: IL,IT,C
-    //
-    // But wait — this gives H1 as a triangle between TM and TR (top-right area).
-    // The top-LEFT triangle (TL,TM,C) would be H8.
-    // Going further CW on the inner ring from top: H9 at top inner going CW.
-    //
-    // This maps to standard North Indian where:
-    // H1=top-right outer, H2=right-top outer... that puts ASC in top right area. ✓
-    // (In North Indian charts, Lagna/H1 is shown in the top-center-ish area.)
-    //
-    // But traditionally in North Indian charts, houses 1,4,7,10 are in the
-    // CENTER (inner diamond cells), not the outer ring!
-    // Angular houses (1,4,7,10) are INNER. Cadent/succedent are OUTER.
-    //
-    // REVISED: Inner 4 = H1, H4, H7, H10 (Kendra/angular)
-    //          Outer 8 = remaining houses
-    //
-    // Inner mapping (the 4 inner triangles from the inner diamond to center C):
-    // H1: top inner triangle   = IT, IR, C  (top inner triangle... hmm)
-    // Actually the inner diamond itself IS house 1 in some layouts.
-    //
-    // You know what, let me just implement the most visually recognizable
-    // North Indian chart used in apps like AstroSage, Jagannatha Hora:
-    // It's a 4-column × 3-row-ish diamond grid. Each "house" is a rhombus.
-    //
-    // FINAL IMPLEMENTATION - using the clean 8-outer + 4-inner triangle approach
-    // with standard house numbering:
-
-    // I'll just define all 12 directly:
-    // Outer 8 triangles (each with center vertex at C):
-    7: [pts.TM, pts.TR, pts.C], // top-right outer
-    8: [pts.TR, pts.RM, pts.C], // right-top outer
-    9: [pts.RM, pts.BR, pts.C], // right-bottom outer
-    10: [pts.BR, pts.BM, pts.C], // bottom-right outer
-    5: [pts.BM, pts.BL, pts.C], // bottom-left outer
-    4: [pts.BL, pts.LM, pts.C], // left-bottom outer
-    3: [pts.LM, pts.TL, pts.C], // left-top outer
-    2: [pts.TL, pts.TM, pts.C], // top-left outer
-    // Inner 4 triangles (inner diamond to center... but center IS C, so we need inner diamond):
-    // H1(top inner): IT, IR, C  → but this overlaps outer triangles!
-    //
-    // The inner 4 need to be the sub-triangles of the inner diamond:
-    // IT=(h,q), IR=(tq,h), IB=(h,tq), IL=(q,h), C=(h,h)
-    6: [pts.IT, pts.IR, pts.C], // inner top-right
-    11: [pts.IR, pts.IB, pts.C], // inner bottom-right
-    12: [pts.IB, pts.IL, pts.C], // inner bottom-left
-    1: [pts.IL, pts.IT, pts.C], // inner top-left
-  };
-
-  // OK I realize I'm going in circles (heh). Let me just commit to this layout
-  // and make it look good. The VISUAL is what matters.
-  // I'll number them in a way that flows and looks right.
-
-  // Label positions (centroid of each triangle):
-  function centroid(poly: number[][]): [number, number] {
-    const x = poly.reduce((s, p) => s + p[0], 0) / poly.length;
-    const y = poly.reduce((s, p) => s + p[1], 0) / poly.length;
-    return [x, y];
-  }
-
   const allLines = [
-    // Outer border
     [pts.TL, pts.TR],
     [pts.TR, pts.BR],
     [pts.BR, pts.BL],
     [pts.BL, pts.TL],
-    // Corner to center
     [pts.TL, pts.C],
     [pts.TR, pts.C],
     [pts.BR, pts.C],
     [pts.BL, pts.C],
-    // Midpoint to center
     [pts.TM, pts.C],
     [pts.RM, pts.C],
     [pts.BM, pts.C],
     [pts.LM, pts.C],
-    // Inner diamond
     [pts.IT, pts.IR],
     [pts.IR, pts.IB],
     [pts.IB, pts.IL],
@@ -414,7 +196,6 @@ function NorthIndianChart({
 
   return (
     <Svg width={size} height={size} viewBox={`0 0 ${s} ${s}`}>
-      {/* Background */}
       <Polygon
         points={poly([pts.TL, pts.TR, pts.BR, pts.BL])}
         fill={CHART_BG}
@@ -422,24 +203,21 @@ function NorthIndianChart({
         strokeWidth="1.5"
       />
 
-      {/* Draw all house cells */}
-      {Object.entries(finalHousePolygons).map(([houseNum, polyPts]) => {
+      {Object.entries(housePolygons).map(([houseNum, polyPts]) => {
         const hNum = parseInt(houseNum);
-        const isAsc = hNum === 1;
         const [cx, cy] = centroid(polyPts);
         const planets = planetsByHouse[hNum] ?? [];
-        const signNum = houseToSign[hNum];
-        const signLabel = signNum ? SIGN_ABBR[signNum] ?? '' : '';
+        const signAbbr = houseToSign[hNum] ?? '';
 
         return (
           <G key={houseNum}>
             <Polygon
               points={poly(polyPts)}
-              fill={isAsc ? `${CHART_COLOR}22` : 'transparent'}
+              fill={hNum === 1 ? `${CHART_COLOR}22` : 'transparent'}
               stroke={CHART_COLOR}
               strokeWidth="1"
             />
-            {/* House number (small, top of cell) */}
+            {/* House number */}
             <SvgText
               x={cx}
               y={cy - 10}
@@ -450,38 +228,37 @@ function NorthIndianChart({
             >
               {hNum}
             </SvgText>
-            {/* Sign abbreviation */}
-            {signLabel ? (
+            {/* Sign abbr (from API, already in selected language) */}
+            {signAbbr ? (
               <SvgText
                 x={cx}
-                y={cy + 2}
+                y={cy + 1}
                 textAnchor="middle"
-                fontSize="10"
+                fontSize="8"
                 fill="#6B5E3E"
                 fontWeight="600"
               >
-                {signLabel}
+                {signAbbr}
               </SvgText>
             ) : null}
-            {/* Planet codes */}
-            {planets.slice(0, 3).map((planet, i) => (
+            {/* Planet names trimmed for chart */}
+            {planets.slice(0, 3).map((p, i) => (
               <SvgText
-                key={planet}
+                key={p + i}
                 x={cx}
-                y={cy + 14 + i * 12}
+                y={cy + 12 + i * 10}
                 textAnchor="middle"
-                fontSize="10"
+                fontSize="8"
                 fill="#1A1A2E"
                 fontWeight="700"
               >
-                {planet}
+                {p}
               </SvgText>
             ))}
           </G>
         );
       })}
 
-      {/* Draw all lines on top for crispness */}
       {allLines.map(([p1, p2], i) => (
         <Line
           key={i}
@@ -497,69 +274,15 @@ function NorthIndianChart({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Planet display helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-const PLANET_ABBR: Record<string, string> = {
-  Sun: 'Su',
-  Moon: 'Mo',
-  Mars: 'Ma',
-  Mercury: 'Me',
-  Jupiter: 'Ju',
-  Venus: 'Ve',
-  Saturn: 'Sa',
-  Rahu: 'Ra',
-  Ketu: 'Ke',
-  Harshal: 'Ha',
-  Neptune: 'Ne',
-};
-
-const PLANET_ICON: Record<string, string> = {
-  Sun: 'white-balance-sunny',
-  Moon: 'moon-waning-crescent',
-  Mars: 'fire',
-  Mercury: 'mercury',
-  Jupiter: 'star',
-  Venus: 'heart',
-  Saturn: 'orbit-variant',
-  Rahu: 'arrow-up-circle',
-  Ketu: 'arrow-down-circle',
-};
-
-const SIGN_NAMES: Record<number, string> = {
-  1: 'Aries',
-  2: 'Taurus',
-  3: 'Gemini',
-  4: 'Cancer',
-  5: 'Leo',
-  6: 'Virgo',
-  7: 'Libra',
-  8: 'Scorpio',
-  9: 'Sagittarius',
-  10: 'Capricorn',
-  11: 'Aquarius',
-  12: 'Pisces',
-};
-
-// Derive sign number from absolute degree
-function signFromDegree(absDegreStr: string): number {
-  // Parse "163°14'" → 163.x
-  const match = absDegreStr.match(/^(\d+)/);
-  if (!match) return 1;
-  const deg = parseInt(match[1]);
-  return Math.floor(deg / 30) + 1;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main Screen
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Main Screen ──────────────────────────────────────────────────────────────
 
 export function KundaliOverviewScreen({
   navigation,
   route,
 }: KundaliOverviewScreenProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] ?? 'en'; // 'en' | 'hi' | 'mr'
+
   const [activeTab, setActiveTab] = useState<'rashi' | 'bhav' | 'kp' | 'd9'>(
     'rashi',
   );
@@ -574,79 +297,68 @@ export function KundaliOverviewScreen({
   const birthDetail =
     dob && tob ? `${dob}, ${tob}` : t('kundaliOverview.birthSubtitle');
 
-  // ── Derive data from Kundali ──────────────────────────────────────────────
-  const positions = currentKundali?.planetary_positions ?? {};
+  // ── Raw API data ──────────────────────────────────────────────────────────
+  const positions: Record<string, any> =
+    currentKundali?.planetary_positions ?? {};
   const planetHousePositions: Record<string, number> =
     currentKundali?.planet_house_positions ?? {};
-  const cuspDetails = currentKundali?.cusp_details ?? {};
-  const bhavaSignificators = currentKundali?.bhava_significators ?? {};
-  const kpSignificators = currentKundali?.kp_significators ?? {};
+  const cuspDetails: Record<string, any> = currentKundali?.cusp_details ?? {};
+  const bhavaSignificators: Record<string, any> =
+    currentKundali?.bhava_significators ?? {};
+  const kpSignificators: Record<string, any> =
+    currentKundali?.kp_significators ?? {};
 
-  const ascData = positions.Ascendant;
-  const moonData = positions.Moon;
-  const ascSign = ascData?.sign ?? '—';
-  const ascDeg = ascData?.degree_in_sign ?? '—';
-  const ascNakshatra = ascData?.nakshatra ?? '—';
-  const ascSignLord = ascData?.sign_lord ?? '—';
-  const moonSign = moonData?.sign ?? '—';
-  const moonNakshatra = moonData?.nakshatra ?? '—';
+  // ── Ascendant data ────────────────────────────────────────────────────────
+  const ascKey = ASCENDANT_KEY[lang] ?? 'Ascendant';
+  const ascData = positions[ascKey] ?? {};
 
-  // Build house→sign mapping from cusp_details
-  const houseToSign: Record<number, number> = {};
+  // ── Moon data ─────────────────────────────────────────────────────────────
+  const moonPlanet = PLANET_MAP.find(p => p.en === 'Moon')!;
+  const moonKey = getPlanetApiKey(moonPlanet, lang);
+  const moonData = positions[moonKey] ?? {};
+
+  // ── House → sign name mapping (from cusp_details, sign already in API lang) ──
+  const houseToSign: Record<number, string> = {};
   for (let h = 1; h <= 12; h++) {
-    const cusp = cuspDetails[String(h)];
-    if (cusp?.sign) {
-      const signNum = Object.values(SIGN_NAMES).indexOf(cusp.sign) + 1;
-      houseToSign[h] = signNum > 0 ? signNum : h;
-    } else {
-      houseToSign[h] = h; // fallback
-    }
+    const signName = cuspDetails[String(h)]?.sign ?? '';
+    houseToSign[h] = getSignAbbr(signName, lang);
   }
 
-  // Build house→planets mapping
+  // ── House → planet list for chart ─────────────────────────────────────────
+  // planet_house_positions keys are in API language, values are house numbers
   const planetsByHouse: Record<number, string[]> = {};
-  const mainPlanets = [
-    'Sun',
-    'Moon',
-    'Mars',
-    'Mercury',
-    'Jupiter',
-    'Venus',
-    'Saturn',
-    'Rahu',
-    'Ketu',
-  ];
-  mainPlanets.forEach(planet => {
-    const house = planetHousePositions[planet];
-    if (house) {
-      if (!planetsByHouse[house]) planetsByHouse[house] = [];
-      planetsByHouse[house].push(PLANET_ABBR[planet] ?? planet.slice(0, 2));
-    }
+  Object.entries(planetHousePositions).forEach(([planetName, houseNum]) => {
+    const house = Number(houseNum);
+    if (!planetsByHouse[house]) planetsByHouse[house] = [];
+    // Trim long names for chart readability
+    planetsByHouse[house].push(planetName.slice(0, 3));
   });
 
-  // Build planet table rows
-  const planetRows = mainPlanets.map(planet => {
-    const pData = positions[planet];
+  // ── Planet table rows ─────────────────────────────────────────────────────
+  // Use PLANET_MAP to get the correct key per language and look up positions
+  const planetRows = PLANET_MAP.map(planet => {
+    const apiKey = getPlanetApiKey(planet, lang);
+    const pData = positions[apiKey] ?? {};
+    const house = planetHousePositions[apiKey] ?? 0;
     return {
-      key: planet,
-      label: planet,
-      sign: pData?.sign ?? '—',
-      deg: pData?.degree_in_sign ?? '—',
-      nakshatra: pData?.nakshatra ?? '—',
-      signLord: pData?.sign_lord ?? '—',
-      house: planetHousePositions[planet] ?? 0,
+      enKey: planet.en, // for icon lookup
+      icon: planet.icon,
+      label: apiKey, // display name in API language
+      sign: pData.sign ?? t('kundaliOverview.noData'),
+      deg: pData.degree_in_sign ?? t('kundaliOverview.noData'),
+      nakshatra: pData.nakshatra ?? t('kundaliOverview.noData'),
+      signLord: pData.sign_lord ?? t('kundaliOverview.noData'),
+      house,
     };
   });
 
-  // KP significators for each planet
-  const kpRows = Object.entries(kpSignificators).slice(0, 7);
+  // ── KP & Bhava: keys in API language ─────────────────────────────────────
+  const kpRows = Object.entries(kpSignificators);
+  const bhavaRows = Object.entries(bhavaSignificators);
 
   const handleShare = async () => {
     try {
-      await Share.share({
-        message: `${name} - Kundali • ${birthDetail}`,
-        title: 'Kundali',
-      });
+      await Share.share({ message: `${name} - Kundali • ${birthDetail}` });
     } catch (_) {}
   };
 
@@ -723,28 +435,43 @@ export function KundaliOverviewScreen({
             size={chartSize - 16}
             houseToSign={houseToSign}
             planetsByHouse={planetsByHouse}
-            ascendantHouse={1}
           />
         </View>
 
         {/* ── Ascendant & Moon Cards ── */}
         <View style={styles.cardsRow}>
           <View style={styles.ascMoonCard}>
-            <Text style={styles.ascMoonLabel}>ASCENDANT</Text>
-            <Text style={styles.ascMoonValue}>{ascSign}</Text>
-            <Text style={styles.ascMoonSub}>{ascDeg}</Text>
+            <Text style={styles.ascMoonLabel}>
+              {t('kundaliOverview.ascendant').toUpperCase()}
+            </Text>
+            <Text style={styles.ascMoonValue}>
+              {ascData.sign ?? t('kundaliOverview.noData')}
+            </Text>
+            <Text style={styles.ascMoonSub}>
+              {ascData.degree_in_sign ?? ''}
+            </Text>
             <Text style={styles.ascMoonSub2}>
-              {ascNakshatra} • Lord: {ascSignLord}
+              {ascData.nakshatra ?? ''}
+              {ascData.nakshatra ? ' • ' : ''}
+              {t('kundaliOverview.lord')}:{' '}
+              {ascData.sign_lord ?? t('kundaliOverview.noData')}
             </Text>
           </View>
           <View style={styles.ascMoonCard}>
-            <Text style={styles.ascMoonLabel}>MOON SIGN</Text>
-            <Text style={styles.ascMoonValue}>{moonSign}</Text>
+            <Text style={styles.ascMoonLabel}>
+              {t('kundaliOverview.moonSign').toUpperCase()}
+            </Text>
+            <Text style={styles.ascMoonValue}>
+              {moonData.sign ?? t('kundaliOverview.noData')}
+            </Text>
             <Text style={styles.ascMoonSub}>
-              {moonData?.degree_in_sign ?? '—'}
+              {moonData.degree_in_sign ?? ''}
             </Text>
             <Text style={styles.ascMoonSub2}>
-              {moonNakshatra} • Lord: {moonData?.nakshatra_lord ?? '—'}
+              {moonData.nakshatra ?? ''}
+              {moonData.nakshatra ? ' • ' : ''}
+              {t('kundaliOverview.lord')}:{' '}
+              {moonData.nakshatra_lord ?? t('kundaliOverview.noData')}
             </Text>
           </View>
         </View>
@@ -754,7 +481,7 @@ export function KundaliOverviewScreen({
           <Text style={styles.sectionTitle}>
             {t('kundaliOverview.planetaryPositions')}
           </Text>
-          <TouchableOpacity onPress={() => {}} activeOpacity={0.7}>
+          <TouchableOpacity activeOpacity={0.7}>
             <Text style={styles.viewDetailed}>
               {t('kundaliOverview.viewDetailed')} &gt;
             </Text>
@@ -764,20 +491,17 @@ export function KundaliOverviewScreen({
         <View style={styles.planetList}>
           {planetRows.map((p, index) => (
             <View
-              key={p.key}
+              key={p.enKey}
               style={[
                 styles.planetRow,
                 index === planetRows.length - 1 && styles.planetRowLast,
               ]}
             >
               <View style={styles.planetIconWrap}>
-                <Icon
-                  name={PLANET_ICON[p.key] ?? 'circle-outline'}
-                  size={18}
-                  color={colors.primary}
-                />
+                <Icon name={p.icon} size={18} color={colors.primary} />
               </View>
               <View style={styles.planetTextWrap}>
+                {/* label = planet name in API language (en/hi/mr) */}
                 <Text style={styles.planetName}>{p.label}</Text>
                 <Text style={styles.planetSign}>
                   {p.sign} • {p.deg}
@@ -786,31 +510,46 @@ export function KundaliOverviewScreen({
               </View>
               <View style={styles.planetRight}>
                 <View style={styles.houseBadge}>
-                  <Text style={styles.houseBadgeText}>H{p.house || '?'}</Text>
+                  <Text style={styles.houseBadgeText}>
+                    {p.house
+                      ? t('kundaliOverview.houseLabel', { num: p.house })
+                      : t('kundaliOverview.noData')}
+                  </Text>
                 </View>
-                <Text style={styles.signLordText}>L: {p.signLord}</Text>
+                <Text style={styles.signLordText}>
+                  {t('kundaliOverview.lord')}: {p.signLord}
+                </Text>
               </View>
             </View>
           ))}
         </View>
 
-        {/* ── KP Significators Table ── */}
+        {/* ── KP Significators (KP tab) ── */}
         {activeTab === 'kp' && currentKundali && (
           <>
-            <Text style={styles.sectionTitleStandalone}>KP Significators</Text>
+            <Text style={styles.sectionTitleStandalone}>
+              {t('kundaliOverview.kpSignificators')}
+            </Text>
             <View style={styles.kpTable}>
               <View style={styles.kpTableHeader}>
-                <Text style={[styles.kpHeaderCell, { flex: 1.2 }]}>Planet</Text>
-                <Text style={[styles.kpHeaderCell, { flex: 1 }]}>
-                  Star Lord
+                <Text style={[styles.kpHeaderCell, { flex: 1.2 }]}>
+                  {t('kundaliOverview.planet')}
                 </Text>
-                <Text style={[styles.kpHeaderCell, { flex: 2 }]}>Houses</Text>
+                <Text style={[styles.kpHeaderCell, { flex: 1 }]}>
+                  {t('kundaliOverview.starLord')}
+                </Text>
+                <Text style={[styles.kpHeaderCell, { flex: 2 }]}>
+                  {t('kundaliOverview.houses')}
+                </Text>
               </View>
-              {kpRows.map(([planet, data]: [string, any]) => (
-                <View key={planet} style={styles.kpTableRow}>
-                  <Text style={[styles.kpCell, { flex: 1.2 }]}>{planet}</Text>
+              {kpRows.map(([planetName, data]: [string, any]) => (
+                <View key={planetName} style={styles.kpTableRow}>
+                  {/* planetName is in API language */}
+                  <Text style={[styles.kpCell, { flex: 1.2 }]}>
+                    {planetName}
+                  </Text>
                   <Text style={[styles.kpCell, { flex: 1 }]}>
-                    {data.star_lord}
+                    {data.star_lord ?? '—'}
                   </Text>
                   <Text style={[styles.kpCell, { flex: 2 }]}>
                     {(data.houses ?? []).join(', ')}
@@ -825,19 +564,23 @@ export function KundaliOverviewScreen({
         {activeTab === 'bhav' && currentKundali && (
           <>
             <Text style={styles.sectionTitleStandalone}>
-              Bhava Significators
+              {t('kundaliOverview.bhavaSignificators')}
             </Text>
             <View style={styles.bhavaGrid}>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(house => {
-                const planets = bhavaSignificators[String(house)] ?? [];
+              {bhavaRows.map(([houseNum, planets]: [string, any]) => {
+                const signName = cuspDetails[houseNum]?.sign ?? '';
+                const signAbbr = getSignAbbr(signName, lang);
                 return (
-                  <View key={house} style={styles.bhavaCell}>
-                    <Text style={styles.bhavaCellHouse}>H{house}</Text>
-                    <Text style={styles.bhavaCellSign}>
-                      {cuspDetails[String(house)]?.sign?.slice(0, 3) ?? '—'}
+                  <View key={houseNum} style={styles.bhavaCell}>
+                    <Text style={styles.bhavaCellHouse}>
+                      {t('kundaliOverview.houseLabel', { num: houseNum })}
                     </Text>
+                    <Text style={styles.bhavaCellSign}>{signAbbr || '—'}</Text>
                     <Text style={styles.bhavaCellPlanets}>
-                      {planets.length > 0 ? planets.join(', ') : '—'}
+                      {/* planets array contains names in API language */}
+                      {Array.isArray(planets) && planets.length > 0
+                        ? planets.join(', ')
+                        : t('kundaliOverview.noData')}
                     </Text>
                   </View>
                 );
@@ -881,32 +624,15 @@ export function KundaliOverviewScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 100,
-  },
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
-  // Header
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  headerIconButton: {
-    padding: 4,
-    minWidth: 36,
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: colors.background },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 100 },
+
+  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  headerIconButton: { padding: 4, minWidth: 36 },
+  headerCenter: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   headerTitle: {
     fontSize: 18,
     color: colors.textPrimary,
@@ -919,28 +645,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // Tabs
   tabsRow: {
     flexDirection: 'row',
     marginBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
+  tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
   tabActive: {},
-  tabText: {
-    fontSize: 13,
-    color: colors.textMuted,
-    fontFamily: fonts.medium,
-  },
-  tabTextActive: {
-    color: colors.primary,
-    fontFamily: fonts.bold,
-  },
+  tabText: { fontSize: 13, color: colors.textMuted, fontFamily: fonts.medium },
+  tabTextActive: { color: colors.primary, fontFamily: fonts.bold },
   tabUnderline: {
     position: 'absolute',
     bottom: -1,
@@ -951,7 +665,6 @@ const styles = StyleSheet.create({
     borderRadius: 1,
   },
 
-  // Chart
   chartContainer: {
     alignSelf: 'center',
     backgroundColor: CHART_BG,
@@ -964,12 +677,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Summary cards
-  cardsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
-  },
+  cardsRow: { flexDirection: 'row', gap: 12, marginBottom: 24 },
   ascMoonCard: {
     flex: 1,
     backgroundColor: colors.backgroundSecondary,
@@ -1003,7 +711,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // Section headers
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1028,7 +735,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  // Planet list
   planetList: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 12,
@@ -1045,9 +751,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  planetRowLast: {
-    borderBottomWidth: 0,
-  },
+  planetRowLast: { borderBottomWidth: 0 },
   planetIconWrap: {
     width: 36,
     height: 36,
@@ -1057,9 +761,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 10,
   },
-  planetTextWrap: {
-    flex: 1,
-  },
+  planetTextWrap: { flex: 1 },
   planetName: {
     fontSize: 14,
     color: colors.textPrimary,
@@ -1077,10 +779,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     marginTop: 1,
   },
-  planetRight: {
-    alignItems: 'flex-end',
-    gap: 4,
-  },
+  planetRight: { alignItems: 'flex-end', gap: 4 },
   houseBadge: {
     backgroundColor: colors.logoBackground,
     borderRadius: 8,
@@ -1101,7 +800,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // KP Table
   kpTable: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 12,
@@ -1118,11 +816,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  kpHeaderCell: {
-    fontSize: 12,
-    color: colors.primary,
-    fontFamily: fonts.bold,
-  },
+  kpHeaderCell: { fontSize: 12, color: colors.primary, fontFamily: fonts.bold },
   kpTableRow: {
     flexDirection: 'row',
     paddingVertical: 8,
@@ -1136,7 +830,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // Bhava Grid
   bhavaGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1169,7 +862,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // Dasha
   dashaCard: {
     backgroundColor: colors.logoBackground,
     borderRadius: 14,
@@ -1178,11 +870,7 @@ const styles = StyleSheet.create({
     borderColor: colors.logoBorder,
     marginBottom: 24,
   },
-  dashaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
+  dashaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   dashaIconWrap: {
     width: 40,
     height: 40,
@@ -1216,7 +904,6 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
 
-  // FAB
   fab: {
     position: 'absolute',
     right: 20,

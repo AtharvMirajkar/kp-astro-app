@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next'; // ← NEW
 
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
@@ -52,7 +53,9 @@ const RING_ICON_COUNT = ZODIAC_RING.length;
 
 export function KundaliLoadingScreen({ navigation }: any) {
   const dispatch = useDispatch<AppDispatch>();
-  const { birthDetails, loading } = useSelector((s: RootState) => s.kundali);
+  const { i18n } = useTranslation(); // ← NEW: track active language
+
+  const { birthDetails } = useSelector((s: RootState) => s.kundali);
 
   // ── Animation refs ──
   const ringRotate = useRef(new Animated.Value(0)).current;
@@ -62,11 +65,10 @@ export function KundaliLoadingScreen({ navigation }: any) {
   const progressWidth = useRef(new Animated.Value(0)).current;
   const stepFadeAnim = useRef(new Animated.Value(1)).current;
 
-  // ── Step state ──
   const [stepIndex, setStepIndex] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Ring rotation (clockwise) ──
+  // ── Ring rotation ──
   useEffect(() => {
     Animated.loop(
       Animated.timing(ringRotate, {
@@ -143,7 +145,6 @@ export function KundaliLoadingScreen({ navigation }: any) {
   // ── Step cycling with crossfade ──
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      // Fade out
       Animated.timing(stepFadeAnim, {
         toValue: 0,
         duration: 250,
@@ -152,7 +153,6 @@ export function KundaliLoadingScreen({ navigation }: any) {
         setStepIndex(prev =>
           prev < LOADING_STEPS.length - 1 ? prev + 1 : prev,
         );
-        // Fade in
         Animated.timing(stepFadeAnim, {
           toValue: 1,
           duration: 350,
@@ -166,7 +166,12 @@ export function KundaliLoadingScreen({ navigation }: any) {
     };
   }, [stepFadeAnim]);
 
-  // ── API call ──
+  // ── API call ──────────────────────────────────────────────────────────────
+  // i18n.language is included in the dep array so if the language somehow
+  // changes before the call completes it re-fires with the correct language.
+  // In practice the language is resolved inside getApiLanguage() in the thunk
+  // at the moment of dispatch, so this is just a safety net.
+
   useEffect(() => {
     const generate = async () => {
       if (!birthDetails) return;
@@ -188,7 +193,8 @@ export function KundaliLoadingScreen({ navigation }: any) {
       }
     };
     generate();
-  }, [birthDetails, dispatch, navigation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [birthDetails, dispatch, navigation, i18n.language]); // ← NEW: i18n.language dep
 
   // ── Interpolations ──
   const ringDeg = ringRotate.interpolate({
@@ -221,10 +227,8 @@ export function KundaliLoadingScreen({ navigation }: any) {
 
         {/* ── Mandala / Ring area ── */}
         <View style={styles.mandalaWrap}>
-          {/* Outer glow */}
           <Animated.View style={[styles.outerGlow, { opacity: glowOpacity }]} />
 
-          {/* Rotating zodiac ring */}
           <Animated.View
             style={[styles.zodiacRing, { transform: [{ rotate: ringDeg }] }]}
           >
@@ -241,7 +245,7 @@ export function KundaliLoadingScreen({ navigation }: any) {
                       transform: [
                         { translateX: x },
                         { translateY: y },
-                        { rotate: counterDeg }, // keep icons upright
+                        { rotate: counterDeg },
                       ],
                     },
                   ]}
@@ -257,13 +261,9 @@ export function KundaliLoadingScreen({ navigation }: any) {
             })}
           </Animated.View>
 
-          {/* Static decorative ring border */}
           <View style={styles.ringBorder} />
-
-          {/* Inner dotted ring */}
           <View style={styles.innerRingBorder} />
 
-          {/* Pulsing centre circle */}
           <Animated.View
             style={[
               styles.centreCircle,
@@ -282,7 +282,7 @@ export function KundaliLoadingScreen({ navigation }: any) {
 
         {/* ── Step indicator ── */}
         <Animated.View style={[styles.stepRow, { opacity: stepFadeAnim }]}>
-          <View style={[styles.stepIconWrap]}>
+          <View style={styles.stepIconWrap}>
             <Icon name={currentStep.icon} size={16} color={colors.primary} />
           </View>
           <Text style={styles.stepText}>{currentStep.text}</Text>
@@ -293,7 +293,6 @@ export function KundaliLoadingScreen({ navigation }: any) {
           <Animated.View
             style={[styles.progressFill, { width: barWidth as any }]}
           />
-          {/* Shimmer dot at progress front */}
           <Animated.View
             style={[styles.progressDot, { left: barWidth as any }]}
           />
@@ -314,11 +313,7 @@ const MANDALA_SIZE = width * 0.78;
 const CENTER_SIZE = 96;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-
+  safeArea: { flex: 1, backgroundColor: colors.background },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -326,7 +321,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
 
-  // Top pill label
   topLabel: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -346,7 +340,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Mandala container
   mandalaWrap: {
     width: MANDALA_SIZE,
     height: MANDALA_SIZE,
@@ -354,8 +347,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 44,
   },
-
-  // Outer animated glow halo
   outerGlow: {
     position: 'absolute',
     width: MANDALA_SIZE,
@@ -364,8 +355,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     opacity: 0.06,
   },
-
-  // Static ring border
   ringBorder: {
     position: 'absolute',
     width: MANDALA_SIZE - 20,
@@ -375,8 +364,6 @@ const styles = StyleSheet.create({
     borderColor: colors.logoBorder,
     borderStyle: 'dashed',
   },
-
-  // Inner decorative ring
   innerRingBorder: {
     position: 'absolute',
     width: MANDALA_SIZE * 0.52,
@@ -385,8 +372,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.logoBorder,
   },
-
-  // Rotating zodiac ring overlay
   zodiacRing: {
     position: 'absolute',
     width: MANDALA_SIZE,
@@ -394,8 +379,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  // Each zodiac icon positioned around the ring
   zodiacIconWrap: {
     position: 'absolute',
     width: 28,
@@ -407,8 +390,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.logoBorder,
   },
-
-  // Pulsing centre
   centreCircle: {
     width: CENTER_SIZE,
     height: CENTER_SIZE,
@@ -418,7 +399,6 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    // Subtle shadow
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.35,
@@ -426,7 +406,6 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
-  // Title & subtitle
   title: {
     fontSize: 22,
     fontFamily: fonts.bold,
@@ -444,7 +423,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  // Step row
   stepRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -469,7 +447,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
 
-  // Progress bar
   progressTrack: {
     width: '100%',
     height: 4,
@@ -498,7 +475,6 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 
-  // Step counter
   stepCounter: {
     fontSize: 11,
     fontFamily: fonts.regular,

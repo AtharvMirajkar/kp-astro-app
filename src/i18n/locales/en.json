@@ -168,7 +168,17 @@
     "retro": "Retro",
     "currentDasha": "Current Vimshottari Dasha",
     "dashaValue": "Venus - Moon - Rahu",
-    "dashaUntil": "Until 15 May 2024"
+    "dashaUntil": "Until 15 May 2024",
+    "kpSignificators": "KP Significators",
+    "bhavaSignificators": "Bhava Significators",
+    "planet": "Planet",
+    "starLord": "Star Lord",
+    "houses": "Houses",
+    "degree": "Degree",
+    "nakshatra": "Nakshatra",
+    "lord": "Lord",
+    "houseLabel": "H{{num}}",
+    "noData": "—"
   },
   "matching": {
     "screenTitle": "Kundli Matching",

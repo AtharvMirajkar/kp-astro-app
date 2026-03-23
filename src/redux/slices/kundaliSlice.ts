@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '../../api/axiosInstance';
 import axios from 'axios';
+import i18n from '../../i18n'; // your existing i18n instance
 
-// ─── New imports for FCM ──────────────────────────────────────────────────────
+// ─── FCM imports ──────────────────────────────────────────────────────────────
 import {
   requestNotificationPermission,
   getOrCreateDeviceId,
@@ -16,10 +17,9 @@ interface KundaliState {
   kundaliList: any[];
   birthDetails: BirthDetails | null;
   loading: boolean;
-  // ── NEW ──
-  userRecordId: string | null; // MongoDB _id from POST /api/users
-  deviceId: string | null; // stable hardware device ID
-  fcmToken: string | null; // Firebase Cloud Messaging token
+  userRecordId: string | null;
+  deviceId: string | null;
+  fcmToken: string | null;
 }
 
 interface BirthDetails {
@@ -39,14 +39,26 @@ const initialState: KundaliState = {
   kundaliList: [],
   birthDetails: null,
   loading: false,
-  // ── NEW ──
   userRecordId: null,
   deviceId: null,
   fcmToken: null,
 };
 
-// ─── EXISTING: generateKundali ────────────────────────────────────────────────
-// Untouched — calls external engine directly with plain axios
+// ─── Language helper ──────────────────────────────────────────────────────────
+
+type SupportedLanguage = 'en' | 'hi' | 'mr';
+
+const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['en', 'hi', 'mr'];
+
+function getApiLanguage(): SupportedLanguage {
+  // i18n.language can be "en", "hi", "mr", or locale variants like "en-US"
+  const lang = i18n.language?.split('-')[0];
+  return SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage)
+    ? (lang as SupportedLanguage)
+    : 'en';
+}
+
+// ─── generateKundali ─────────────────────────────────────────────────────────
 
 export const generateKundali = createAsyncThunk(
   'kundali/generate',
@@ -58,6 +70,8 @@ export const generateKundali = createAsyncThunk(
     latitude: string;
     longitude: string;
   }) => {
+    const language = getApiLanguage();
+
     const payload = {
       date: birthDetails.dob,
       time: birthDetails.tob,
@@ -66,23 +80,24 @@ export const generateKundali = createAsyncThunk(
       timezone: 'Asia/Kolkata',
     };
 
-    console.log(payload, '<------- Payload');
+    console.log(`[generateKundali] Language: ${language}`);
+
     const res = await axios.post(
-      'https://kp-astro-engine.onrender.com/generate-chart',
+      `https://kp-astro-engine.onrender.com/generate-chart?language=${language}`,
       payload,
     );
     return res.data;
   },
 );
 
-// ─── EXISTING: fetchKundaliList ───────────────────────────────────────────────
+// ─── fetchKundaliList ─────────────────────────────────────────────────────────
 
 export const fetchKundaliList = createAsyncThunk('kundali/list', async () => {
   const res = await axiosInstance.get('/kundali');
   return res.data;
 });
 
-// ─── EXISTING: fetchKundaliOverview ──────────────────────────────────────────
+// ─── fetchKundaliOverview ─────────────────────────────────────────────────────
 
 export const fetchKundaliOverview = createAsyncThunk(
   'kundali/overview',
@@ -92,26 +107,19 @@ export const fetchKundaliOverview = createAsyncThunk(
   },
 );
 
-// ─── NEW: saveBirthDetails ────────────────────────────────────────────────────
-// Resolves deviceId + FCM token, then saves user data to POST /api/users.
-// Call this from BirthDetailsScreen BEFORE navigating to KundaliLoadingScreen.
-// generateKundali is still called from KundaliLoadingScreen exactly as before.
+// ─── saveBirthDetails ────────────────────────────────────────────────────────
 
 export const saveBirthDetails = createAsyncThunk(
   'kundali/saveBirthDetails',
   async (details: BirthDetails, { rejectWithValue }) => {
     try {
-      // 1. Request notification permission (no-op if already granted)
       await requestNotificationPermission();
 
-      // 2. Get deviceId + FCM token in parallel
       const [deviceId, fcmToken] = await Promise.all([
         getOrCreateDeviceId(),
         getFCMToken(),
       ]);
 
-      // 3. Save to your backend POST /api/users
-      // Backend schema: { name, gender, deviceId, dateOfBirth, timeOfBirth, placeOfBirth }
       const response = await axiosInstance.post('/api/users', {
         name: details.name,
         gender: details.gender,
@@ -145,18 +153,15 @@ const kundaliSlice = createSlice({
   name: 'kundali',
   initialState,
   reducers: {
-    // EXISTING — untouched
     setBirthDetails(state, action: PayloadAction<BirthDetails>) {
       state.birthDetails = action.payload;
     },
-    // NEW — called by useNotifications when Firebase rotates the token
     updateFCMToken(state, action: PayloadAction<string>) {
       state.fcmToken = action.payload;
     },
   },
   extraReducers: builder => {
     builder
-      // ── EXISTING: generateKundali ──────────────────────────────────────────
       .addCase(generateKundali.pending, state => {
         state.loading = true;
       })
@@ -165,17 +170,14 @@ const kundaliSlice = createSlice({
         state.currentKundali = action.payload;
       })
 
-      // ── EXISTING: fetchKundaliList ─────────────────────────────────────────
       .addCase(fetchKundaliList.fulfilled, (state, action) => {
         state.kundaliList = action.payload;
       })
 
-      // ── EXISTING: fetchKundaliOverview ─────────────────────────────────────
       .addCase(fetchKundaliOverview.fulfilled, (state, action) => {
         state.currentKundali = action.payload;
       })
 
-      // ── NEW: saveBirthDetails ──────────────────────────────────────────────
       .addCase(saveBirthDetails.pending, state => {
         state.loading = true;
       })
@@ -187,8 +189,6 @@ const kundaliSlice = createSlice({
         state.userRecordId = action.payload.userRecordId;
       })
       .addCase(saveBirthDetails.rejected, state => {
-        // Don't block the user — they can still generate kundali
-        // deviceId/fcmToken just won't be stored on backend this session
         state.loading = false;
       });
   },
