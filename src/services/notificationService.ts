@@ -2,7 +2,7 @@
  * src/services/notificationService.ts
  *
  * Handles FCM token, permissions, and listeners.
- * Foreground messages are now displayed via Notifee instead of Alert.
+ * Calls PATCH /api/users/fcm-token on app launch and whenever token rotates.
  */
 
 import { Platform } from 'react-native';
@@ -12,6 +12,7 @@ import messaging, {
 import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { displayNotification } from './notifeeService';
+import { updateFCMTokenOnBackend } from '../api/notificationApi';
 
 const DEVICE_ID_KEY = '@kp_device_id';
 const FCM_TOKEN_KEY = '@kp_fcm_token';
@@ -67,34 +68,61 @@ export async function getFCMToken(): Promise<string | null> {
   }
 }
 
-export async function getCachedFCMToken(): Promise<string | null> {
-  return AsyncStorage.getItem(FCM_TOKEN_KEY);
+// ─── Sync token to backend ────────────────────────────────────────────────────
+// Calls PATCH /api/users/fcm-token with the latest token + stable deviceId.
+// Called on app launch AND whenever Firebase rotates the token.
+
+async function syncTokenToBackend(fcmToken: string): Promise<void> {
+  try {
+    const deviceId = await getOrCreateDeviceId();
+    await updateFCMTokenOnBackend({ deviceId, fcmToken });
+    console.log('[FCM] Token synced to backend');
+  } catch (error) {
+    // Non-blocking — token sync failure should never break the app
+    console.warn('[FCM] Token sync failed:', error);
+  }
+}
+
+// ─── Init token on app launch ─────────────────────────────────────────────────
+// Call once from useNotifications after permission is granted.
+// Gets the current FCM token and syncs it to your backend.
+
+export async function initFCMToken(): Promise<string | null> {
+  const token = await getFCMToken();
+  if (token) {
+    await syncTokenToBackend(token);
+  }
+  return token;
 }
 
 // ─── Foreground listener ──────────────────────────────────────────────────────
-// Uses Notifee to display a styled notification instead of a plain Alert.
 
 export function listenForForegroundMessages(
   onMessage?: (msg: FirebaseMessagingTypes.RemoteMessage) => void,
 ): () => void {
   return messaging().onMessage(async remoteMessage => {
     console.log('[FCM] Foreground message:', remoteMessage);
-
-    // Show styled Notifee notification
     await displayNotification(remoteMessage);
-
-    // Optional custom handler (e.g. update badge, refresh a screen)
     onMessage?.(remoteMessage);
   });
 }
 
-// ─── Token refresh ────────────────────────────────────────────────────────────
+// ─── Token refresh listener ───────────────────────────────────────────────────
+// Automatically syncs new token to backend and calls optional Redux callback.
 
 export function listenForTokenRefresh(
   onRefresh: (newToken: string) => void,
 ): () => void {
-  return messaging().onTokenRefresh(newToken => {
-    AsyncStorage.setItem(FCM_TOKEN_KEY, newToken);
+  return messaging().onTokenRefresh(async newToken => {
+    console.log('[FCM] Token refreshed');
+
+    // 1. Persist new token locally
+    await AsyncStorage.setItem(FCM_TOKEN_KEY, newToken);
+
+    // 2. Sync to backend immediately — PATCH /api/users/fcm-token
+    await syncTokenToBackend(newToken);
+
+    // 3. Update Redux state
     onRefresh(newToken);
   });
 }
@@ -102,7 +130,6 @@ export function listenForTokenRefresh(
 // ─── Background handler (register in index.js) ───────────────────────────────
 
 export function registerBackgroundHandler(): void {
-  // FCM background message → display via Notifee for rich styling
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('[FCM] Background message:', remoteMessage);
     await displayNotification(remoteMessage);

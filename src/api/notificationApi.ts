@@ -36,7 +36,17 @@ export interface BroadcastPayload {
   data?: Record<string, string>;
 }
 
-// ─── API calls ────────────────────────────────────────────────────────────────
+/** PATCH /api/users/fcm-token — update FCM token for a device on refresh */
+export interface UpdateFCMTokenPayload {
+  deviceId: string;
+  fcmToken: string;
+}
+
+export async function updateFCMTokenOnBackend(
+  payload: UpdateFCMTokenPayload,
+): Promise<void> {
+  await axiosInstance.patch('/api/users/fcm-token', payload);
+}
 
 /**
  * Send notification to a specific device by its FCM token (deviceId).
