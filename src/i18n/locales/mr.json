@@ -254,7 +254,14 @@
     "walletTitle": "वॉलेट आणि क्रेडिट्स",
     "walletSubtitle": "शिल्लक: ₹1,250.00",
     "historyTitle": "समुपदेशन इतिहास",
-    "historySubtitle": "मागील तज्ज्ञ कॉल्स पाहा"
+    "historySubtitle": "मागील तज्ज्ञ कॉल्स पाहा",
+    "editBirthDetailsTitle": "जन्म तपशील संपादित करा",
+    "editBirthDetailsSub": "नाव, जन्मतारीख किंवा जन्मस्थान अपडेट करा",
+    "editBirthDetailsConfirm": "हे आपली सध्याची कुंडली हटवेल. आपल्याला पुन्हा जन्म तपशील भरावे लागतील."
+  },
+  "common": {
+      "cancel": "रद्द करा",
+      "continue": "पुढे जा"
   },
   "predictions": {
     "headerTitle": "भविष्यवाण्या",

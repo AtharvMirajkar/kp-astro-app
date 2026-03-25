@@ -254,8 +254,15 @@
     "walletTitle": "Wallet & Credits",
     "walletSubtitle": "Balance: ₹1,250.00",
     "historyTitle": "Consultation History",
-    "historySubtitle": "Access previous expert calls"
+    "historySubtitle": "Access previous expert calls",
+    "editBirthDetailsTitle": "Edit Birth Details",
+    "editBirthDetailsSub": "Update your name, date or place of birth",
+    "editBirthDetailsConfirm": "This will clear your current chart. You will need to re-enter your birth details and regenerate your Kundali."
   },
+   "common": {
+      "cancel": "Cancel",
+      "continue": "Continue"
+    },
   "predictions": {
     "headerTitle": "Future Predictions",
     "headerSub": "Forecast for {{name}}",

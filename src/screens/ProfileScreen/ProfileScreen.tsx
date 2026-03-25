@@ -8,16 +8,22 @@ import {
   Image,
   Switch,
   Pressable,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { CommonActions } from '@react-navigation/native';
 import { OptionSelectModal } from '../../components';
 import { colors } from '../../constants/colors';
 import type { ProfileScreenProps } from '../../types/navigation';
 import { fonts } from '../../constants';
-import { RootState } from '../../redux/store';
+import { RootState, AppDispatch } from '../../redux/store';
+import {
+  clearPersistedData,
+  resetKundali,
+} from '../../redux/slices/kundaliSlice';
 
 const SUPPORTED_LOCALES = ['en', 'hi', 'mr'] as const;
 type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
@@ -30,6 +36,8 @@ function normalizeLanguage(lang: string): LocaleCode {
 
 export function ProfileScreen({ navigation }: ProfileScreenProps) {
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
+
   const { currentKundali, birthDetails } = useSelector(
     (state: RootState) => state.kundali,
   );
@@ -59,6 +67,47 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
     if (SUPPORTED_LOCALES.includes(locale as LocaleCode)) {
       i18n.changeLanguage(locale);
     }
+  };
+
+  // ── Edit Birth Details ────────────────────────────────────────────────────
+  const handleEditBirthDetails = () => {
+    Alert.alert(
+      t('profile.editBirthDetailsTitle'),
+      t('profile.editBirthDetailsConfirm'),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('common.continue'),
+          style: 'destructive',
+          onPress: async () => {
+            // 1. Clear AsyncStorage so next launch skips directly to onboarding
+            await dispatch(clearPersistedData());
+
+            // 2. Clear Redux state
+            dispatch(resetKundali());
+
+            // 3. Navigate to BirthDetails — reset the full navigation stack
+            //    so the user cannot press back to get to MainTabs
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'Onboarding' as any,
+                    state: {
+                      routes: [{ name: 'BirthDetails' }],
+                    },
+                  },
+                ],
+              }),
+            );
+          },
+        },
+      ],
+    );
   };
 
   // Dynamic kundali values
@@ -249,9 +298,35 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
             </View>
             <Icon name="chevron-right" size={20} color={colors.textSecondary} />
           </Pressable>
+
+          {/* ── NEW: Edit Birth Details ── */}
+          <View style={styles.menuDivider} />
+
+          <Pressable
+            style={styles.menuRow}
+            onPress={handleEditBirthDetails}
+            android_ripple={{ color: colors.border }}
+          >
+            <View style={styles.menuIconWrap}>
+              <Icon
+                name="account-edit-outline"
+                size={18}
+                color={colors.primary}
+              />
+            </View>
+            <View style={styles.menuTextWrap}>
+              <Text style={styles.menuTitle}>
+                {t('profile.editBirthDetailsTitle')}
+              </Text>
+              <Text style={styles.menuSub}>
+                {t('profile.editBirthDetailsSub')}
+              </Text>
+            </View>
+            <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+          </Pressable>
         </View>
 
-        {/* ── Preferences (from Settings) ── */}
+        {/* ── Preferences ── */}
         <Text style={styles.sectionLabel}>
           {t('settings.preferences').toUpperCase()}
         </Text>
@@ -345,9 +420,7 @@ const styles = StyleSheet.create({
   },
 
   // Header
-  headerRow: {
-    marginBottom: 16,
-  },
+  headerRow: { marginBottom: 16 },
   headerTitle: {
     fontSize: 22,
     color: colors.textPrimary,
@@ -370,11 +443,7 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     marginBottom: 12,
   },
-  avatarImage: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-  },
+  avatarImage: { width: 88, height: 88, borderRadius: 44 },
   avatarBadge: {
     position: 'absolute',
     bottom: 0,
@@ -472,15 +541,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     alignItems: 'center',
   },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: colors.border,
-  },
+  statItem: { flex: 1, alignItems: 'center' },
+  statDivider: { width: 1, height: 32, backgroundColor: colors.border },
   statValue: {
     fontSize: 18,
     fontFamily: fonts.bold,
@@ -507,10 +569,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 8,
   },
-  zodiacItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
+  zodiacItem: { flex: 1, alignItems: 'center' },
   zodiacIconWrap: {
     width: 36,
     height: 36,
@@ -541,7 +600,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // Menu card (services + preferences)
+  // Menu card
   menuCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -568,9 +627,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
-  menuTextWrap: {
-    flex: 1,
-  },
+  menuTextWrap: { flex: 1 },
   menuTitle: {
     fontSize: 14,
     color: colors.textPrimary,

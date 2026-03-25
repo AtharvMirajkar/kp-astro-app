@@ -1,14 +1,21 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../../api/axiosInstance';
 import axios from 'axios';
-import i18n from '../../i18n'; // your existing i18n instance
+import i18n from '../../i18n';
 
-// ─── FCM imports ──────────────────────────────────────────────────────────────
 import {
   requestNotificationPermission,
   getOrCreateDeviceId,
   getFCMToken,
 } from '../../services/notificationService';
+
+// ─── Persistence keys (shared with RootNavigator) ─────────────────────────────
+
+const STORAGE_KEYS = {
+  BIRTH_DETAILS: '@kp_birth_details',
+  CURRENT_KUNDALI: '@kp_current_kundali',
+} as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -47,18 +54,16 @@ const initialState: KundaliState = {
 // ─── Language helper ──────────────────────────────────────────────────────────
 
 type SupportedLanguage = 'en' | 'hi' | 'mr';
-
 const SUPPORTED_LANGUAGES: SupportedLanguage[] = ['en', 'hi', 'mr'];
 
 function getApiLanguage(): SupportedLanguage {
-  // i18n.language can be "en", "hi", "mr", or locale variants like "en-US"
   const lang = i18n.language?.split('-')[0];
   return SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage)
     ? (lang as SupportedLanguage)
     : 'en';
 }
 
-// ─── generateKundali ─────────────────────────────────────────────────────────
+// ─── EXISTING: generateKundali ────────────────────────────────────────────────
 
 export const generateKundali = createAsyncThunk(
   'kundali/generate',
@@ -80,6 +85,7 @@ export const generateKundali = createAsyncThunk(
       timezone: 'Asia/Kolkata',
     };
 
+    console.log(payload, '<------- Payload');
     console.log(`[generateKundali] Language: ${language}`);
 
     const res = await axios.post(
@@ -90,14 +96,14 @@ export const generateKundali = createAsyncThunk(
   },
 );
 
-// ─── fetchKundaliList ─────────────────────────────────────────────────────────
+// ─── EXISTING: fetchKundaliList ───────────────────────────────────────────────
 
 export const fetchKundaliList = createAsyncThunk('kundali/list', async () => {
   const res = await axiosInstance.get('/kundali');
   return res.data;
 });
 
-// ─── fetchKundaliOverview ─────────────────────────────────────────────────────
+// ─── EXISTING: fetchKundaliOverview ──────────────────────────────────────────
 
 export const fetchKundaliOverview = createAsyncThunk(
   'kundali/overview',
@@ -107,7 +113,7 @@ export const fetchKundaliOverview = createAsyncThunk(
   },
 );
 
-// ─── saveBirthDetails ────────────────────────────────────────────────────────
+// ─── NEW: saveBirthDetails ────────────────────────────────────────────────────
 
 export const saveBirthDetails = createAsyncThunk(
   'kundali/saveBirthDetails',
@@ -130,6 +136,12 @@ export const saveBirthDetails = createAsyncThunk(
         fcmToken: fcmToken ?? '',
       });
 
+      // Persist birth details so next launch skips onboarding
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.BIRTH_DETAILS,
+        JSON.stringify(details),
+      );
+
       return {
         details,
         deviceId,
@@ -147,37 +159,70 @@ export const saveBirthDetails = createAsyncThunk(
   },
 );
 
+// ─── NEW: clearBirthDetails (for "change details" flow) ──────────────────────
+
+export const clearPersistedData = createAsyncThunk(
+  'kundali/clearPersistedData',
+  async () => {
+    await Promise.all([
+      AsyncStorage.removeItem(STORAGE_KEYS.BIRTH_DETAILS),
+      AsyncStorage.removeItem(STORAGE_KEYS.CURRENT_KUNDALI),
+    ]);
+  },
+);
+
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
 const kundaliSlice = createSlice({
   name: 'kundali',
   initialState,
   reducers: {
+    // EXISTING
     setBirthDetails(state, action: PayloadAction<BirthDetails>) {
       state.birthDetails = action.payload;
     },
+    // NEW — rehydrate kundali from AsyncStorage on app launch
+    setCurrentKundali(state, action: PayloadAction<any>) {
+      state.currentKundali = action.payload;
+    },
+    // NEW — update FCM token when Firebase rotates it
     updateFCMToken(state, action: PayloadAction<string>) {
       state.fcmToken = action.payload;
+    },
+    // NEW — called when user wants to change birth details
+    resetKundali(state) {
+      state.birthDetails = null;
+      state.currentKundali = null;
+      state.userRecordId = null;
     },
   },
   extraReducers: builder => {
     builder
+      // generateKundali
       .addCase(generateKundali.pending, state => {
         state.loading = true;
       })
       .addCase(generateKundali.fulfilled, (state, action) => {
         state.loading = false;
         state.currentKundali = action.payload;
+        // Persist kundali data so it survives app restart
+        AsyncStorage.setItem(
+          STORAGE_KEYS.CURRENT_KUNDALI,
+          JSON.stringify(action.payload),
+        ).catch(() => {});
       })
 
+      // fetchKundaliList
       .addCase(fetchKundaliList.fulfilled, (state, action) => {
         state.kundaliList = action.payload;
       })
 
+      // fetchKundaliOverview
       .addCase(fetchKundaliOverview.fulfilled, (state, action) => {
         state.currentKundali = action.payload;
       })
 
+      // saveBirthDetails
       .addCase(saveBirthDetails.pending, state => {
         state.loading = true;
       })
@@ -190,9 +235,22 @@ const kundaliSlice = createSlice({
       })
       .addCase(saveBirthDetails.rejected, state => {
         state.loading = false;
+      })
+
+      // clearPersistedData
+      .addCase(clearPersistedData.fulfilled, state => {
+        state.birthDetails = null;
+        state.currentKundali = null;
+        state.userRecordId = null;
       });
   },
 });
 
-export const { setBirthDetails, updateFCMToken } = kundaliSlice.actions;
+export const {
+  setBirthDetails,
+  setCurrentKundali,
+  updateFCMToken,
+  resetKundali,
+} = kundaliSlice.actions;
+
 export default kundaliSlice.reducer;

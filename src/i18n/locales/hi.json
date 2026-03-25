@@ -254,8 +254,15 @@
     "walletTitle": "वॉलेट एवं क्रेडिट्स",
     "walletSubtitle": "बैलेंस: ₹1,250.00",
     "historyTitle": "परामर्श इतिहास",
-    "historySubtitle": "पिछली विशेषज्ञ कॉल्स देखें"
+    "historySubtitle": "पिछली विशेषज्ञ कॉल्स देखें",
+    "editBirthDetailsTitle": "जन्म विवरण संपादित करें",
+    "editBirthDetailsSub": "नाम, जन्म तिथि या स्थान अपडेट करें",
+    "editBirthDetailsConfirm": "यह आपकी वर्तमान कुंडली को हटा देगा। आपको पुनः जन्म विवरण दर्ज करना होगा।"
   },
+   "common": {
+      "cancel": "रद्द करें",
+      "continue": "जारी रखें"
+    },
   "predictions": {
     "headerTitle": "भविष्यवाणियाँ",
     "headerSub": "{{name}} के लिए भविष्यवाणी",
