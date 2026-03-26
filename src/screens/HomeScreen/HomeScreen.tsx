@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -101,29 +100,35 @@ export function HomeScreen({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      {/* ── Fixed Header ── */}
+      <View style={styles.fixedHeader}>
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>{t('home.headerTitle')}</Text>
+
+          <View style={styles.headerRight}>
+            <TouchableOpacity>
+              <Icon name="bell-outline" size={22} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
       >
-        {/* ── Header ── */}
-        <View style={styles.headerRow}>
-          <Icon name="menu" size={24} color={colors.textPrimary} />
-          <Text style={styles.headerTitle}>{t('home.headerTitle')}</Text>
-          <View style={styles.headerRight}>
-            <Icon name="bell-outline" size={22} color={colors.textPrimary} />
-          </View>
-        </View>
-
         {/* ── Profile Card ── */}
         <View style={styles.card}>
           <View style={styles.profileRow}>
-            {/* <View style={styles.avatarWrapper}>
-              <Image
-                source={{ uri: 'https://via.placeholder.com/80x80.png' }}
-                style={styles.avatarImage}
-              />
+            <View style={styles.avatarWrapper}>
+              {/* Profile Icon instead of placeholder image */}
+              <View style={styles.avatarIconContainer}>
+                <Icon name="account-circle" size={64} color={colors.primary} />
+              </View>
               <View style={styles.statusDot} />
-            </View> */}
+            </View>
+
             <View style={styles.profileText}>
               <Text style={styles.greeting}>
                 {t('home.greeting', { name: userName })}
@@ -353,24 +358,28 @@ export function HomeScreen({ navigation }: any) {
   );
 }
 
+// ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 32,
+
+  // Fixed Header
+  fixedHeader: {
+    backgroundColor: colors.background,
+    zIndex: 10,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
@@ -379,6 +388,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
+  // Scroll Content
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+  },
+
+  // Profile Card
   card: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -397,13 +413,18 @@ const styles = StyleSheet.create({
   avatarWrapper: {
     width: 64,
     height: 64,
-    borderRadius: 32,
-    overflow: 'hidden',
     marginRight: 16,
+    position: 'relative',
   },
-  avatarImage: {
-    width: '100%',
-    height: '100%',
+  avatarIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.backgroundSecondary,
   },
   statusDot: {
     position: 'absolute',
@@ -420,7 +441,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    fontSize: 20,
+    fontSize: 18,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
     marginBottom: 4,
@@ -442,6 +463,8 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.3,
   },
+
+  // Rest of the styles remain unchanged
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -461,7 +484,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  // ── Summary Cards ──────────────────────────────────────
   summaryRow: {
     flexDirection: 'row',
     gap: 12,
@@ -508,7 +530,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  // ── Sun Card ──────────────────────────────────────────
   sunCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -553,7 +574,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
-  // ── Planet Grid ──────────────────────────────────────
   planetGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -600,7 +620,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  // ── Period Cards ─────────────────────────────────────
   periodCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -660,7 +679,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  // ── KP Card ──────────────────────────────────────────
   kpCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -705,7 +723,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  // ── Insight Card ─────────────────────────────────────
   insightCard: {
     marginTop: 8,
     borderRadius: 20,

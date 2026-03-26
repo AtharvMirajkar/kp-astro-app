@@ -122,22 +122,26 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* ── Header ── */}
+      {/* ── Fixed Header ── */}
+      <View style={styles.fixedHeader}>
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>{t('profile.headerTitle')}</Text>
         </View>
+      </View>
 
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+      >
         {/* ── Profile Card ── */}
         <View style={styles.profileCard}>
           <View style={styles.avatarWrapper}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/120x120.png' }}
-              style={styles.avatarImage}
-            />
+            {/* Profile Icon - Shows nice avatar instead of empty placeholder */}
+            <View style={styles.avatarIconContainer}>
+              <Icon name="account-circle" size={88} color={colors.primary} />
+            </View>
+
             <TouchableOpacity style={styles.avatarBadge} activeOpacity={0.8}>
               <Icon name="pencil" size={14} color={colors.textOnPrimary} />
             </TouchableOpacity>
@@ -299,7 +303,6 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
             <Icon name="chevron-right" size={20} color={colors.textSecondary} />
           </Pressable>
 
-          {/* ── NEW: Edit Birth Details ── */}
           <View style={styles.menuDivider} />
 
           <Pressable
@@ -408,45 +411,62 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
   );
 }
 
+// ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  scrollContent: {
+
+  // Fixed Header
+  fixedHeader: {
+    backgroundColor: colors.background,
+    zIndex: 10,
+  },
+  headerRow: {
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 40,
+    paddingBottom: 12,
   },
-
-  // Header
-  headerRow: { marginBottom: 16 },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
+  // Scroll Content
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
 
-  // Profile card
+  // Profile Card
   profileCard: {
     alignItems: 'center',
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 20,
-    paddingVertical: 20,
+    paddingVertical: 24,
     paddingHorizontal: 16,
     marginBottom: 12,
   },
   avatarWrapper: {
     width: 88,
     height: 88,
-    borderRadius: 44,
-    overflow: 'visible',
     marginBottom: 12,
+    position: 'relative',
   },
-  avatarImage: { width: 88, height: 88, borderRadius: 44 },
+  avatarIconContainer: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: colors.background, // subtle background
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: colors.backgroundSecondary,
+  },
   avatarBadge: {
     position: 'absolute',
-    bottom: 0,
+    bottom: -2,
     right: -2,
     width: 28,
     height: 28,
@@ -454,11 +474,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: colors.backgroundSecondary,
   },
   profileName: {
-    fontSize: 20,
+    fontSize: 16,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
     marginBottom: 4,
@@ -490,13 +510,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
     fontFamily: fonts.regular,
-    marginBottom: 12,
+    marginBottom: 16,
     textAlign: 'center',
   },
   profileButtonsRow: {
     flexDirection: 'row',
     width: '100%',
-    marginTop: 4,
     gap: 10,
   },
   buttonIcon: { marginRight: 6 },
@@ -507,7 +526,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.primary,
     borderRadius: 12,
-    paddingVertical: 10,
+    paddingVertical: 11,
   },
   editButtonText: {
     fontSize: 14,
@@ -521,7 +540,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 12,
-    paddingVertical: 10,
+    paddingVertical: 11,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -531,7 +550,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  // Stats
+  // Stats, Zodiac, Menu styles (unchanged)
   statsRow: {
     flexDirection: 'row',
     backgroundColor: colors.backgroundSecondary,
@@ -556,7 +575,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // Zodiac
   zodiacCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -591,7 +609,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
-  // Shared section label
   sectionLabel: {
     fontSize: 13,
     color: colors.textSecondary,
@@ -600,7 +617,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // Menu card
   menuCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,

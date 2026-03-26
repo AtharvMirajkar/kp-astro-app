@@ -1,169 +1,199 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Pressable,
+  Platform,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { colors } from '../../constants/colors';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 import { Input, PrimaryButton } from '../../components';
-import type { MatchingScreenProps } from '../../types/navigation';
+import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
+import type { MatchingScreenProps } from '../../types/navigation';
 
 type Gender = 'male' | 'female';
 
-function PartnerForm({
-  titleKey,
-  fullNamePlaceholderKey,
-  gender,
-  onGenderChange,
-  fullName,
-  onFullNameChange,
-  dob,
-  onDobChange,
-  tob,
-  onTobChange,
-  location,
-  onLocationChange,
-  t,
-}: {
-  titleKey: string;
-  fullNamePlaceholderKey: string;
-  gender: Gender;
-  onGenderChange: (g: Gender) => void;
-  fullName: string;
-  onFullNameChange: (s: string) => void;
-  dob: string;
-  onDobChange: (s: string) => void;
-  tob: string;
-  onTobChange: (s: string) => void;
-  location: string;
-  onLocationChange: (s: string) => void;
-  t: (key: string) => string;
-}) {
-  return (
-    <View style={styles.partnerCard}>
-      <View style={styles.partnerHeader}>
-        <Icon name="account-outline" size={18} color={colors.primary} />
-        <Text style={styles.partnerTitle}>{t(titleKey)}</Text>
-      </View>
-      <Input
-        label={t('matching.fullNameLabel')}
-        placeholder={t(fullNamePlaceholderKey)}
-        value={fullName}
-        onChangeText={onFullNameChange}
-        leftIcon="user"
-      />
-      <Text style={styles.fieldLabel}>{t('matching.genderLabel')}</Text>
-      <TouchableOpacity
-        style={styles.genderRow}
-        activeOpacity={0.8}
-        onPress={() => onGenderChange(gender === 'male' ? 'female' : 'male')}
-      >
-        <Text style={styles.genderValue}>
-          {gender === 'male'
-            ? t('matching.genderMale')
-            : t('matching.genderFemale')}
-        </Text>
-        <Icon name="chevron-down" size={20} color={colors.textSecondary} />
-      </TouchableOpacity>
-      <View style={styles.inlineRow}>
-        <TouchableOpacity style={styles.fieldPill} activeOpacity={0.8}>
-          <View style={styles.fieldTextWrapper}>
-            <Text style={styles.fieldLabelText}>{t('matching.dobLabel')}</Text>
-            <Text
-              style={dob ? styles.fieldValueText : styles.fieldPlaceholderText}
-            >
-              {dob || t('matching.dobPlaceholder')}
-            </Text>
-          </View>
-          <Icon
-            name="calendar-blank-outline"
-            size={18}
-            color={colors.primary}
-            style={styles.fieldRightIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.fieldPill} activeOpacity={0.8}>
-          <View style={styles.fieldTextWrapper}>
-            <Text style={styles.fieldLabelText}>{t('matching.tobLabel')}</Text>
-            <Text
-              style={tob ? styles.fieldValueText : styles.fieldPlaceholderText}
-            >
-              {tob || t('matching.tobPlaceholder')}
-            </Text>
-          </View>
-          <Icon
-            name="clock-time-four-outline"
-            size={18}
-            color={colors.primary}
-            style={styles.fieldRightIcon}
-          />
-        </TouchableOpacity>
-      </View>
-      <Input
-        label={t('matching.birthLocationLabel')}
-        placeholder={t('matching.birthLocationPlaceholder')}
-        value={location}
-        onChangeText={onLocationChange}
-        leftIcon="location"
-      />
-    </View>
-  );
-}
-
 export function MatchingScreen({ navigation }: MatchingScreenProps) {
   const { t } = useTranslation();
+
+  // Partner 1
   const [gender1, setGender1] = useState<Gender>('male');
-  const [gender2, setGender2] = useState<Gender>('female');
   const [name1, setName1] = useState('');
-  const [name2, setName2] = useState('');
-  const [dob1, setDob1] = useState('');
-  const [dob2, setDob2] = useState('');
-  const [tob1, setTob1] = useState('');
-  const [tob2, setTob2] = useState('');
+  const [dob1, setDob1] = useState<Date | null>(null);
+  const [tob1, setTob1] = useState<Date | null>(null);
   const [location1, setLocation1] = useState('');
+  const [lat1, setLat1] = useState('');
+  const [lon1, setLon1] = useState('');
+  const [suggestions1, setSuggestions1] = useState<any[]>([]);
+  const [showSuggestions1, setShowSuggestions1] = useState(false);
+
+  // Partner 2
+  const [gender2, setGender2] = useState<Gender>('female');
+  const [name2, setName2] = useState('');
+  const [dob2, setDob2] = useState<Date | null>(null);
+  const [tob2, setTob2] = useState<Date | null>(null);
   const [location2, setLocation2] = useState('');
+  const [lat2, setLat2] = useState('');
+  const [lon2, setLon2] = useState('');
+  const [suggestions2, setSuggestions2] = useState<any[]>([]);
+  const [showSuggestions2, setShowSuggestions2] = useState(false);
+
+  const [showDatePicker1, setShowDatePicker1] = useState(false);
+  const [showTimePicker1, setShowTimePicker1] = useState(false);
+  const [showDatePicker2, setShowDatePicker2] = useState(false);
+  const [showTimePicker2, setShowTimePicker2] = useState(false);
+
+  const debounceTimeout1 = useRef<number | null>(null);
+  const debounceTimeout2 = useRef<number | null>(null);
+
+  // Auto-sync gender
+  useEffect(() => {
+    if (gender1 === 'male') setGender2('female');
+    else setGender2('male');
+  }, [gender1]);
+
+  useEffect(() => {
+    if (gender2 === 'male') setGender1('female');
+    else setGender1('male');
+  }, [gender2]);
+
+  const formatDate = (date: Date | null) =>
+    date ? date.toISOString().split('T')[0] : '';
+  const formatTime = (time: Date | null) =>
+    time
+      ? time.toLocaleTimeString('en-US', {
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : '';
+
+  // Location Search with debounce
+  const searchLocation = (text: string, isPartner1: boolean) => {
+    const setLocation = isPartner1 ? setLocation1 : setLocation2;
+    const setSuggestions = isPartner1 ? setSuggestions1 : setSuggestions2;
+    const setShowSuggestions = isPartner1
+      ? setShowSuggestions1
+      : setShowSuggestions2;
+    const timeoutRef = isPartner1 ? debounceTimeout1 : debounceTimeout2;
+
+    setLocation(text);
+
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    if (text.length < 3) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    timeoutRef.current = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+            text,
+          )}&format=json&limit=5`,
+          {
+            headers: {
+              'User-Agent': 'KundaliApp/1.0',
+              'Accept-Language': 'en',
+            },
+          },
+        );
+        const data = await response.json();
+        setSuggestions(data);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.log('Location search error', error);
+      }
+    }, 500);
+  };
+
+  const selectLocation = (item: any, isPartner1: boolean) => {
+    if (isPartner1) {
+      setLocation1(item.display_name || '');
+      setLat1(item.lat || '');
+      setLon1(item.lon || '');
+      setSuggestions1([]);
+      setShowSuggestions1(false);
+    } else {
+      setLocation2(item.display_name || '');
+      setLat2(item.lat || '');
+      setLon2(item.lon || '');
+      setSuggestions2([]);
+      setShowSuggestions2(false);
+    }
+  };
 
   const handleCalculate = () => {
     navigation.navigate('CompatibilityReport');
   };
 
+  const renderGenderButtons = (
+    gender: Gender,
+    onChange: (g: Gender) => void,
+  ) => (
+    <View style={styles.genderContainer}>
+      <TouchableOpacity
+        style={[
+          styles.genderButton,
+          gender === 'male' && styles.genderButtonActive,
+        ]}
+        onPress={() => onChange('male')}
+      >
+        <Text
+          style={[
+            styles.genderText,
+            gender === 'male' && styles.genderTextActive,
+          ]}
+        >
+          {t('matching.genderMale')}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.genderButton,
+          gender === 'female' && styles.genderButtonActive,
+        ]}
+        onPress={() => onChange('female')}
+      >
+        <Text
+          style={[
+            styles.genderText,
+            gender === 'female' && styles.genderTextActive,
+          ]}
+        >
+          {t('matching.genderFemale')}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      {/* Fixed Header */}
+      <View style={styles.fixedHeader}>
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>{t('matching.screenTitle')}</Text>
+          <TouchableOpacity>
+            <Icon name="information-outline" size={22} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            style={styles.headerIconButton}
-          >
-            <Icon name="arrow-left" size={24} color={colors.primary} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('matching.screenTitle')}</Text>
-          <TouchableOpacity
-            onPress={() => {}}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            style={styles.headerIconButton}
-          >
-            <Icon name="information-outline" size={22} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.progressRow}>
-          <View style={[styles.progressDot, styles.progressDotActive]} />
-          <View style={[styles.progressDot, styles.progressDotActive]} />
-          <View style={[styles.progressDot, styles.progressDotInactive]} />
-        </View>
-
         <View style={styles.sectionIntro}>
           <Text style={styles.sectionTitle}>{t('matching.checkTitle')}</Text>
           <Text style={styles.sectionSubtitle}>
@@ -171,43 +201,203 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
           </Text>
         </View>
 
-        <PartnerForm
-          titleKey="matching.firstPartner"
-          fullNamePlaceholderKey="matching.fullNamePlaceholder1"
-          gender={gender1}
-          onGenderChange={setGender1}
-          fullName={name1}
-          onFullNameChange={setName1}
-          dob={dob1}
-          onDobChange={setDob1}
-          tob={tob1}
-          onTobChange={setTob1}
-          location={location1}
-          onLocationChange={setLocation1}
-          t={t}
-        />
+        {/* Partner 1 */}
+        <View style={styles.partnerCard}>
+          <View style={styles.partnerHeader}>
+            <Icon name="account-outline" size={18} color={colors.primary} />
+            <Text style={styles.partnerTitle}>
+              {t('matching.firstPartner')}
+            </Text>
+          </View>
 
+          <Input
+            label={t('matching.fullNameLabel')}
+            placeholder={t('matching.fullNamePlaceholder1')}
+            value={name1}
+            onChangeText={setName1}
+            leftIcon="user"
+          />
+
+          <Text style={styles.fieldLabel}>{t('matching.genderLabel')}</Text>
+          {renderGenderButtons(gender1, setGender1)}
+
+          <Pressable onPress={() => setShowDatePicker1(true)}>
+            <Input
+              label={t('matching.dobLabel')}
+              placeholder={t('matching.dobPlaceholder')}
+              value={formatDate(dob1)}
+              editable={false}
+              pointerEvents="none"
+              leftIcon="calendar"
+            />
+          </Pressable>
+
+          <Pressable onPress={() => setShowTimePicker1(true)}>
+            <Input
+              label={t('matching.tobLabel')}
+              placeholder={t('matching.tobPlaceholder')}
+              value={formatTime(tob1)}
+              editable={false}
+              pointerEvents="none"
+              leftIcon="clock-outline"
+            />
+          </Pressable>
+
+          <Input
+            label={t('matching.birthLocationLabel')}
+            placeholder={t('matching.birthLocationPlaceholder')}
+            value={location1}
+            onChangeText={text => searchLocation(text, true)}
+            leftIcon="location"
+          />
+
+          {showSuggestions1 && suggestions1.length > 0 && (
+            <View style={styles.suggestionBox}>
+              <FlatList
+                data={suggestions1}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.suggestionItem}
+                    onPress={() => selectLocation(item, true)}
+                  >
+                    <Text style={styles.suggestionText}>
+                      {item.display_name}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Heart Separator */}
         <View style={styles.heartSeparator}>
           <View style={styles.heartCircle}>
             <Icon name="heart" size={28} color={colors.textOnPrimary} />
           </View>
         </View>
 
-        <PartnerForm
-          titleKey="matching.secondPartner"
-          fullNamePlaceholderKey="matching.fullNamePlaceholder2"
-          gender={gender2}
-          onGenderChange={setGender2}
-          fullName={name2}
-          onFullNameChange={setName2}
-          dob={dob2}
-          onDobChange={setDob2}
-          tob={tob2}
-          onTobChange={setTob2}
-          location={location2}
-          onLocationChange={setLocation2}
-          t={t}
-        />
+        {/* Partner 2 */}
+        <View style={styles.partnerCard}>
+          <View style={styles.partnerHeader}>
+            <Icon name="account-outline" size={18} color={colors.primary} />
+            <Text style={styles.partnerTitle}>
+              {t('matching.secondPartner')}
+            </Text>
+          </View>
+
+          <Input
+            label={t('matching.fullNameLabel')}
+            placeholder={t('matching.fullNamePlaceholder2')}
+            value={name2}
+            onChangeText={setName2}
+            leftIcon="user"
+          />
+
+          <Text style={styles.fieldLabel}>{t('matching.genderLabel')}</Text>
+          {renderGenderButtons(gender2, setGender2)}
+
+          <Pressable onPress={() => setShowDatePicker2(true)}>
+            <Input
+              label={t('matching.dobLabel')}
+              placeholder={t('matching.dobPlaceholder')}
+              value={formatDate(dob2)}
+              editable={false}
+              pointerEvents="none"
+              leftIcon="calendar"
+            />
+          </Pressable>
+
+          <Pressable onPress={() => setShowTimePicker2(true)}>
+            <Input
+              label={t('matching.tobLabel')}
+              placeholder={t('matching.tobPlaceholder')}
+              value={formatTime(tob2)}
+              editable={false}
+              pointerEvents="none"
+              leftIcon="clock-outline"
+            />
+          </Pressable>
+
+          <Input
+            label={t('matching.birthLocationLabel')}
+            placeholder={t('matching.birthLocationPlaceholder')}
+            value={location2}
+            onChangeText={text => searchLocation(text, false)}
+            leftIcon="location"
+          />
+
+          {showSuggestions2 && suggestions2.length > 0 && (
+            <View style={styles.suggestionBox}>
+              <FlatList
+                data={suggestions2}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.suggestionItem}
+                    onPress={() => selectLocation(item, false)}
+                  >
+                    <Text style={styles.suggestionText}>
+                      {item.display_name}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Date & Time Pickers */}
+        {showDatePicker1 && (
+          <DateTimePicker
+            value={dob1 || new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'inline' : 'default'}
+            onChange={(e, date) => {
+              setShowDatePicker1(Platform.OS === 'ios');
+              if (date) setDob1(date);
+            }}
+            maximumDate={new Date()}
+          />
+        )}
+
+        {showTimePicker1 && (
+          <DateTimePicker
+            value={tob1 || new Date()}
+            mode="time"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(e, time) => {
+              setShowTimePicker1(Platform.OS === 'ios');
+              if (time) setTob1(time);
+            }}
+          />
+        )}
+
+        {showDatePicker2 && (
+          <DateTimePicker
+            value={dob2 || new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'inline' : 'default'}
+            onChange={(e, date) => {
+              setShowDatePicker2(Platform.OS === 'ios');
+              if (date) setDob2(date);
+            }}
+            maximumDate={new Date()}
+          />
+        )}
+
+        {showTimePicker2 && (
+          <DateTimePicker
+            value={tob2 || new Date()}
+            mode="time"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(e, time) => {
+              setShowTimePicker2(Platform.OS === 'ios');
+              if (time) setTob2(time);
+            }}
+          />
+        )}
 
         <View style={styles.ctaWrapper}>
           <PrimaryButton title={t('matching.cta')} onPress={handleCalculate} />
@@ -218,75 +408,58 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
+  safeArea: { flex: 1, backgroundColor: colors.background },
+
+  fixedHeader: {
     backgroundColor: colors.background,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 32,
+    zIndex: 10,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  headerIconButton: {
-    padding: 4,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 20,
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 40,
   },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  progressDotActive: {
-    backgroundColor: colors.primary,
-    width: 20,
-  },
-  progressDotInactive: {
-    backgroundColor: colors.border,
-  },
-  sectionIntro: {
-    marginBottom: 20,
-  },
+  sectionIntro: { marginBottom: 24 },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: fonts.bold,
     color: colors.textPrimary,
     marginBottom: 8,
+    textAlign: 'center',
   },
   sectionSubtitle: {
     fontSize: 14,
     color: colors.textSecondary,
     fontFamily: fonts.medium,
     lineHeight: 20,
+    textAlign: 'center',
   },
+
   partnerCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    padding: 16,
     marginBottom: 16,
   },
   partnerHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 16,
   },
   partnerTitle: {
     marginLeft: 8,
@@ -294,84 +467,75 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: colors.textPrimary,
   },
+
   fieldLabel: {
     fontSize: 14,
     color: colors.textSecondary,
     fontFamily: fonts.regular,
-    marginBottom: 8,
+    marginBottom: 10,
   },
-  genderRow: {
+
+  genderContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.inputBackground,
+    marginBottom: 16,
+  },
+  genderButton: {
+    flex: 1,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 12,
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
-  genderValue: {
-    fontSize: 15,
-    color: colors.textPrimary,
-    fontFamily: fonts.regular,
-  },
-  inlineRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  fieldPill: {
-    flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.inputBackground,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    marginHorizontal: 4,
   },
-  fieldTextWrapper: {
-    flex: 1,
+  genderButtonActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.logoBackground,
   },
-  fieldLabelText: {
-    fontSize: 11,
+  genderText: {
+    fontSize: 14,
+    fontFamily: fonts.medium,
     color: colors.textSecondary,
-    fontFamily: fonts.regular,
-    marginBottom: 2,
   },
-  fieldPlaceholderText: {
-    fontSize: 13,
-    color: colors.placeholder,
+  genderTextActive: {
+    color: colors.primary,
   },
-  fieldValueText: {
-    fontSize: 13,
-    color: colors.textPrimary,
-    fontFamily: fonts.regular,
-  },
-  fieldRightIcon: {
-    marginLeft: 8,
-  },
+
   heartSeparator: {
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 12,
   },
   heartCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  ctaWrapper: {
-    marginTop: 8,
+
+  suggestionBox: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    maxHeight: 180,
+    marginBottom: 12,
+    backgroundColor: colors.background,
   },
+  suggestionItem: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  suggestionText: {
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+
+  ctaWrapper: { marginTop: 16 },
   footerNote: {
-    marginTop: 10,
+    marginTop: 12,
     fontSize: 12,
     color: colors.textSecondary,
     fontFamily: fonts.medium,

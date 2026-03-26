@@ -23,17 +23,11 @@ const CHART_COLOR = '#C9A227';
 const CHART_BG = '#FDFBF7';
 
 // ─── Planet key maps per language ─────────────────────────────────────────────
-// API uses different keys in planetary_positions / planet_house_positions
-// depending on the language param used.
-// English: "Sun", "Moon", "Mars" …
-// Hindi:   "सूर्य", "चन्द्र", "मंगल" …  (note: चन्द्र)
-// Marathi: "सूर्य", "चंद्र",  "मंगळ" …  (note: चंद्र, मंगळ, गुरू, शनी, राहू, केतू)
-
 type PlanetKey = {
-  en: string; // API key for English response
-  hi: string; // API key for Hindi response
-  mr: string; // API key for Marathi response
-  icon: string; // MaterialCommunityIcons name
+  en: string;
+  hi: string;
+  mr: string;
+  icon: string;
 };
 
 const PLANET_MAP: PlanetKey[] = [
@@ -50,22 +44,17 @@ const PLANET_MAP: PlanetKey[] = [
   { en: 'Neptune', hi: 'नेप्च्यून', mr: 'नेप्च्यून', icon: 'water-outline' },
 ];
 
-// Ascendant key also differs per language
 const ASCENDANT_KEY: Record<string, string> = {
   en: 'Ascendant',
   hi: 'लग्न',
   mr: 'लग्न',
 };
 
-// Returns the API key for a planet given the active language
 function getPlanetApiKey(planet: PlanetKey, lang: string): string {
   if (lang === 'hi') return planet.hi;
   if (lang === 'mr') return planet.mr;
   return planet.en;
 }
-
-// ─── Sign abbreviations per language ─────────────────────────────────────────
-// Sign names in API responses per language — maps full name → short abbr for SVG chart
 
 const SIGN_ABBR: Record<string, Record<string, string>> = {
   en: {
@@ -118,12 +107,11 @@ function getSignAbbr(signName: string, lang: string): string {
   return map[signName] ?? signName.slice(0, 2);
 }
 
-// ─── North Indian Chart SVG ───────────────────────────────────────────────────
-
+// ─── North Indian Chart SVG (unchanged) ─────────────────────────────────────
 interface NorthIndianChartProps {
   size: number;
-  houseToSign: Record<number, string>; // house# → sign name in API language
-  planetsByHouse: Record<number, string[]>; // house# → planet names (API language, trimmed)
+  houseToSign: Record<number, string>;
+  planetsByHouse: Record<number, string[]>;
 }
 
 function NorthIndianChart({
@@ -217,7 +205,6 @@ function NorthIndianChart({
               stroke={CHART_COLOR}
               strokeWidth="1"
             />
-            {/* House number */}
             <SvgText
               x={cx}
               y={cy - 10}
@@ -228,8 +215,7 @@ function NorthIndianChart({
             >
               {hNum}
             </SvgText>
-            {/* Sign abbr (from API, already in selected language) */}
-            {signAbbr ? (
+            {signAbbr && (
               <SvgText
                 x={cx}
                 y={cy + 1}
@@ -240,8 +226,7 @@ function NorthIndianChart({
               >
                 {signAbbr}
               </SvgText>
-            ) : null}
-            {/* Planet names trimmed for chart */}
+            )}
             {planets.slice(0, 3).map((p, i) => (
               <SvgText
                 key={p + i}
@@ -275,13 +260,12 @@ function NorthIndianChart({
 }
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
-
 export function KundaliOverviewScreen({
   navigation,
   route,
 }: KundaliOverviewScreenProps) {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language?.split('-')[0] ?? 'en'; // 'en' | 'hi' | 'mr'
+  const lang = i18n.language?.split('-')[0] ?? 'en';
 
   const [activeTab, setActiveTab] = useState<'rashi' | 'bhav' | 'kp' | 'd9'>(
     'rashi',
@@ -297,7 +281,7 @@ export function KundaliOverviewScreen({
   const birthDetail =
     dob && tob ? `${dob}, ${tob}` : t('kundaliOverview.birthSubtitle');
 
-  // ── Raw API data ──────────────────────────────────────────────────────────
+  // Raw API data
   const positions: Record<string, any> =
     currentKundali?.planetary_positions ?? {};
   const planetHousePositions: Record<string, number> =
@@ -308,42 +292,37 @@ export function KundaliOverviewScreen({
   const kpSignificators: Record<string, any> =
     currentKundali?.kp_significators ?? {};
 
-  // ── Ascendant data ────────────────────────────────────────────────────────
   const ascKey = ASCENDANT_KEY[lang] ?? 'Ascendant';
   const ascData = positions[ascKey] ?? {};
 
-  // ── Moon data ─────────────────────────────────────────────────────────────
   const moonPlanet = PLANET_MAP.find(p => p.en === 'Moon')!;
   const moonKey = getPlanetApiKey(moonPlanet, lang);
   const moonData = positions[moonKey] ?? {};
 
-  // ── House → sign name mapping (from cusp_details, sign already in API lang) ──
+  // House → Sign mapping
   const houseToSign: Record<number, string> = {};
   for (let h = 1; h <= 12; h++) {
     const signName = cuspDetails[String(h)]?.sign ?? '';
     houseToSign[h] = getSignAbbr(signName, lang);
   }
 
-  // ── House → planet list for chart ─────────────────────────────────────────
-  // planet_house_positions keys are in API language, values are house numbers
+  // Planets by house for chart
   const planetsByHouse: Record<number, string[]> = {};
   Object.entries(planetHousePositions).forEach(([planetName, houseNum]) => {
     const house = Number(houseNum);
     if (!planetsByHouse[house]) planetsByHouse[house] = [];
-    // Trim long names for chart readability
     planetsByHouse[house].push(planetName.slice(0, 3));
   });
 
-  // ── Planet table rows ─────────────────────────────────────────────────────
-  // Use PLANET_MAP to get the correct key per language and look up positions
+  // Planet table rows
   const planetRows = PLANET_MAP.map(planet => {
     const apiKey = getPlanetApiKey(planet, lang);
     const pData = positions[apiKey] ?? {};
     const house = planetHousePositions[apiKey] ?? 0;
     return {
-      enKey: planet.en, // for icon lookup
+      enKey: planet.en,
       icon: planet.icon,
-      label: apiKey, // display name in API language
+      label: apiKey,
       sign: pData.sign ?? t('kundaliOverview.noData'),
       deg: pData.degree_in_sign ?? t('kundaliOverview.noData'),
       nakshatra: pData.nakshatra ?? t('kundaliOverview.noData'),
@@ -352,7 +331,6 @@ export function KundaliOverviewScreen({
     };
   });
 
-  // ── KP & Bhava: keys in API language ─────────────────────────────────────
   const kpRows = Object.entries(kpSignificators);
   const bhavaRows = Object.entries(bhavaSignificators);
 
@@ -373,11 +351,8 @@ export function KundaliOverviewScreen({
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* ── Header ── */}
+      {/* ── Fixed Header ── */}
+      <View style={styles.fixedHeader}>
         <View style={styles.headerRow}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -386,6 +361,7 @@ export function KundaliOverviewScreen({
           >
             <Icon name="arrow-left" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
+
           <View style={styles.headerCenter}>
             <Text style={styles.headerTitle}>
               {t('kundaliOverview.screenTitle')}
@@ -394,6 +370,7 @@ export function KundaliOverviewScreen({
               {name} • {birthDetail}
             </Text>
           </View>
+
           <TouchableOpacity
             onPress={handleShare}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -402,7 +379,13 @@ export function KundaliOverviewScreen({
             <Icon name="share-variant" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
+      </View>
 
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+      >
         {/* ── Tabs ── */}
         <View style={styles.tabsRow}>
           {tabs.map(({ key, label }) => (
@@ -501,7 +484,6 @@ export function KundaliOverviewScreen({
                 <Icon name={p.icon} size={18} color={colors.primary} />
               </View>
               <View style={styles.planetTextWrap}>
-                {/* label = planet name in API language (en/hi/mr) */}
                 <Text style={styles.planetName}>{p.label}</Text>
                 <Text style={styles.planetSign}>
                   {p.sign} • {p.deg}
@@ -524,7 +506,7 @@ export function KundaliOverviewScreen({
           ))}
         </View>
 
-        {/* ── KP Significators (KP tab) ── */}
+        {/* Conditional Tabs Content */}
         {activeTab === 'kp' && currentKundali && (
           <>
             <Text style={styles.sectionTitleStandalone}>
@@ -544,7 +526,6 @@ export function KundaliOverviewScreen({
               </View>
               {kpRows.map(([planetName, data]: [string, any]) => (
                 <View key={planetName} style={styles.kpTableRow}>
-                  {/* planetName is in API language */}
                   <Text style={[styles.kpCell, { flex: 1.2 }]}>
                     {planetName}
                   </Text>
@@ -560,7 +541,6 @@ export function KundaliOverviewScreen({
           </>
         )}
 
-        {/* ── Bhava Significators (Bhav tab) ── */}
         {activeTab === 'bhav' && currentKundali && (
           <>
             <Text style={styles.sectionTitleStandalone}>
@@ -577,7 +557,6 @@ export function KundaliOverviewScreen({
                     </Text>
                     <Text style={styles.bhavaCellSign}>{signAbbr || '—'}</Text>
                     <Text style={styles.bhavaCellPlanets}>
-                      {/* planets array contains names in API language */}
                       {Array.isArray(planets) && planets.length > 0
                         ? planets.join(', ')
                         : t('kundaliOverview.noData')}
@@ -589,7 +568,7 @@ export function KundaliOverviewScreen({
           </>
         )}
 
-        {/* ── Current Dasha ── */}
+        {/* Current Dasha */}
         <Text style={styles.sectionTitleStandalone}>
           {t('kundaliOverview.currentDasha')}
         </Text>
@@ -625,12 +604,21 @@ export function KundaliOverviewScreen({
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 100 },
 
-  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  // Fixed Header
+  fixedHeader: {
+    backgroundColor: colors.background,
+    zIndex: 10,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
   headerIconButton: { padding: 4, minWidth: 36 },
   headerCenter: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   headerTitle: {
@@ -645,6 +633,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
+  // Scroll Content
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 100,
+  },
+
+  // Tabs, Chart, Cards, etc. (rest unchanged)
   tabsRow: {
     flexDirection: 'row',
     marginBottom: 16,

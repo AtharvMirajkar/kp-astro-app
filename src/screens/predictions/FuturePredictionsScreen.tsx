@@ -17,7 +17,7 @@ import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
 import { RootState } from '../../redux/store';
 
-// ─── Category config ────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type CategoryKey = 'career' | 'marriage' | 'finance' | 'health';
 
@@ -28,6 +28,10 @@ interface Category {
   bgColor: string;
 }
 
+type PeriodKey = 'weekly' | 'monthly' | 'yearly';
+
+// ─── Category Config ─────────────────────────────────────────────────────────
+
 const CATEGORIES: Category[] = [
   {
     key: 'career',
@@ -35,7 +39,12 @@ const CATEGORIES: Category[] = [
     accentColor: '#C9A227',
     bgColor: '#FFF8E7',
   },
-  { key: 'marriage', icon: 'ring', accentColor: '#E07A8C', bgColor: '#FFF0F3' },
+  {
+    key: 'marriage',
+    icon: 'ring',
+    accentColor: '#E07A8C',
+    bgColor: '#FFF0F3',
+  },
   {
     key: 'finance',
     icon: 'chart-line',
@@ -50,9 +59,28 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-// ─── Period tabs ─────────────────────────────────────────────────────────────
+// ─── Static Data ─────────────────────────────────────────────────────────────
 
-type PeriodKey = 'weekly' | 'monthly' | 'yearly';
+const SCORE_WIDTHS: Record<CategoryKey, Record<PeriodKey, DimensionValue>> = {
+  career: { weekly: '72%', monthly: '65%', yearly: '80%' },
+  marriage: { weekly: '58%', monthly: '74%', yearly: '68%' },
+  finance: { weekly: '45%', monthly: '60%', yearly: '75%' },
+  health: { weekly: '82%', monthly: '70%', yearly: '78%' },
+};
+
+const PLANETARY_INFLUENCES = [
+  { planet: 'Jupiter', key: 'jupiter', color: '#C9A227' },
+  { planet: 'Saturn', key: 'saturn', color: '#5B6BA8' },
+  { planet: 'Venus', key: 'venus', color: '#E07A8C' },
+  { planet: 'Rahu', key: 'rahu', color: '#6B4E8E' },
+];
+
+const REMEDIES = [
+  { icon: 'candle' },
+  { icon: 'leaf' },
+  { icon: 'meditation' },
+  { icon: 'food-apple-outline' },
+];
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
@@ -78,11 +106,8 @@ export function FuturePredictionsScreen({ navigation }: any) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* ── Header ── */}
+      {/* ── Fixed Header (Always visible while scrolling) ── */}
+      <View style={styles.fixedHeader}>
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.headerTitle}>
@@ -102,8 +127,16 @@ export function FuturePredictionsScreen({ navigation }: any) {
             />
           </TouchableOpacity>
         </View>
+      </View>
 
-        {/* ── Dasha banner ── */}
+      {/* ── Scrollable Content ── */}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={[1]} // Makes Period Selector sticky
+        scrollEventThrottle={16}
+      >
+        {/* Dasha Banner */}
         <View style={styles.dashaBanner}>
           <View style={styles.dashaBannerLeft}>
             <Icon name="clock-fast" size={20} color={colors.primary} />
@@ -122,30 +155,32 @@ export function FuturePredictionsScreen({ navigation }: any) {
           </View>
         </View>
 
-        {/* ── Period Selector ── */}
-        <View style={styles.periodRow}>
-          {periods.map(p => (
-            <Pressable
-              key={p.key}
-              style={[
-                styles.periodChip,
-                activePeriod === p.key && styles.periodChipActive,
-              ]}
-              onPress={() => setActivePeriod(p.key)}
-            >
-              <Text
+        {/* Sticky Period Selector */}
+        <View style={styles.periodStickyContainer}>
+          <View style={styles.periodRow}>
+            {periods.map(p => (
+              <Pressable
+                key={p.key}
                 style={[
-                  styles.periodChipText,
-                  activePeriod === p.key && styles.periodChipTextActive,
+                  styles.periodChip,
+                  activePeriod === p.key && styles.periodChipActive,
                 ]}
+                onPress={() => setActivePeriod(p.key)}
               >
-                {p.label}
-              </Text>
-            </Pressable>
-          ))}
+                <Text
+                  style={[
+                    styles.periodChipText,
+                    activePeriod === p.key && styles.periodChipTextActive,
+                  ]}
+                >
+                  {p.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
 
-        {/* ── Category Cards (2×2 grid) ── */}
+        {/* Category Cards */}
         <PredictionSectionTitle label={t('predictions.categoriesTitle')} />
         <View style={styles.categoryGrid}>
           {CATEGORIES.map(cat => (
@@ -155,9 +190,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
                 styles.categoryCard,
                 { backgroundColor: cat.bgColor },
                 activeCategory === cat.key && styles.categoryCardActive,
-                activeCategory === cat.key && {
-                  borderColor: cat.accentColor,
-                },
+                activeCategory === cat.key && { borderColor: cat.accentColor },
               ]}
               activeOpacity={0.85}
               onPress={() => setActiveCategory(cat.key)}
@@ -191,7 +224,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
           ))}
         </View>
 
-        {/* ── Active Category Detail ── */}
+        {/* Active Category Detail */}
         <View
           style={[
             styles.detailCard,
@@ -213,8 +246,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
             </View>
             <View style={{ flex: 1, marginLeft: 10 }}>
               <Text style={styles.detailTitle}>
-                {t(`predictions.category_${activeCategory}`)}
-                {' · '}
+                {t(`predictions.category_${activeCategory}`)} ·{' '}
                 {t(`predictions.period_${activePeriod}_label`)}
               </Text>
               <Text
@@ -262,7 +294,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
             ))}
           </View>
 
-          {/* Favorable dates */}
+          {/* Favorable Dates */}
           <View style={styles.favorableDatesRow}>
             <Icon name="star-outline" size={14} color={activeCat.accentColor} />
             <Text style={styles.favorableDatesText}>
@@ -279,7 +311,7 @@ export function FuturePredictionsScreen({ navigation }: any) {
           </View>
         </View>
 
-        {/* ── Planetary Influences ── */}
+        {/* Planetary Influences */}
         <PredictionSectionTitle label={t('predictions.planetaryInfluences')} />
         <View style={styles.influenceList}>
           {PLANETARY_INFLUENCES.map((item, i) => (
@@ -316,11 +348,17 @@ export function FuturePredictionsScreen({ navigation }: any) {
           ))}
         </View>
 
-        {/* ── Remedies ── */}
+        {/* Remedies */}
         <PredictionSectionTitle label={t('predictions.remediesTitle')} />
         <View style={styles.remediesCard}>
           {REMEDIES.map((remedy, i) => (
-            <View key={i} style={styles.remedyRow}>
+            <View
+              key={i}
+              style={[
+                styles.remedyRow,
+                i === REMEDIES.length - 1 && styles.remedyRowLast,
+              ]}
+            >
               <View style={styles.remedyIconWrap}>
                 <Icon name={remedy.icon} size={18} color={colors.primary} />
               </View>
@@ -335,55 +373,33 @@ export function FuturePredictionsScreen({ navigation }: any) {
   );
 }
 
-// ─── Static data ─────────────────────────────────────────────────────────────
-
-const SCORE_WIDTHS: Record<CategoryKey, Record<PeriodKey, DimensionValue>> = {
-  career: { weekly: '72%', monthly: '65%', yearly: '80%' },
-  marriage: { weekly: '58%', monthly: '74%', yearly: '68%' },
-  finance: { weekly: '45%', monthly: '60%', yearly: '75%' },
-  health: { weekly: '82%', monthly: '70%', yearly: '78%' },
-};
-
-const PLANETARY_INFLUENCES = [
-  { planet: 'Jupiter', key: 'jupiter', color: '#C9A227' },
-  { planet: 'Saturn', key: 'saturn', color: '#5B6BA8' },
-  { planet: 'Venus', key: 'venus', color: '#E07A8C' },
-  { planet: 'Rahu', key: 'rahu', color: '#6B4E8E' },
-];
-
-const REMEDIES = [
-  { icon: 'candle' },
-  { icon: 'leaf' },
-  { icon: 'meditation' },
-  { icon: 'food-apple-outline' },
-];
-
-function capitalize(s: string) {
+// ─── Helper Function ─────────────────────────────────────────────────────────
+function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 40,
-  },
 
-  // Header
+  // Fixed Header
+  fixedHeader: {
+    backgroundColor: colors.background,
+    zIndex: 10,
+  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
@@ -403,8 +419,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  // Scroll Content
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
 
-  // Dasha banner
+  // Sticky Period Container
+  periodStickyContainer: {
+    backgroundColor: colors.background,
+    paddingVertical: 8,
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
+    zIndex: 9,
+  },
+  periodRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  periodChip: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignItems: 'center',
+    backgroundColor: colors.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  periodChipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  periodChipText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    fontFamily: fonts.medium,
+  },
+  periodChipTextActive: {
+    color: colors.textOnPrimary,
+    fontFamily: fonts.bold,
+  },
+
+  // Dasha Banner
   dashaBanner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -445,44 +501,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // Period selector
-  periodRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 20,
-  },
-  periodChip: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: 20,
-    alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  periodChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  periodChipText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    fontFamily: fonts.medium,
-  },
-  periodChipTextActive: {
-    color: colors.textOnPrimary,
-    fontFamily: fonts.bold,
-  },
-
-  // Section title
-  sectionTitle: {
-    fontSize: 15,
-    color: colors.textPrimary,
-    fontFamily: fonts.bold,
-    marginBottom: 12,
-  },
-
-  // Category grid
+  // Category Grid
   categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -529,7 +548,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  // Detail card
+  // Detail Card
   detailCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -612,7 +631,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
-  // Planetary influences
+  // Planetary Influences
   influenceList: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -666,6 +685,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 4,
+    marginBottom: 30,
   },
   remedyRow: {
     flexDirection: 'row',
@@ -674,6 +694,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     gap: 12,
+  },
+  remedyRowLast: {
+    borderBottomWidth: 0,
   },
   remedyIconWrap: {
     width: 34,
