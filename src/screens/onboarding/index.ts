@@ -1,3 +1,4 @@
+export { SplashScreen } from './SplashScreen';
 export { OnboardingScreen } from './OnboardingScreen';
 export { LanguageSelectionScreen } from './LanguageSelectionScreen';
 export { BirthDetailsScreen } from './BirthDetailsScreen';

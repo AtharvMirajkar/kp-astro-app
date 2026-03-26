@@ -7,11 +7,12 @@ import { useDispatch } from 'react-redux';
 import { AuthStackNavigator } from './AuthStackNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
 import { OnboardingStackNavigator } from './OnboardingStackNavigator';
+import { SplashScreen } from '../screens/onboarding';
 import type { RootStackParamList } from './types';
 import { AppDispatch } from '../redux/store';
 import {
   setBirthDetails,
-  setCurrentKundali, // add this action — see kundaliSlice changes below
+  setCurrentKundali,
 } from '../redux/slices/kundaliSlice';
 import { colors } from '../constants/colors';
 
@@ -28,10 +29,14 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
   const dispatch = useDispatch<AppDispatch>();
+
+  // Show splash first, then resolve route
+  const [isSplashDone, setIsSplashDone] = useState(false);
   const [initialRoute, setInitialRoute] = useState<
     keyof RootStackParamList | null
   >(null);
 
+  // ── Load persisted data while splash is showing ─────────────────────────
   useEffect(() => {
     const checkPersistedData = async () => {
       try {
@@ -41,16 +46,12 @@ export function RootNavigator() {
         ]);
 
         if (storedBirth) {
-          // Rehydrate Redux with persisted birth details
           dispatch(setBirthDetails(JSON.parse(storedBirth)));
         }
-
         if (storedKundali) {
-          // Rehydrate Redux with persisted kundali data
           dispatch(setCurrentKundali(JSON.parse(storedKundali)));
         }
 
-        // If birth details exist → user has already onboarded → go to MainTabs
         setInitialRoute(storedBirth ? 'MainTabs' : 'Onboarding');
       } catch (error) {
         console.error('[RootNavigator] Failed to load persisted data:', error);
@@ -61,7 +62,14 @@ export function RootNavigator() {
     checkPersistedData();
   }, [dispatch]);
 
-  // Show a splash/loader while checking AsyncStorage
+  // ── Show splash until animation finishes ─────────────────────────────────
+  // Data loading happens in parallel so by the time splash (2.8s) is done,
+  // initialRoute is always resolved.
+  if (!isSplashDone) {
+    return <SplashScreen onFinish={() => setIsSplashDone(true)} />;
+  }
+
+  // ── Tiny safety net: if data check somehow isn't done yet ────────────────
   if (!initialRoute) {
     return (
       <View style={styles.loader}>
