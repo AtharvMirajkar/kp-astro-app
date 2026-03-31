@@ -104,47 +104,29 @@ function getChannelForType(type?: string): ChannelId {
 export async function displayNotification(
   remoteMessage: FirebaseMessagingTypes.RemoteMessage,
 ): Promise<void> {
-  // Support both notification messages AND data-only messages.
-  // Your backend sends { deviceId, title, body, data } — when FCM delivers
-  // this as a data-only payload, title/body land in remoteMessage.data.
-  const title =
-    remoteMessage.notification?.title ??
-    (remoteMessage.data?.title as string) ??
-    'KP Jyotish';
-  const body =
-    remoteMessage.notification?.body ??
-    (remoteMessage.data?.body as string) ??
-    '';
-  const type = remoteMessage.data?.type as string | undefined;
-  const screen = remoteMessage.data?.screen as string | undefined;
-  const imageUrl = remoteMessage.notification?.android?.imageUrl;
+  // Backend sends DATA-ONLY messages — title and body are in remoteMessage.data.
+  // remoteMessage.notification will be undefined — that is expected and correct.
+  const title = (remoteMessage.data?.title as string) ?? 'KP Jyotish';
+  const body = (remoteMessage.data?.body as string) ?? '';
+  const type = (remoteMessage.data?.type as string) ?? 'general';
+  const screen = (remoteMessage.data?.screen as string) ?? '';
 
   const channelId = getChannelForType(type);
 
   await notifee.displayNotification({
     title,
     body,
-    data: { type: type ?? 'general', screen: screen ?? '' },
+    data: { type, screen },
     android: {
       channelId,
-      smallIcon: 'ic_notification', // drawable in android/app/src/main/res/drawable
+      smallIcon: 'ic_notification',
       color: '#C9A227',
       pressAction: { id: 'default' },
       importance: AndroidImportance.HIGH,
-      // Large image style if imageUrl present
-      ...(imageUrl
-        ? {
-            style: {
-              type: AndroidStyle.BIGPICTURE,
-              picture: imageUrl,
-            },
-          }
-        : {
-            style: {
-              type: AndroidStyle.BIGTEXT,
-              text: body,
-            },
-          }),
+      style: {
+        type: AndroidStyle.BIGTEXT,
+        text: body,
+      },
     },
     ios: {
       sound: 'default',
