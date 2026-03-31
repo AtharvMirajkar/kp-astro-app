@@ -5,20 +5,20 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Switch,
   Pressable,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSelector, useDispatch } from 'react-redux';
 import { CommonActions } from '@react-navigation/native';
+
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { OptionSelectModal } from '../../components';
 import { colors } from '../../constants/colors';
-import type { ProfileScreenProps } from '../../types/navigation';
 import { fonts } from '../../constants';
+import type { ProfileScreenProps } from '../../types/navigation';
 import { RootState, AppDispatch } from '../../redux/store';
 import {
   clearPersistedData,
@@ -42,7 +42,9 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
     (state: RootState) => state.kundali,
   );
 
+  // Modals State
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
+  const [showEditConfirmModal, setShowEditConfirmModal] = useState(false);
   const [pushNotificationsOn, setPushNotificationsOn] = useState(false);
 
   const currentLang = normalizeLanguage(i18n.language);
@@ -69,44 +71,31 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
     }
   };
 
-  // ── Edit Birth Details ────────────────────────────────────────────────────
-  const handleEditBirthDetails = () => {
-    Alert.alert(
-      t('profile.editBirthDetailsTitle'),
-      t('profile.editBirthDetailsConfirm'),
-      [
-        {
-          text: t('common.cancel'),
-          style: 'cancel',
-        },
-        {
-          text: t('common.continue'),
-          style: 'destructive',
-          onPress: async () => {
-            // 1. Clear AsyncStorage so next launch skips directly to onboarding
-            await dispatch(clearPersistedData());
+  // ── Edit Birth Details Handler ────────────────────────────────────────────
+  const handleEditBirthDetailsPress = () => {
+    setShowEditConfirmModal(true);
+  };
 
-            // 2. Clear Redux state
-            dispatch(resetKundali());
+  const handleConfirmEditBirthDetails = async () => {
+    setShowEditConfirmModal(false);
 
-            // 3. Navigate to BirthDetails — reset the full navigation stack
-            //    so the user cannot press back to get to MainTabs
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: 'Onboarding' as any,
-                    state: {
-                      routes: [{ name: 'BirthDetails' }],
-                    },
-                  },
-                ],
-              }),
-            );
+    // Clear persisted data and reset kundali
+    await dispatch(clearPersistedData());
+    dispatch(resetKundali());
+
+    // Reset navigation stack to Onboarding → BirthDetails
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'Onboarding' as any,
+            state: {
+              routes: [{ name: 'BirthDetails' }],
+            },
           },
-        },
-      ],
+        ],
+      }),
     );
   };
 
@@ -137,7 +126,6 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
         {/* ── Profile Card ── */}
         <View style={styles.profileCard}>
           <View style={styles.avatarWrapper}>
-            {/* Profile Icon - Shows nice avatar instead of empty placeholder */}
             <View style={styles.avatarIconContainer}>
               <Icon name="account-circle" size={88} color={colors.primary} />
             </View>
@@ -305,9 +293,10 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
 
           <View style={styles.menuDivider} />
 
+          {/* Edit Birth Details - Now opens Confirm Modal */}
           <Pressable
             style={styles.menuRow}
-            onPress={handleEditBirthDetails}
+            onPress={handleEditBirthDetailsPress}
             android_ripple={{ color: colors.border }}
           >
             <View style={styles.menuIconWrap}>
@@ -395,6 +384,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
         </View>
       </ScrollView>
 
+      {/* Language Modal */}
       <OptionSelectModal
         visible={languageModalVisible}
         onClose={() => setLanguageModalVisible(false)}
@@ -406,6 +396,19 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
         disclaimerText={t('languageModal.disclaimer')}
         titleIcon="star-four-points"
         activeSubLabel={t('languageModal.currentlyActive')}
+      />
+
+      {/* Confirm Modal for Edit Birth Details */}
+      <ConfirmModal
+        visible={showEditConfirmModal}
+        onClose={() => setShowEditConfirmModal(false)}
+        title={t('profile.editBirthDetailsTitle')}
+        message={t('profile.editBirthDetailsConfirm')}
+        confirmText={t('common.continue')}
+        cancelText={t('common.cancel')}
+        confirmStyle="destructive"
+        icon="account-edit-outline"
+        onConfirm={handleConfirmEditBirthDetails}
       />
     </SafeAreaView>
   );
@@ -433,13 +436,14 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
+
   // Scroll Content
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
 
-  // Profile Card
+  // Profile Card (unchanged)
   profileCard: {
     alignItems: 'center',
     backgroundColor: colors.backgroundSecondary,
@@ -458,7 +462,7 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 44,
-    backgroundColor: colors.background, // subtle background
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,

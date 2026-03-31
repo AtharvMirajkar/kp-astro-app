@@ -2,10 +2,12 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTranslation } from 'react-i18next';
+
 import { HomeScreen, ProfileScreen } from '../screens';
 import { MatchStackNavigator } from './MatchStackNavigator';
 import { HoroscopeStackNavigator } from './HoroscopeStackNavigator';
 import { PredictionsStackNavigator } from './PredictionsStackNavigator';
+
 import { colors } from '../constants/colors';
 import type { MainTabParamList } from './types';
 import { useNotifications } from '../hooks/useNotifications';
@@ -38,7 +40,7 @@ export function MainTabNavigator() {
         options={{
           tabBarLabel: t('tabs:home'),
           tabBarIcon: ({ color, size }) => (
-            <Icon name="home-outline" size={size} color={color} />
+            <Icon name="home-variant-outline" size={size} color={color} />
           ),
         }}
       />
@@ -49,37 +51,40 @@ export function MainTabNavigator() {
         options={{
           tabBarLabel: t('tabs.horoscope'),
           tabBarIcon: ({ color, size }) => (
-            <Icon name="zodiac-gemini" size={size} color={color} />
+            <Icon name="zodiac-leo" size={size} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
         name="Predictions"
         component={PredictionsStackNavigator}
         options={{
           tabBarLabel: t('tabs.predictions'),
           tabBarIcon: ({ color, size }) => (
-            <Icon name="crystal-ball" size={size} color={color} />
+            <Icon name="star-four-points-outline" size={size} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
         name="Match"
         component={MatchStackNavigator}
         options={{
           tabBarLabel: t('tabs:match'),
           tabBarIcon: ({ color, size }) => (
-            <Icon name="heart-outline" size={size} color={color} />
+            <Icon name="heart-multiple-outline" size={size} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
           tabBarLabel: t('tabs.profile'),
           tabBarIcon: ({ color, size }) => (
-            <Icon name="account-outline" size={size} color={color} />
+            <Icon name="account-circle-outline" size={size} color={color} />
           ),
         }}
       />
