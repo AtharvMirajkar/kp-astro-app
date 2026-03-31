@@ -4,6 +4,7 @@ import {
   subscriptionReducer,
   appReducer,
   authReducer,
+  matchingReducer,
 } from './slices';
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
     kundali: kundaliReducer,
     subscription: subscriptionReducer,
     app: appReducer,
+    matching: matchingReducer, // ← new
   },
 });
 

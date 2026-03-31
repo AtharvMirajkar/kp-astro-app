@@ -8,23 +8,30 @@ import {
   Pressable,
   Platform,
   FlatList,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Input, PrimaryButton } from '../../components';
 import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
 import type { MatchingScreenProps } from '../../types/navigation';
+import { AppDispatch, RootState } from '../../redux/store';
+import { calculateGunMilan } from '../../redux/slices/matchingSlice';
 
 type Gender = 'male' | 'female';
 
 export function MatchingScreen({ navigation }: MatchingScreenProps) {
   const { t } = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading } = useSelector((s: RootState) => s.matching);
 
-  // Partner 1
+  // ── Partner 1 ──────────────────────────────────────────────────────────────
   const [gender1, setGender1] = useState<Gender>('male');
   const [name1, setName1] = useState('');
   const [dob1, setDob1] = useState<Date | null>(null);
@@ -35,7 +42,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
   const [suggestions1, setSuggestions1] = useState<any[]>([]);
   const [showSuggestions1, setShowSuggestions1] = useState(false);
 
-  // Partner 2
+  // ── Partner 2 ──────────────────────────────────────────────────────────────
   const [gender2, setGender2] = useState<Gender>('female');
   const [name2, setName2] = useState('');
   const [dob2, setDob2] = useState<Date | null>(null);
@@ -46,6 +53,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
   const [suggestions2, setSuggestions2] = useState<any[]>([]);
   const [showSuggestions2, setShowSuggestions2] = useState(false);
 
+  // ── Pickers ────────────────────────────────────────────────────────────────
   const [showDatePicker1, setShowDatePicker1] = useState(false);
   const [showTimePicker1, setShowTimePicker1] = useState(false);
   const [showDatePicker2, setShowDatePicker2] = useState(false);
@@ -54,19 +62,19 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
   const debounceTimeout1 = useRef<number | null>(null);
   const debounceTimeout2 = useRef<number | null>(null);
 
-  // Auto-sync gender
+  // ── Auto-sync gender ───────────────────────────────────────────────────────
   useEffect(() => {
-    if (gender1 === 'male') setGender2('female');
-    else setGender2('male');
+    setGender2(gender1 === 'male' ? 'female' : 'male');
   }, [gender1]);
 
   useEffect(() => {
-    if (gender2 === 'male') setGender1('female');
-    else setGender1('male');
+    setGender1(gender2 === 'male' ? 'female' : 'male');
   }, [gender2]);
 
+  // ── Helpers ────────────────────────────────────────────────────────────────
   const formatDate = (date: Date | null) =>
     date ? date.toISOString().split('T')[0] : '';
+
   const formatTime = (time: Date | null) =>
     time
       ? time.toLocaleTimeString('en-US', {
@@ -76,7 +84,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
         })
       : '';
 
-  // Location Search with debounce
+  // ── Location search ────────────────────────────────────────────────────────
   const searchLocation = (text: string, isPartner1: boolean) => {
     const setLocation = isPartner1 ? setLocation1 : setLocation2;
     const setSuggestions = isPartner1 ? setSuggestions1 : setSuggestions2;
@@ -86,7 +94,6 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
     const timeoutRef = isPartner1 ? debounceTimeout1 : debounceTimeout2;
 
     setLocation(text);
-
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     if (text.length < 3) {
@@ -133,53 +140,85 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
     }
   };
 
-  const handleCalculate = () => {
-    navigation.navigate('CompatibilityReport');
+  // ── Validation & submit ────────────────────────────────────────────────────
+  const handleCalculate = async () => {
+    // Basic validation
+    if (!name1 || !dob1 || !tob1 || !lat1) {
+      Alert.alert(
+        t('matching.validationTitle'),
+        t('matching.validationPartner1'),
+      );
+      return;
+    }
+    if (!name2 || !dob2 || !tob2 || !lat2) {
+      Alert.alert(
+        t('matching.validationTitle'),
+        t('matching.validationPartner2'),
+      );
+      return;
+    }
+
+    const result = await dispatch(
+      calculateGunMilan({
+        partner1: {
+          name: name1,
+          gender: gender1,
+          dob: formatDate(dob1),
+          tob: formatTime(tob1),
+          latitude: lat1,
+          longitude: lon1,
+        },
+        partner2: {
+          name: name2,
+          gender: gender2,
+          dob: formatDate(dob2),
+          tob: formatTime(tob2),
+          latitude: lat2,
+          longitude: lon2,
+        },
+      }),
+    );
+
+    if (calculateGunMilan.fulfilled.match(result)) {
+      navigation.navigate('CompatibilityReport');
+    } else {
+      Alert.alert(
+        t('matching.errorTitle'),
+        (result.payload as string) ?? t('matching.errorBody'),
+      );
+    }
   };
 
+  // ── Render gender buttons ──────────────────────────────────────────────────
   const renderGenderButtons = (
     gender: Gender,
     onChange: (g: Gender) => void,
   ) => (
     <View style={styles.genderContainer}>
-      <TouchableOpacity
-        style={[
-          styles.genderButton,
-          gender === 'male' && styles.genderButtonActive,
-        ]}
-        onPress={() => onChange('male')}
-      >
-        <Text
+      {(['male', 'female'] as Gender[]).map(g => (
+        <TouchableOpacity
+          key={g}
           style={[
-            styles.genderText,
-            gender === 'male' && styles.genderTextActive,
+            styles.genderButton,
+            gender === g && styles.genderButtonActive,
           ]}
+          onPress={() => onChange(g)}
         >
-          {t('matching.genderMale')}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.genderButton,
-          gender === 'female' && styles.genderButtonActive,
-        ]}
-        onPress={() => onChange('female')}
-      >
-        <Text
-          style={[
-            styles.genderText,
-            gender === 'female' && styles.genderTextActive,
-          ]}
-        >
-          {t('matching.genderFemale')}
-        </Text>
-      </TouchableOpacity>
+          <Text
+            style={[styles.genderText, gender === g && styles.genderTextActive]}
+          >
+            {g === 'male'
+              ? t('matching.genderMale')
+              : t('matching.genderFemale')}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      {/* Fixed Header */}
+      {/* Header */}
       <View style={styles.fixedHeader}>
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>{t('matching.screenTitle')}</Text>
@@ -201,7 +240,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
           </Text>
         </View>
 
-        {/* Partner 1 */}
+        {/* ── Partner 1 ── */}
         <View style={styles.partnerCard}>
           <View style={styles.partnerHeader}>
             <Icon name="account-outline" size={18} color={colors.primary} />
@@ -255,7 +294,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
             <View style={styles.suggestionBox}>
               <FlatList
                 data={suggestions1}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(_, i) => i.toString()}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.suggestionItem}
@@ -271,14 +310,14 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
           )}
         </View>
 
-        {/* Heart Separator */}
+        {/* Heart separator */}
         <View style={styles.heartSeparator}>
           <View style={styles.heartCircle}>
             <Icon name="heart" size={28} color={colors.textOnPrimary} />
           </View>
         </View>
 
-        {/* Partner 2 */}
+        {/* ── Partner 2 ── */}
         <View style={styles.partnerCard}>
           <View style={styles.partnerHeader}>
             <Icon name="account-outline" size={18} color={colors.primary} />
@@ -332,7 +371,7 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
             <View style={styles.suggestionBox}>
               <FlatList
                 data={suggestions2}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(_, i) => i.toString()}
                 renderItem={({ item }) => (
                   <TouchableOpacity
                     style={styles.suggestionItem}
@@ -348,59 +387,69 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
           )}
         </View>
 
-        {/* Date & Time Pickers */}
+        {/* Pickers */}
         {showDatePicker1 && (
           <DateTimePicker
             value={dob1 || new Date()}
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
-            onChange={(e, date) => {
+            onChange={(_, d) => {
               setShowDatePicker1(Platform.OS === 'ios');
-              if (date) setDob1(date);
+              if (d) setDob1(d);
             }}
             maximumDate={new Date()}
           />
         )}
-
         {showTimePicker1 && (
           <DateTimePicker
             value={tob1 || new Date()}
             mode="time"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={(e, time) => {
+            onChange={(_, t2) => {
               setShowTimePicker1(Platform.OS === 'ios');
-              if (time) setTob1(time);
+              if (t2) setTob1(t2);
             }}
           />
         )}
-
         {showDatePicker2 && (
           <DateTimePicker
             value={dob2 || new Date()}
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
-            onChange={(e, date) => {
+            onChange={(_, d) => {
               setShowDatePicker2(Platform.OS === 'ios');
-              if (date) setDob2(date);
+              if (d) setDob2(d);
             }}
             maximumDate={new Date()}
           />
         )}
-
         {showTimePicker2 && (
           <DateTimePicker
             value={tob2 || new Date()}
             mode="time"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={(e, time) => {
+            onChange={(_, t2) => {
               setShowTimePicker2(Platform.OS === 'ios');
-              if (time) setTob2(time);
+              if (t2) setTob2(t2);
             }}
           />
         )}
 
+        {/* CTA */}
         <View style={styles.ctaWrapper}>
-          <PrimaryButton title={t('matching.cta')} onPress={handleCalculate} />
+          {loading ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.loadingText}>
+                {t('matching.calculating')}
+              </Text>
+            </View>
+          ) : (
+            <PrimaryButton
+              title={t('matching.cta')}
+              onPress={handleCalculate}
+            />
+          )}
           <Text style={styles.footerNote}>{t('matching.footerNote')}</Text>
         </View>
       </ScrollView>
@@ -408,14 +457,9 @@ export function MatchingScreen({ navigation }: MatchingScreenProps) {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
-
-  fixedHeader: {
-    backgroundColor: colors.background,
-    zIndex: 10,
-  },
+  fixedHeader: { backgroundColor: colors.background, zIndex: 10 },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -429,11 +473,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 40,
-  },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 40 },
   sectionIntro: { marginBottom: 24 },
   sectionTitle: {
     fontSize: 18,
@@ -449,7 +489,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: 'center',
   },
-
   partnerCard: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
@@ -467,14 +506,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: colors.textPrimary,
   },
-
   fieldLabel: {
     fontSize: 14,
     color: colors.textSecondary,
     fontFamily: fonts.regular,
     marginBottom: 10,
   },
-
   genderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -498,14 +535,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: colors.textSecondary,
   },
-  genderTextActive: {
-    color: colors.primary,
-  },
-
-  heartSeparator: {
-    alignItems: 'center',
-    marginVertical: 12,
-  },
+  genderTextActive: { color: colors.primary },
+  heartSeparator: { alignItems: 'center', marginVertical: 12 },
   heartCircle: {
     width: 52,
     height: 52,
@@ -514,7 +545,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   suggestionBox: {
     borderWidth: 1,
     borderColor: colors.border,
@@ -528,12 +558,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  suggestionText: {
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-
+  suggestionText: { fontSize: 14, color: colors.textPrimary },
   ctaWrapper: { marginTop: 16 },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 14,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontFamily: fonts.medium,
+  },
   footerNote: {
     marginTop: 12,
     fontSize: 12,
