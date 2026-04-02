@@ -1,6 +1,10 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { HoroscopeScreen, KundaliOverviewScreen } from '../screens/HoroscopeScreen';
+import {
+  DailyHoroscopeScreen,
+  HoroscopeScreen,
+  KundaliOverviewScreen,
+} from '../screens/HoroscopeScreen';
 import type { HoroscopeStackParamList } from './types';
 
 const Stack = createStackNavigator<HoroscopeStackParamList>();
@@ -14,6 +18,7 @@ export function HoroscopeStackNavigator() {
     >
       {/* <Stack.Screen name="CreateKundali" component={HoroscopeScreen} /> */}
       <Stack.Screen name="KundaliOverview" component={KundaliOverviewScreen} />
+      <Stack.Screen name="DailyHoroscope" component={DailyHoroscopeScreen} />
     </Stack.Navigator>
   );
 }

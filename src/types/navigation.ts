@@ -16,6 +16,7 @@ export type HoroscopeStackParamList = {
         place?: string;
       }
     | undefined;
+  DailyHoroscope: undefined;
 };
 
 export type MainTabParamList = {

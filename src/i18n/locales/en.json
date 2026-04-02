@@ -119,8 +119,35 @@
     "retrograde": "Retrograde",
     "insightTitle": "Personalized Insight",
     "insightBody": "Mercury moving into your 10th house today suggests a perfect time for professional communication and signing contracts.",
-    "insightCta": "Read Full Report"
+    "insightCta": "Read Full Report",
+    "dailyHoroscopeEyebrow": "Today's Forecast",
+    "dailyHoroscopeTitle": "Daily Horoscope",
+    "dailyHoroscopeSub": "Tap to read your full reading",
+    "dailyHoroscopeCta": "Read Now"
   },
+
+     "dailyHoroscope": {
+      "screenTitle": "Daily Horoscope",
+      "dateLabel": "Today's Reading",
+      "authorPrefix": "by",
+      "mySign": "Your Sign",
+      "luckyNumber": "Lucky No.",
+      "luckyColor": "Lucky Color",
+      "predictionTitle": "Today's Prediction",
+      "ratingsTitle": "Today's Ratings",
+      "remedyTitle": "Today's Remedy",
+      "sourceLabel": "Source: AstroSage",
+      "loadingText": "Loading your horoscope...",
+      "errorText": "Horoscope unavailable. Please try again.",
+      "retryButton": "Try Again",
+      "refreshHint": "Pull down to refresh",
+      "rating_health": "Health",
+      "rating_wealth": "Wealth",
+      "rating_family": "Family",
+      "rating_love": "Love",
+      "rating_career": "Career",
+      "rating_marriage": "Marriage"
+    },
   "kundali": {
     "screenTitle": "Create Kundali",
     "birthDetailsTitle": "Birth Details",

@@ -119,8 +119,35 @@
     "retrograde": "वक्री",
     "insightTitle": "व्यक्तिगत मार्गदर्शन",
     "insightBody": "आज बुध आपके दशम भाव में प्रवेश कर रहा है, जो पेशेवर बातचीत और अनुबंधों पर हस्ताक्षर के लिए उत्तम समय दर्शाता है।",
-    "insightCta": "पूरा विवरण पढ़ें"
+    "insightCta": "पूरा विवरण पढ़ें",
+    "dailyHoroscopeEyebrow": "आज का पूर्वानुमान",
+    "dailyHoroscopeTitle": "दैनिक राशिफल",
+    "dailyHoroscopeSub": "पूरा राशिफल पढ़ने के लिए टैप करें",
+    "dailyHoroscopeCta": "अभी पढ़ें"
   },
+   
+      "dailyHoroscope": {
+      "screenTitle": "दैनिक राशिफल",
+      "dateLabel": "आज का राशिफल",
+      "authorPrefix": "लेखक",
+      "mySign": "आपकी राशि",
+      "luckyNumber": "शुभ अंक",
+      "luckyColor": "शुभ रंग",
+      "predictionTitle": "आज का राशिफल",
+      "ratingsTitle": "आज की ग्रह स्थिति",
+      "remedyTitle": "आज का उपाय",
+      "sourceLabel": "स्रोत: AstroSage",
+      "loadingText": "राशिफल लोड हो रहा है...",
+      "errorText": "राशिफल उपलब्ध नहीं है। कृपया पुनः प्रयास करें।",
+      "retryButton": "पुनः प्रयास करें",
+      "refreshHint": "ताज़ा करने के लिए नीचे खींचें",
+      "rating_health": "स्वास्थ्य",
+      "rating_wealth": "धन",
+      "rating_family": "परिवार",
+      "rating_love": "प्रेम",
+      "rating_career": "कार्य",
+      "rating_marriage": "विवाह"
+    },
   "kundali": {
     "screenTitle": "कुंडली बनाएं",
     "birthDetailsTitle": "जन्म विवरण",

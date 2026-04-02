@@ -58,6 +58,22 @@ const planetColorMap: Record<string, string> = {
   Ketu: '#FFE8F0',
 };
 
+// Sign → zodiac key for the horoscope banner
+const SIGN_TO_ZODIAC: Record<string, string> = {
+  Aries: 'aries',
+  Taurus: 'taurus',
+  Gemini: 'gemini',
+  Cancer: 'cancer',
+  Leo: 'leo',
+  Virgo: 'virgo',
+  Libra: 'libra',
+  Scorpio: 'scorpio',
+  Sagittarius: 'sagittarius',
+  Capricorn: 'capricorn',
+  Aquarius: 'aquarius',
+  Pisces: 'pisces',
+};
+
 // Get house suffix
 function houseSuffix(n: number): string {
   if (n === 1) return '1st';
@@ -87,7 +103,13 @@ export function HomeScreen({ navigation }: any) {
   const moonSign = moonData?.sign ?? t('home.moonSignSign');
   const moonNakshatra = moonData?.nakshatra ?? t('home.moonSignSub');
 
-  // Top 5 planets to show in "Planetary Snapshot"
+  // Zodiac icon for the horoscope banner
+  const moonZodiacIcon =
+    moonSign && zodiacIconMap[moonSign]
+      ? zodiacIconMap[moonSign]
+      : 'zodiac-virgo';
+
+  // Top planets to show in "Planetary Snapshot"
   const keyPlanets = [
     'Sun',
     'Moon',
@@ -104,7 +126,6 @@ export function HomeScreen({ navigation }: any) {
       <View style={styles.fixedHeader}>
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>{t('home.headerTitle')}</Text>
-
           <View style={styles.headerRight}>
             <TouchableOpacity>
               <Icon name="bell-outline" size={22} color={colors.textPrimary} />
@@ -122,13 +143,11 @@ export function HomeScreen({ navigation }: any) {
         <View style={styles.card}>
           <View style={styles.profileRow}>
             <View style={styles.avatarWrapper}>
-              {/* Profile Icon instead of placeholder image */}
               <View style={styles.avatarIconContainer}>
                 <Icon name="account-circle" size={64} color={colors.primary} />
               </View>
               <View style={styles.statusDot} />
             </View>
-
             <View style={styles.profileText}>
               <Text style={styles.greeting}>
                 {t('home.greeting', { name: userName })}
@@ -147,6 +166,46 @@ export function HomeScreen({ navigation }: any) {
             </View>
           </View>
         </View>
+
+        {/* ── Daily Horoscope Banner ── */}
+        <TouchableOpacity
+          style={styles.horoscopeBanner}
+          activeOpacity={0.88}
+          onPress={() =>
+            navigation.navigate('Horoscope', {
+              screen: 'DailyHoroscope',
+            } as any)
+          }
+        >
+          <View style={styles.horoscopeBannerLeft}>
+            <View style={styles.horoscopeBannerIconWrap}>
+              <Icon name={moonZodiacIcon} size={28} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.horoscopeBannerEyebrow}>
+                {t('home.dailyHoroscopeEyebrow')}
+              </Text>
+              <Text style={styles.horoscopeBannerTitle}>
+                {t('home.dailyHoroscopeTitle')}
+              </Text>
+              {moonSign ? (
+                <Text style={styles.horoscopeBannerSub}>
+                  {moonSign} · {t('home.dailyHoroscopeSub')}
+                </Text>
+              ) : (
+                <Text style={styles.horoscopeBannerSub}>
+                  {t('home.dailyHoroscopeSub')}
+                </Text>
+              )}
+            </View>
+          </View>
+          <View style={styles.horoscopeBannerCta}>
+            <Text style={styles.horoscopeBannerCtaText}>
+              {t('home.dailyHoroscopeCta')}
+            </Text>
+            <Icon name="chevron-right" size={16} color={colors.primary} />
+          </View>
+        </TouchableOpacity>
 
         {/* ── Natal Summary ── */}
         <View style={styles.sectionHeaderRow}>
@@ -272,7 +331,6 @@ export function HomeScreen({ navigation }: any) {
           {t('home.currentPeriodsTitle')}
         </Text>
 
-        {/* Jupiter Period */}
         <View style={styles.periodCard}>
           <View style={styles.periodIconWrapperJupiter}>
             <Text style={styles.periodIconText}>
@@ -295,7 +353,6 @@ export function HomeScreen({ navigation }: any) {
           </View>
         </View>
 
-        {/* Saturn Period */}
         <View style={styles.periodCard}>
           <View style={styles.periodIconWrapperSaturn}>
             <Icon name="orbit-variant" size={20} color={colors.primary} />
@@ -360,16 +417,9 @@ export function HomeScreen({ navigation }: any) {
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  safeArea: { flex: 1, backgroundColor: colors.background },
 
-  // Fixed Header
-  fixedHeader: {
-    backgroundColor: colors.background,
-    zIndex: 10,
-  },
+  fixedHeader: { backgroundColor: colors.background, zIndex: 10 },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -383,33 +433,23 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  // Scroll Content
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 32,
-  },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 32 },
 
   // Profile Card
   card: {
     backgroundColor: colors.backgroundSecondary,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 24,
+    marginBottom: 16,
     shadowColor: '#000000',
     shadowOpacity: 0.05,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  profileRow: { flexDirection: 'row', alignItems: 'center' },
   avatarWrapper: {
     width: 64,
     height: 64,
@@ -437,24 +477,15 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.backgroundSecondary,
   },
-  profileText: {
-    flex: 1,
-  },
+  profileText: { flex: 1 },
   greeting: {
     fontSize: 18,
     color: colors.textPrimary,
     fontFamily: fonts.bold,
     marginBottom: 4,
   },
-  dateLine: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 6,
-  },
-  auspiciousRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  dateLine: { fontSize: 13, color: colors.textSecondary, marginBottom: 6 },
+  auspiciousRow: { flexDirection: 'row', alignItems: 'center' },
   auspiciousText: {
     marginLeft: 6,
     fontSize: 12,
@@ -464,7 +495,68 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Rest of the styles remain unchanged
+  // ── Daily Horoscope Banner ──────────────────────────────────────────────────
+  horoscopeBanner: {
+    backgroundColor: colors.logoBackground,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: colors.logoBorder,
+  },
+  horoscopeBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 10,
+  },
+  horoscopeBannerIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.backgroundSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.primary + '44',
+  },
+  horoscopeBannerEyebrow: {
+    fontSize: 10,
+    color: colors.primary,
+    fontFamily: fonts.bold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 3,
+  },
+  horoscopeBannerTitle: {
+    fontSize: 16,
+    color: colors.textPrimary,
+    fontFamily: fonts.bold,
+    marginBottom: 3,
+  },
+  horoscopeBannerSub: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    fontFamily: fonts.regular,
+  },
+  horoscopeBannerCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 10,
+    paddingVertical: 9,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 4,
+  },
+  horoscopeBannerCtaText: {
+    fontSize: 13,
+    color: colors.primary,
+    fontFamily: fonts.bold,
+  },
+
+  // Natal Summary
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -484,11 +576,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
   },
 
-  summaryRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
+  summaryRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   summaryCard: {
     flex: 1,
     backgroundColor: colors.backgroundSecondary,
@@ -507,11 +595,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  summaryLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
+  summaryLabel: { fontSize: 12, color: colors.textSecondary, marginBottom: 4 },
   summaryValue: {
     fontSize: 18,
     fontWeight: '700',
@@ -540,33 +624,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     justifyContent: 'space-between',
   },
-  sunLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sunLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: 2,
-  },
+  sunLeft: { flexDirection: 'row', alignItems: 'center' },
+  sunLabel: { fontSize: 12, color: colors.textSecondary, marginBottom: 2 },
   sunValue: {
     fontSize: 15,
     fontWeight: '700',
     color: colors.textPrimary,
     fontFamily: fonts.bold,
   },
-  sunSub: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  sunRight: {
-    alignItems: 'center',
-  },
-  sunHouseLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-  },
+  sunSub: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  sunRight: { alignItems: 'center' },
+  sunHouseLabel: { fontSize: 11, color: colors.textSecondary },
   sunHouseValue: {
     fontSize: 18,
     fontWeight: '700',
@@ -647,11 +715,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF4D6',
     marginRight: 12,
   },
-  periodIconText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.primary,
-  },
+  periodIconText: { fontSize: 16, fontWeight: '700', color: colors.primary },
   periodTextWrapper: { flex: 1 },
   periodTitle: {
     fontSize: 14,
@@ -686,11 +750,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 4,
   },
-  kpHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
+  kpHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   kpTitle: {
     fontSize: 14,
     fontWeight: '600',
@@ -698,16 +758,8 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontFamily: fonts.medium,
   },
-  kpSub: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginBottom: 10,
-  },
-  kpPillRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
+  kpSub: { fontSize: 12, color: colors.textSecondary, marginBottom: 10 },
+  kpPillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   kpPill: {
     backgroundColor: colors.logoBackground,
     borderRadius: 20,
