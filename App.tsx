@@ -25,9 +25,7 @@ function App() {
             barStyle={isDarkMode ? 'light-content' : 'dark-content'}
             backgroundColor={colors.background}
           />
-          <NavigationContainer>
-            <RootNavigator />
-          </NavigationContainer>
+          <RootNavigator />
         </SafeAreaProvider>
       </Provider>
     </GestureHandlerRootView>

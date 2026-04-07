@@ -1,8 +1,9 @@
 /**
  * src/hooks/useNotifications.ts
  *
- * Drop into MainTabNavigator.
- * Now also initialises Notifee channels, permissions, and event listeners.
+ * Handles in-app navigation when a notification is pressed.
+ * Receives navigationRef from App.tsx so we always have access
+ * to the root navigator regardless of which screen is active.
  */
 
 import { useEffect } from 'react';
@@ -20,13 +21,83 @@ import {
 import {
   createNotificationChannels,
   requestNotifeePermission,
-  handleNotifeeEvent,
   scheduleDailyHoroscope,
 } from '../services/notifeeService';
 
 import notifee, { EventType } from '@notifee/react-native';
+import type { NavigationContainerRef } from '@react-navigation/native';
+import type { RootStackParamList } from '../types/navigation';
 
-export function useNotifications(navigate?: (screen: string) => void) {
+// ─── Screen map ───────────────────────────────────────────────────────────────
+// The `screen` value in your notification payload (data.screen) must match
+// one of these keys exactly. Add new screens here as the app grows.
+
+type ScreenMapping = {
+  tab: string;
+  screen: string;
+};
+
+const SCREEN_MAP: Record<string, ScreenMapping> = {
+  // Horoscope stack
+  DailyHoroscopeScreen: { tab: 'Horoscope', screen: 'DailyHoroscope' },
+  KundaliOverview: { tab: 'HoroscopeTab', screen: 'KundaliOverview' },
+
+  // Predictions stack
+  FuturePredictions: { tab: 'Predictions', screen: 'FuturePredictions' },
+  CareerPrediction: { tab: 'Predictions', screen: 'CareerPrediction' },
+  MarriagePrediction: { tab: 'Predictions', screen: 'MarriagePrediction' },
+  FinancePrediction: { tab: 'Predictions', screen: 'FinancePrediction' },
+  HealthPrediction: { tab: 'Predictions', screen: 'HealthPrediction' },
+
+  // Match stack
+  Matching: { tab: 'Match', screen: 'Matching' },
+  CompatibilityReport: { tab: 'Match', screen: 'CompatibilityReport' },
+
+  // Single-screen tabs
+  Home: { tab: 'Home', screen: 'Home' },
+  Profile: { tab: 'Profile', screen: 'Profile' },
+};
+
+// ─── Navigation helper ────────────────────────────────────────────────────────
+
+export function navigateFromNotification(
+  screen: string,
+  navigationRef: NavigationContainerRef<RootStackParamList>,
+) {
+  console.log(`[Navigate] Attempting navigation to screen: "${screen}"`);
+
+  if (!navigationRef.isReady()) {
+    console.warn('[Navigate] Navigator NOT ready, skipping');
+    return;
+  }
+
+  const mapping = SCREEN_MAP[screen];
+  if (!mapping) {
+    console.warn(`[Navigate] UNKNOWN screen in SCREEN_MAP: "${screen}"`);
+    console.log('[Navigate] Available keys:', Object.keys(SCREEN_MAP));
+    return;
+  }
+
+  console.log(`[Navigate] Found mapping:`, mapping);
+
+  try {
+    navigationRef.navigate('MainTabs' as any, {
+      screen: mapping.tab,
+      params: { screen: mapping.screen },
+    });
+    console.log(
+      `[Navigate] SUCCESS - Navigated to ${mapping.tab} → ${mapping.screen}`,
+    );
+  } catch (error) {
+    console.error('[Navigate] Navigation failed with error:', error);
+  }
+}
+
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+export function useNotifications(
+  navigationRef: NavigationContainerRef<RootStackParamList>,
+) {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -35,50 +106,45 @@ export function useNotifications(navigate?: (screen: string) => void) {
     let unsubNotifee: (() => void) | undefined;
 
     const init = async () => {
-      // 1. Create Android notification channels (idempotent, safe to repeat)
       await createNotificationChannels();
 
-      // 2. Request FCM permission
       const fcmGranted = await requestNotificationPermission();
       if (!fcmGranted) {
         console.warn('[Notifications] FCM permission denied');
         return;
       }
 
-      // 3. Request Notifee permission (needed on iOS)
       await requestNotifeePermission();
 
-      // 4. Get current FCM token and sync to backend via PATCH /api/users/fcm-token
-      //    Handles both first launch and cases where token changed since last session
       const token = await initFCMToken();
       if (token) {
         dispatch(updateFCMToken(token));
       }
 
-      // 5. Foreground FCM listener → Notifee display
       unsubForeground = listenForForegroundMessages();
 
-      // 6. Token refresh → sync new token to backend + update Redux
       unsubTokenRefresh = listenForTokenRefresh(newToken => {
         dispatch(updateFCMToken(newToken));
       });
 
-      // 7. Notifee foreground event listener (notification press → navigate)
+      // Foreground: app open, user taps notification banner
       unsubNotifee = notifee.onForegroundEvent(event => {
         if (event.type === EventType.PRESS) {
-          handleNotifeeEvent(event, screen => {
-            navigate?.(screen);
-          });
+          const screen = event.detail.notification?.data?.screen as
+            | string
+            | undefined;
+          if (screen) {
+            navigateFromNotification(screen, navigationRef);
+          }
         }
       });
 
-      // 8. Schedule daily horoscope local trigger at 7:00 AM
       if (token) {
         await scheduleDailyHoroscope(
           '🌟 Your Daily Horoscope',
           'Tap to see what the stars have in store for you today.',
-          7, // hour (IST)
-          0, // minute
+          7,
+          0,
         );
       }
     };
@@ -90,5 +156,5 @@ export function useNotifications(navigate?: (screen: string) => void) {
       unsubTokenRefresh?.();
       unsubNotifee?.();
     };
-  }, [dispatch, navigate]);
+  }, [dispatch, navigationRef]);
 }

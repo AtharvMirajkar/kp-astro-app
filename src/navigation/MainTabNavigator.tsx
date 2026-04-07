@@ -1,3 +1,11 @@
+/**
+ * src/navigation/MainTabNavigator.tsx
+ *
+ * useNotifications is now called from RootNavigator (via AppNavigator),
+ * NOT here. This keeps the hook at the top of the tree where it has
+ * access to the root navigationRef.
+ */
+
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,13 +18,15 @@ import { PredictionsStackNavigator } from './PredictionsStackNavigator';
 
 import { colors } from '../constants/colors';
 import type { MainTabParamList } from './types';
-import { useNotifications } from '../hooks/useNotifications';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export function MainTabNavigator() {
   const { t } = useTranslation();
-  useNotifications();
+
+  // ⚠️  useNotifications() has been removed from here.
+  //     It is now called in AppNavigator inside RootNavigator.tsx
+  //     so it receives the root navigationRef.
 
   return (
     <Tab.Navigator
@@ -38,7 +48,7 @@ export function MainTabNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: t('tabs:home'),
+          tabBarLabel: t('tabs.home'),
           tabBarIcon: ({ color, size }) => (
             <Icon name="home-variant-outline" size={size} color={color} />
           ),
@@ -71,7 +81,7 @@ export function MainTabNavigator() {
         name="Match"
         component={MatchStackNavigator}
         options={{
-          tabBarLabel: t('tabs:match'),
+          tabBarLabel: t('tabs.match'),
           tabBarIcon: ({ color, size }) => (
             <Icon name="heart-multiple-outline" size={size} color={color} />
           ),
