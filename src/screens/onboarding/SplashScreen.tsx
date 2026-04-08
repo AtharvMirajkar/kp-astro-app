@@ -9,18 +9,15 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { colors } from '../../constants/colors';
 import { fonts } from '../../constants';
+import { colors } from '../../constants/colors';
 
 const { width, height } = Dimensions.get('window');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
+const PRIMARY = colors.primary; // #FF772F (Orange)
+const RING_SIZE = width * 0.6;
 
-const PRIMARY = '#C9A227'; // gold
-const PRIMARY_BG = '#1A1608'; // deep warm dark — gives a luxurious astrology feel
-const RING_SIZE = width * 0.62;
-
-// Zodiac signs arranged around the ring
 const ZODIAC_ICONS = [
   'zodiac-aries',
   'zodiac-taurus',
@@ -37,152 +34,124 @@ const ZODIAC_ICONS = [
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
 interface SplashScreenProps {
-  onFinish: () => void; // called when animation is done — trigger navigation
+  onFinish: () => void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-
 export function SplashScreen({ onFinish }: SplashScreenProps) {
-  // ── Animation values ──────────────────────────────────────────────────────
   const ringRotate = useRef(new Animated.Value(0)).current;
-  const ringScale = useRef(new Animated.Value(0.6)).current;
+  const ringScale = useRef(new Animated.Value(0.65)).current;
   const ringOpacity = useRef(new Animated.Value(0)).current;
 
-  const logoScale = useRef(new Animated.Value(0)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const logoGlow = useRef(new Animated.Value(0)).current;
+  const centerScale = useRef(new Animated.Value(0)).current;
+  const centerOpacity = useRef(new Animated.Value(0)).current;
 
   const titleOpacity = useRef(new Animated.Value(0)).current;
-  const titleTranslateY = useRef(new Animated.Value(16)).current;
+  const titleTranslateY = useRef(new Animated.Value(25)).current;
 
   const taglineOpacity = useRef(new Animated.Value(0)).current;
-  const taglineTranslateY = useRef(new Animated.Value(12)).current;
+  const taglineTranslateY = useRef(new Animated.Value(18)).current;
 
   const dotsOpacity = useRef(new Animated.Value(0)).current;
+  const screenOpacity = useRef(new Animated.Value(1)).current;
 
-  const screenOpacity = useRef(new Animated.Value(1)).current; // for final fade-out
-
-  // ── Sequence ──────────────────────────────────────────────────────────────
   useEffect(() => {
     StatusBar.setHidden(true);
 
-    // 1. Ring fades + scales in while starting to rotate
+    // Ring Animation
     Animated.parallel([
       Animated.timing(ringOpacity, {
         toValue: 1,
-        duration: 600,
+        duration: 700,
         useNativeDriver: true,
       }),
       Animated.spring(ringScale, {
         toValue: 1,
-        friction: 6,
-        tension: 50,
+        friction: 7,
+        tension: 45,
         useNativeDriver: true,
       }),
       Animated.loop(
         Animated.timing(ringRotate, {
           toValue: 1,
-          duration: 14000,
+          duration: 15000,
           easing: Easing.linear,
           useNativeDriver: true,
         }),
       ),
     ]).start();
 
-    // 2. Logo pops in after 300ms
+    // Center Circle Animation
     Animated.sequence([
-      Animated.delay(300),
+      Animated.delay(400),
       Animated.parallel([
-        Animated.spring(logoScale, {
+        Animated.spring(centerScale, {
           toValue: 1,
-          friction: 5,
-          tension: 80,
+          friction: 6,
+          tension: 70,
           useNativeDriver: true,
         }),
-        Animated.timing(logoOpacity, {
+        Animated.timing(centerOpacity, {
           toValue: 1,
-          duration: 400,
+          duration: 500,
           useNativeDriver: true,
         }),
       ]),
     ]).start();
 
-    // 3. Logo glow pulse (looping)
+    // Title
     Animated.sequence([
-      Animated.delay(700),
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(logoGlow, {
-            toValue: 1,
-            duration: 1200,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-          Animated.timing(logoGlow, {
-            toValue: 0,
-            duration: 1200,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: true,
-          }),
-        ]),
-      ),
-    ]).start();
-
-    // 4. App name slides up after 700ms
-    Animated.sequence([
-      Animated.delay(700),
+      Animated.delay(800),
       Animated.parallel([
         Animated.timing(titleOpacity, {
           toValue: 1,
-          duration: 500,
+          duration: 600,
           useNativeDriver: true,
         }),
         Animated.timing(titleTranslateY, {
           toValue: 0,
-          duration: 500,
+          duration: 600,
           easing: Easing.out(Easing.quad),
           useNativeDriver: true,
         }),
       ]),
     ]).start();
 
-    // 5. Tagline slides up after 1000ms
+    // Tagline
     Animated.sequence([
-      Animated.delay(1000),
+      Animated.delay(1100),
       Animated.parallel([
         Animated.timing(taglineOpacity, {
           toValue: 1,
-          duration: 500,
+          duration: 600,
           useNativeDriver: true,
         }),
         Animated.timing(taglineTranslateY, {
           toValue: 0,
-          duration: 500,
+          duration: 600,
           easing: Easing.out(Easing.quad),
           useNativeDriver: true,
         }),
       ]),
     ]).start();
 
-    // 6. Loading dots fade in after 1200ms
+    // Dots
     Animated.sequence([
-      Animated.delay(1200),
+      Animated.delay(1500),
       Animated.timing(dotsOpacity, {
         toValue: 1,
-        duration: 400,
+        duration: 500,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // 7. Fade the whole screen out after 2800ms → call onFinish
+    // Final fade out
     Animated.sequence([
-      Animated.delay(2800),
+      Animated.delay(3000),
       Animated.timing(screenOpacity, {
         toValue: 0,
-        duration: 500,
-        easing: Easing.inOut(Easing.quad),
+        duration: 600,
         useNativeDriver: true,
       }),
     ]).start(() => {
@@ -191,42 +160,32 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
     });
   }, []);
 
-  // ── Derived interpolations ────────────────────────────────────────────────
   const ringDeg = ringRotate.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
   });
 
-  const glowOpacity = logoGlow.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.15, 0.55],
-  });
-
-  const glowScale = logoGlow.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.15],
-  });
-
   return (
     <Animated.View style={[styles.container, { opacity: screenOpacity }]}>
-      {/* ── Subtle radial background glow ── */}
+      {/* Background subtle glow */}
       <View style={styles.bgGlow} />
 
-      {/* ── Mandala / Ring ── */}
+      {/* Rotating Zodiac Ring */}
       <Animated.View
         style={[
-          styles.ringWrap,
+          styles.ringContainer,
           {
             opacity: ringOpacity,
             transform: [{ scale: ringScale }, { rotate: ringDeg }],
           },
         ]}
       >
-        {ZODIAC_ICONS.map((icon, i) => {
-          const angle = (i / ZODIAC_ICONS.length) * 2 * Math.PI;
-          const r = RING_SIZE / 2 - 20;
-          const x = r * Math.cos(angle - Math.PI / 2);
-          const y = r * Math.sin(angle - Math.PI / 2);
+        {ZODIAC_ICONS.map((icon, index) => {
+          const angle = (index / ZODIAC_ICONS.length) * 2 * Math.PI;
+          const radius = RING_SIZE / 2 - 26;
+          const x = radius * Math.cos(angle - Math.PI / 2);
+          const y = radius * Math.sin(angle - Math.PI / 2);
+
           return (
             <Animated.View
               key={icon}
@@ -236,7 +195,6 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
                   transform: [
                     { translateX: x },
                     { translateY: y },
-                    // counter-rotate so icons stay upright
                     {
                       rotate: ringRotate.interpolate({
                         inputRange: [0, 1],
@@ -249,43 +207,28 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
             >
               <Icon
                 name={icon}
-                size={16}
+                size={18}
                 color={PRIMARY}
-                style={{ opacity: 0.7 }}
+                style={{ opacity: 0.85 }}
               />
             </Animated.View>
           );
         })}
 
-        {/* Dashed ring border */}
         <View style={styles.ringBorder} />
       </Animated.View>
 
-      {/* ── Logo glow halo ── */}
+      {/* Center Circle */}
       <Animated.View
         style={[
-          styles.logoGlow,
           {
-            opacity: glowOpacity,
-            transform: [{ scale: glowScale }],
+            opacity: centerOpacity,
+            transform: [{ scale: centerScale }],
           },
         ]}
       />
 
-      {/* ── Centre logo ── */}
-      <Animated.View
-        style={[
-          styles.logoCircle,
-          {
-            opacity: logoOpacity,
-            transform: [{ scale: logoScale }],
-          },
-        ]}
-      >
-        <Icon name="star-david" size={52} color={PRIMARY} />
-      </Animated.View>
-
-      {/* ── App name ── */}
+      {/* App Name - Now in Orange */}
       <Animated.Text
         style={[
           styles.appName,
@@ -298,7 +241,7 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
         KP Jyotish
       </Animated.Text>
 
-      {/* ── Tagline ── */}
+      {/* Tagline - Warm Orange tone */}
       <Animated.Text
         style={[
           styles.tagline,
@@ -311,8 +254,8 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
         Ancient wisdom. Precise predictions.
       </Animated.Text>
 
-      {/* ── Loading dots ── */}
-      <Animated.View style={[styles.dotsRow, { opacity: dotsOpacity }]}>
+      {/* Loading Dots */}
+      <Animated.View style={[styles.dotsContainer, { opacity: dotsOpacity }]}>
         {[0, 1, 2].map(i => (
           <LoadingDot key={i} delay={i * 180} />
         ))}
@@ -321,8 +264,7 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
   );
 }
 
-// ─── Loading dot sub-component ────────────────────────────────────────────────
-
+// Loading Dot Component
 function LoadingDot({ delay }: { delay: number }) {
   const bounce = useRef(new Animated.Value(0)).current;
 
@@ -331,138 +273,106 @@ function LoadingDot({ delay }: { delay: number }) {
       Animated.sequence([
         Animated.delay(delay),
         Animated.timing(bounce, {
-          toValue: -6,
-          duration: 350,
+          toValue: -5.5,
+          duration: 380,
           easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
         Animated.timing(bounce, {
           toValue: 0,
-          duration: 350,
+          duration: 380,
           easing: Easing.inOut(Easing.sin),
           useNativeDriver: true,
         }),
-        Animated.delay(300),
+        Animated.delay(350),
       ]),
     ).start();
   }, []);
 
-  return (
-    <Animated.View
-      style={[styles.dot, { transform: [{ translateY: bounce }] }]}
-    />
-  );
+  return <Animated.View style={styles.dot} />;
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: PRIMARY_BG,
+    backgroundColor: colors.backgroundSecondary,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  // Warm radial glow behind everything
   bgGlow: {
     position: 'absolute',
-    width: width * 1.2,
-    height: width * 1.2,
-    borderRadius: width * 0.6,
+    width: width * 1.25,
+    height: width * 1.25,
+    borderRadius: width * 0.625,
     backgroundColor: PRIMARY,
-    opacity: 0.04,
-    top: height * 0.5 - width * 0.6,
+    opacity: 0.06,
+    top: height * 0.45 - width * 0.625,
   },
 
-  // Rotating zodiac ring
-  ringWrap: {
+  ringContainer: {
     position: 'absolute',
     width: RING_SIZE,
     height: RING_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   ringBorder: {
     position: 'absolute',
-    width: RING_SIZE - 4,
-    height: RING_SIZE - 4,
-    borderRadius: (RING_SIZE - 4) / 2,
-    borderWidth: 1,
+    width: RING_SIZE - 6,
+    height: RING_SIZE - 6,
+    borderRadius: (RING_SIZE - 6) / 2,
+    borderWidth: 1.6,
     borderColor: PRIMARY,
     borderStyle: 'dashed',
-    opacity: 0.3,
+    opacity: 0.28,
   },
+
   zodiacIconWrap: {
     position: 'absolute',
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: 'rgba(201,162,39,0.12)',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 119, 47, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(201,162,39,0.25)',
+    borderColor: 'rgba(255, 119, 47, 0.22)',
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  // Logo glow halo (behind the circle)
-  logoGlow: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: PRIMARY,
-  },
-
-  // Centre logo circle
-  logoCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#231C05',
-    borderWidth: 2,
-    borderColor: PRIMARY,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // Elevation for depth
-    shadowColor: PRIMARY,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-
-  // App name
+  // Orange App Name
   appName: {
-    marginTop: RING_SIZE / 2 + 32,
-    fontSize: 32,
-    color: '#F5E9C8',
+    marginTop: RING_SIZE / 2 + 65,
+    fontSize: 35,
+    color: PRIMARY, // ← Orange as requested
     fontFamily: fonts.bold,
-    letterSpacing: 1.5,
+    letterSpacing: 2.4,
     textAlign: 'center',
   },
 
-  // Tagline
+  // Warm orange tagline
   tagline: {
-    marginTop: 8,
-    fontSize: 13,
-    color: 'rgba(201,162,39,0.75)',
+    marginTop: 10,
+    fontSize: 14.5,
+    color: '#FF8A4D', // Soft orange variant (looks elegant)
     fontFamily: fonts.regular,
-    letterSpacing: 0.8,
+    letterSpacing: 0.7,
     textAlign: 'center',
   },
 
-  // Loading dots
-  dotsRow: {
+  dotsContainer: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 48,
+    gap: 9,
+    marginTop: 60,
   },
+
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: PRIMARY,
-    opacity: 0.7,
+    opacity: 0.78,
   },
 });
