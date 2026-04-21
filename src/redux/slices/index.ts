@@ -3,3 +3,4 @@ export { default as authReducer } from './authSlice';
 export { default as kundaliReducer } from './kundaliSlice';
 export { default as subscriptionReducer } from './subscriptionSlice';
 export { default as matchingReducer } from './matchingSlice';
+export { default as healthPredictionReducer } from './healthPredictionSlice';
